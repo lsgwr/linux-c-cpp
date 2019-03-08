@@ -1,7 +1,7 @@
 # linux-c-51cto
 > 51CTO上的C语言基础和Linux编程视频教程
 
-+ [C语言深度解析](https://edu.51cto.com/topic/1756.html)
+## [C语言深度解析](https://edu.51cto.com/topic/1756.html)
   + [第01章_编译-链接](https://edu.51cto.com/course/10874.html):编译链接详细过程、编译器组成结构、目标文件格式、c程序的内存结构等
   + [第02章_预编译](https://edu.51cto.com/course/14241.html):宏定义、条件编译、代码跨平台、特殊预编译关键字、预定义宏、头文件包含等。
   + [第03章_存储类-生命周期-作用域-链接域](https://edu.51cto.com/course/14264.html):回顾c内存映像，存储类与auto/static/register关键字，指令/常量/变量的生命周期，变量与函数的作用域，链接域与extern/static等。
@@ -12,4 +12,5 @@
   + [第08章_杂项—c语言中无法独立成章的知识](https://edu.51cto.com/course/15550.html):自动类型转换，大小端序，逗号表达式，typedef，字节/字/半字/位宽，编译器优化，extern "C"，程序调试，可变参函数/可变参宏，do{}while(0)的妙用，c内嵌汇编，断言等。
   + [第09章_位操作和标准IO函数](https://edu.51cto.com/course/15577.html):微操作：&，|，~ ，^，<<，>>标准IO函数：fopen、fclose、fscanf、scanf、fgetc、getc、getcha、fgets、gets、freadr等标准IO的缓存问题。
   + [第10章_多线程和网络编程](https://edu.51cto.com/course/15643.html)：多线程，网络编程，数据库，数据结构，顺序表，链表概述，单链表，双链表，队列 和 栈，Linux内核链表等。
-+ [Linux系统及网络编程视频](https://edu.51cto.com/topic/1527.html)
+  
+## [Linux系统及网络编程视频](https://edu.51cto.com/topic/1527.html)
