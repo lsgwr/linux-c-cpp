@@ -28,6 +28,7 @@
     - 验证.i文件是不是ascii文件。
 
     - 验证预处理后.c中的宏、include、条件编译，在.i中还能否见到。
+    - 这一步得到的.i文件会比较大，但是不用担心，下面的步骤生成的文件会把系统库文件排除出去，比如下一步生成的helloworld.s就会和helloworld.c差不多大了
 									
 									
 ### 2）cc1 `MinGW/libexec/gcc/mingw32/5.1.0/cc1.exe`
