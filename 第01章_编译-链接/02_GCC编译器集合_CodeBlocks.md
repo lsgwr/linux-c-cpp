@@ -54,7 +54,9 @@
   + （a）汇编程序（汇编器）：将汇编源码翻译为纯二进制的机器指令，放到.o文件中
 
   + （b）演示<br/>
-        `as helloworld.s -o helloworld.o`
+        `as helloworld.s -o helloworld.o`<br/>
+	出现`invalid instruction suffix for 'push'`错误时只需要在.s文件开头加上`.code32`即可
+	
 									
 									
 ### 4）ld、collect2 <br/>
