@@ -57,8 +57,9 @@
 									
 									
 ### 4）ld、collect2 <br/>
-      ld路径：`MingW\bin\ld.exe`、`MinGW\mingw32\bin\ld.exe` 
-      collect2路径：`MingW\libexec\gcc\mingw32\4.9.2\collect2`
+      
+ld路径：`MingW\bin\ld.exe`、`MinGW\mingw32\bin\ld.exe` 
+collect2路径：`MingW\libexec\gcc\mingw32\4.9.2\collect2`
 
   + （a）链接程序（链接器（静态链接器））
         将所有的.o文件（自己的、编译器提供的）和库（动态库、静态库）链接在一起，得到可以运行的可执行文件。
@@ -71,11 +72,11 @@
       实际上我们完全可以自己调用collect2和ld这两个程序（命令）来进行链接，但是链接并不是一件容易的事情，链接的时候需要跟大量的参数和选项，这些参数和选项我们自己并不清楚，所以我们自己调用collect2 和 ld来链接的话，实际上操作起来比较困难。<br/>
       所以链接的话，我们直接使用gcc程序来链接，gcc会自动调用collect2或者ld来链接，并且自动指定需要的各种的选项和参数，我们并不是需要关心。<br/>
       
-      `gcc helloworld.o -o helloworld`<br/>
-      
-        或者
-        
-      `gcc helloworld.o`  <br/>
+	`gcc helloworld.o -o helloworld`<br/>
+
+	或者<br/>
+
+	`gcc helloworld.o`  <br/>
       _如果不指定可执行文件名字的话，默认为a.exe_
 									
 														
@@ -85,9 +86,9 @@
 
 + （a）gcc、mingW32-gcc、g++的关系
 
-      其中mingW32-gcc是对gcc继续做封装后得到的。
-      c++/g++是用来编译c++程序的，但是由于c++程序兼容c，所以c++/g++也能编译c程序。
-      正式因为编译集合中包含了g++，所以我们也能使用codeblocks来写c++程序的，而且codeblocks这个IDE本身好像就是c++写的。
+	其中mingW32-gcc是对gcc继续做封装后得到的。<br/>
+	c++/g++是用来编译c++程序的，但是由于c++程序兼容c，所以c++/g++也能编译c程序。<br/>
+	正式因为编译集合中包含了g++，所以我们也能使用codeblocks来写c++程序的，而且codeblocks这个IDE本身好像就是c++写的。
 
 + （b）gcc、mingW32-gcc、g++程序的作用
 
