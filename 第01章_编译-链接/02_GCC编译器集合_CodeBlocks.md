@@ -6,7 +6,7 @@
   去codeblocks的编译器集合就放在它的安装目录下(MinGW),比如我的是`D:\Program Files (x86)\CodeBlocks`,MinGW的目录为`D:\Program Files (x86)\CodeBlocks\MinGW`
 									
 ## 编译的四个过程，必须用到的基本程序
-   **cpp、cc1、as、collect2/ld、gcc** <br/>
+   **cpp(预编译)、cc1(编译)、as(汇编)、collect2/ld(链接)、gcc(四合一)** <br/>
    gcc编译时四个过程自动完成，我们既然已经知道了这四个过程，那么我们就自己一步一步实现这四个过程，然后得到最终的可执行文件。<br/>
    我们讲这四个过程的主要目的是什么呢？<br/>
       · 熟悉这四个编译过程，了解每个过程做了什么事<br/>
