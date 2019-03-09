@@ -84,13 +84,13 @@ collect2路径：`MingW\libexec\gcc\mingw32\4.9.2\collect2`
 
   > 其实gcc、mingW32-gcc、g++这几个都能编译c程序。
 
-+ （a）gcc、mingW32-gcc、g++的关系
++ （1）gcc、mingW32-gcc、g++的关系
 
 	其中mingW32-gcc是对gcc继续做封装后得到的。<br/>
 	c++/g++是用来编译c++程序的，但是由于c++程序兼容c，所以c++/g++也能编译c程序。<br/>
 	正式因为编译集合中包含了g++，所以我们也能使用codeblocks来写c++程序的，而且codeblocks这个IDE本身好像就是c++写的。
 
-+ （b）gcc、mingW32-gcc、g++程序的作用
++ （2）gcc、mingW32-gcc、g++程序的作用
 
       gcc/mingW32-gcc/g++/c++其实是总的调度程序，它按照需求去调用cpp/cc1/as/collect2/ld等程序，
     完成对应四个过程。	<br/>
@@ -108,7 +108,7 @@ collect2路径：`MingW\libexec\gcc\mingw32\4.9.2\collect2`
         一次性完成时，中间产生的.i/.s/.o都是临时文件，编译后会被自动删除，这些文件我们并不关心，我们关心的只是最后的可执行文件。<br/>
         使用gcc这个总调度程序，一次性完成所有过程时，编译速度非常快，用起来非常方便。<br/>
 	
-+ （c）gcc、mingW32-gcc、g++、c++的命令的常用选项
++ （3）gcc、mingW32-gcc、g++、c++的命令的常用选项
       > 它们几个的使用方式都是一样的，所以我们就以gcc为例来讲。
       gcc的选项很多，先介绍常用的**E、S、c、g**选项，然后在介绍其它一些个不常用选项。
       至于其它的非常不常用的选项，我们这里不介绍，用到时大家自己研究搞定。
@@ -157,7 +157,7 @@ collect2路径：`MingW\libexec\gcc\mingw32\4.9.2\collect2`
       + 如果要进行debug调试的话，通过指定-g选项，会加入调试信息，没有调试信息是无法进行调试的。
       + debug调试：后面的课程再介绍。
 
-+ （d）gcc、mingW32-gcc、g++、c++的命令的不常用选项
++ （4）gcc、mingW32-gcc、g++、c++的命令的不常用选项
     + -O0、-O1、-O2、-Os、-O3
      指定优化级别，O0< O1 < O2 < Os < O3<br/>
 	`gcc hellowolrd.c -o helloworld.exe -O3` <br/>
@@ -188,12 +188,12 @@ collect2路径：`MingW\libexec\gcc\mingw32\4.9.2\collect2`
 
 
     + -v `显示编译过程的详细信息`
-	演示：<br/>
+	 演示：<br/>
 	`gcc helloworld.c -o helloworld -v  //显示预处理、编译、汇编、链接，所有过程的详细信息。`<br/>
 	
-	回答之前的问题：我怎么知道编译时使用的是as、cc1、collect2、ld这些程序的？<br/>
-	通过加-v选项，阅读编译过程的详细信息知道的，后面会分析这些详细信息。<br/>
+	 回答之前的问题：我怎么知道编译时使用的是as、cc1、collect2、ld这些程序的？<br/>
+	 通过加-v选项，阅读编译过程的详细信息知道的，后面会分析这些详细信息。<br/>
 
-	疑问：单个过程可以加-v吗？<br/>
-	可以，显示的就是单个过程的详细信息，比如<br/>
-	`gcc -E helloworld.c -o helloworld.i -v //只显示预处理的详细信息。`<br/>
+	 疑问：单个过程可以加-v吗？<br/>
+	 可以，显示的就是单个过程的详细信息，比如<br/>
+	 `gcc -E helloworld.c -o helloworld.i -v //只显示预处理的详细信息。`<br/>
