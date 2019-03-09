@@ -30,13 +30,13 @@
     - 验证预处理后.c中的宏、include、条件编译，在.i中还能否见到。
 									
 									
-### 2）cc1 `MingW\libexec\gcc\mingw32\5.1.0\cc1.exe`
+### 2）cc1 `MinGW/libexec/gcc/mingw32/5.1.0/cc1.exe`
 
   + （a）编译程序（编译器）：将C源码翻译为汇编源码
 
   + （b）演示
       
-       `..\libexec\gcc\mingw32\5.1.0\cc1 helloworld.i -o helloworld.s`<br/>
+       `../libexec/gcc/mingw32/5.1.0/cc1 helloworld.i -o helloworld.s`<br/>
     
     验证.s文件是不是ASCII文件。
 
@@ -44,12 +44,12 @@
   + （c）cc1值得注意的地方
   
       其实cc1本身也包含cpp预处理的功能，也就是说可以直接使用cc1将.c——>.s，cc1会完成之前的预处理的功能。<br/>
-					`..\libexec\gcc\mingw32\5.1.0\cc1 helloworld.c -o helloworld.s`<br/>
+					`../libexec/gcc/mingw32/5.1.0/cc1 helloworld.c -o helloworld.s`<br/>
 			不过以上命令并不能被成功执行，因为还缺参数，他会提示找不到头文件，至于缺什么参数，我们这里就不关心了。
 									
 									
 									
-### 3）as `MingW\bin\as.exe`
+### 3）as `MinGW/bin/as.exe`
   + （a）汇编程序（汇编器）：将汇编源码翻译为纯二进制的机器指令，放到.o文件中
 
   + （b）演示<br/>
@@ -58,8 +58,8 @@
 									
 ### 4）ld、collect2 <br/>
       
-ld路径：`MingW\bin\ld.exe`、`MinGW\mingw32\bin\ld.exe` 
-collect2路径：`MingW\libexec\gcc\mingw32\4.9.2\collect2`
+ld路径：`MinGW/bin/ld.exe`、`MinGW/mingw32/bin/ld.exe` 
+collect2路径：`MinGW/libexec/gcc/mingw32/4.9.2/collect2`
 
   + （a）链接程序（链接器（静态链接器））
         将所有的.o文件（自己的、编译器提供的）和库（动态库、静态库）链接在一起，得到可以运行的可执行文件。
@@ -92,19 +92,19 @@ collect2路径：`MingW\libexec\gcc\mingw32\4.9.2\collect2`
 
 + （2）gcc、mingW32-gcc、g++程序的作用
 
-      gcc/mingW32-gcc/g++/c++其实是总的调度程序，它按照需求去调用cpp/cc1/as/collect2/ld等程序，
+      gcc、mingW32-gcc、g++、c++其实是总的调度程序，它按照需求去调用cpp、cc1、as、collect2、ld等程序，
     完成对应四个过程。	<br/>
 
     为什么要一个总的调度程序？<br/>
-      通过前面的讲解知道，虽然我们能够自己调用cpp/cc1/as/collect2/ld来完成四个过程，得到最后的可执行文件，但是存在如下缺点。<br/>
+      通过前面的讲解知道，虽然我们能够自己调用cpp、cc1、as、collect2、ld来完成四个过程，得到最后的可执行文件，但是存在如下缺点。<br/>
 
     - 每个阶段的程序名都不一样，不方便记忆<br/>
         第一阶段叫cpp，第二阶段叫cc1等，老实讲，时间久了我也忘了。<br/>
         有了gcc这个总调度程序后，不管是哪个阶段，对于我们来说，只需要记住gcc这一个程序即可。<br/>
         你想实现那个阶段，通过gcc即可实现，通过给gcc指定不同的选项，gcc可以自动调用cpp、cc1、as、collect2、ld中所需要的程序来实现对应的过程。
 
-    - 如果每个阶段都我们自己亲自执行cpp/cc1/as/collect2/ld这些程序来编译的话，速度太慢了<br/>
-        有了gcc后，虽然可以通过指定选项，分别实现每个过程，但是实际上也可以调用gcc一次性快速完成四个过程，gcc会自动调用cpp/cc1/as/collect2/ld来完成。<br/>
+    - 如果每个阶段都我们自己亲自执行cpp、cc1、as、collect2、ld这些程序来编译的话，速度太慢了<br/>
+        有了gcc后，虽然可以通过指定选项，分别实现每个过程，但是实际上也可以调用gcc一次性快速完成四个过程，gcc会自动调用cpp、cc1、as、collect2、ld来完成。<br/>
         一次性完成时，中间产生的.i/.s/.o都是临时文件，编译后会被自动删除，这些文件我们并不关心，我们关心的只是最后的可执行文件。<br/>
         使用gcc这个总调度程序，一次性完成所有过程时，编译速度非常快，用起来非常方便。<br/>
 	
