@@ -3,7 +3,7 @@
 
 ## codeblocks安装目录
   CodeBlocks的安装包版本为codeblocks-17.12mingw-setup.exe,去http://www.codeblocks.org/downloads/26 下载，版本号酌情选取，不过最好选则自带MinGW编译器的。<br/>
-  去codeblocks的编译器集合就放在它的安装目录下(MinGW),比如我的是`D:\Program Files (x86)\CodeBlocks`,MinGW的目录为`D:\Program Files (x86)\CodeBlocks\MinGW`
+  去codeblocks的编译器集合就放在它的安装目录下(MinGW),比如我的是`D:/Program Files (x86)/CodeBlocks`,MinGW的目录为`D:/Program Files (x86)/CodeBlocks\MinGW`
 									
 ## 编译的四个过程，必须用到的基本程序
    **cpp(预编译)、cc1(编译)、as(汇编)、collect2/ld(链接)、gcc(四合一)** <br/>
@@ -15,7 +15,7 @@
    疑问：老师，你怎么知道编译四过程使用的就是cpp、cc1、as、collect2、gcc这些程序呢？<br/>
    我们后面再来回答这个问题。
 							
-### 1）cpp `MingW\bin\cpp.exe`
+### 1）cpp `MinGW/bin/cpp.exe`
 
 + （a）预编译程序（预编译器、预处理器）：实现预编译 <br/>
     为了方便我们查看预编译后的结果，我们先在.c中加入宏、条件编译、头文件包含。
@@ -80,7 +80,7 @@ collect2路径：`MinGW/libexec/gcc/mingw32/4.9.2/collect2`
       _如果不指定可执行文件名字的话，默认为a.exe_
 									
 														
-### 5）gcc、mingW32-gcc、g++、c++  `均在_MinGW/bin_目录下`
+### 5）gcc、mingW32-gcc、g++、c++  `均在MinGW/bin目录下`
 
   > 其实gcc、mingW32-gcc、g++这几个都能编译c程序。
 
