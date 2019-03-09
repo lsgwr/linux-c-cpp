@@ -97,7 +97,7 @@
 
 + 直接得到可执行文件
 
-  + 演示
+  + 演示  
     `gcc helloworld.c -o helloworld`  
     `gcc helloworld.i -o helloworld`  
     `gcc helloworld.s -o helloworld`  
@@ -112,11 +112,11 @@
 
 							
 ## 编译器集合中的其它程序：nm、strip、objdump、ar、readelf、debug
-		> 这程序都在/usr/bin/目录下，可以使用witch命令查看所在的目录。
+> 这程序都在/usr/bin/目录下，可以使用witch命令查看所在的目录。
 								
-+ 1）nm：查看.o、可执行文件中的各种符号
++ 1）nm：查看.o、可执行文件中的各种符号  
   演示：  
-    `nm helloworld.o`
+    `nm helloworld.o`  
     `nm helloworld`
 
 + 2）strip：对可执行文件进行瘦身
@@ -124,11 +124,11 @@
     我们也可以gcc时先不指定-s，然后自己主动使用strip来瘦身。  
 
 + 3）objdump：反汇编，将机器指令反翻译为可以被人识别的汇编指令，这就反汇编
-  + 演示
+  + 演示  
     - 对.o文件进行反汇编
       objdump -D hellowolrd.o >  hw1.s
 
-      >：将反汇编结果保存到dmphelloworld1.s中。
+      > >：将反汇编结果保存到dmphelloworld1.s中。
 
     - 对可执行文件进行反汇编
       objdump -D hellowolrd > dmphelloworld2.s
