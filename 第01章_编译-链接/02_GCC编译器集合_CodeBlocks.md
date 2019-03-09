@@ -39,7 +39,7 @@
       
        `../libexec/gcc/mingw32/5.1.0/cc1 helloworld.i -o helloworld.s`<br/>
     
-    验证.s文件是不是ASCII文件。
+    验证.s文件是不是ASCII文件(是的)。
 
 
   + （c）cc1值得注意的地方
