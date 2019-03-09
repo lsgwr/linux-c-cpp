@@ -128,7 +128,7 @@
     - 对.o文件进行反汇编
       objdump -D hellowolrd.o >  hw1.s
 
-      > >：将反汇编结果保存到dmphelloworld1.s中。
+      `>`：将反汇编结果保存到dmphelloworld1.s中。
 
     - 对可执行文件进行反汇编
       objdump -D hellowolrd > dmphelloworld2.s
