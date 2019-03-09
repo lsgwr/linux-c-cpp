@@ -80,7 +80,7 @@ collect2路径：`MingW\libexec\gcc\mingw32\4.9.2\collect2`
       _如果不指定可执行文件名字的话，默认为a.exe_
 									
 														
-### 5）gcc、mingW32-gcc、g++、c++  均在`MinGW/bin`目录下
+### 5）gcc、mingW32-gcc、g++、c++  `均在_MinGW/bin_目录下`
 
   > 其实gcc、mingW32-gcc、g++这几个都能编译c程序。
 
