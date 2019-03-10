@@ -21,7 +21,7 @@ Configured with: ../src/configure /*gcc的配置文件路径，常用于大型�
 --without-included-gettext 
 --enable-threads=posix 
 --with-gxx-include-dir=/usr/include/c++/4.8 
---libdir=/usr/lib 
+--libdir=/usr/lib /*GCC编译器集合自带库所在目录*/
 --enable-nls 
 --with-sysroot=/ 
 --enable-clocale=gnu 
@@ -31,9 +31,11 @@ Configured with: ../src/configure /*gcc的配置文件路径，常用于大型�
 --disable-libmudflap 
 --enable-plugin 
 --with-system-zlib 
---disable-browser-plugin 
+--disable-browser-plugin
+/*使用gcc编译带界面的java程序，图形界面底层调用地是ubuntu的gtk基础图形库，下面两行都是*/
 --enable-java-awt=gtk 
 --enable-gtk-cairo 
+/*gcc编译java需要的运行环境配置信息，下面7行到--enable-objc-gc都是*/
 --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-4.8-amd64/jre 
 --enable-java-home 
 --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-4.8-amd64 
@@ -41,6 +43,7 @@ Configured with: ../src/configure /*gcc的配置文件路径，常用于大型�
 --with-arch-directory=amd64 
 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar 
 --enable-objc-gc 
+/*gcc所运行的cpu的结构，对于cpu结构的详细信息，作为应用开发者只需要简单了解，但是对于做硬件、微电子、编译器开发的需要详细了解，下面8行都是*/
 --enable-multiarch 
 --disable-werror 
 --with-arch-32=i686 
@@ -49,10 +52,13 @@ Configured with: ../src/configure /*gcc的配置文件路径，常用于大型�
 --with-tune=generic 
 --enable-checking=release 
 --build=x86_64-linux-gnu 
+/*gcc本身的运行环境：cpu是64位的intel x86 cpi 操作系统是linux*/
 --host=x86_64-linux-gnu 
+/*gcc编译出的可执行程序的运行环境*/
 --target=x86_64-linux-gnu
+
 Thread model: posix
-gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04.3) 
+gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04.3) /*gcc版本，与gcc所运行的ubuntu的版本(Linux发行版操作系统)*/
 COLLECT_GCC_OPTIONS='-o' 'helloworld' '-v' '-mtune=generic' '-march=x86-64'
  /usr/lib/gcc/x86_64-linux-gnu/4.8/cc1 -quiet -v -imultiarch x86_64-linux-gnu helloworld.c -quiet -dumpbase helloworld.c -mtune=generic -march=x86-64 -auxbase helloworld -version -fstack-protector -Wformat -Wformat-security -o /tmp/cc2SMRPO.s
 GNU C (Ubuntu 4.8.4-2ubuntu1~14.04.3) version 4.8.4 (x86_64-linux-gnu)
