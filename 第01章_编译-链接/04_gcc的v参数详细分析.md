@@ -123,11 +123,26 @@ COLLECT_GCC_OPTIONS='-o' 'helloworld' '-v' '-mtune=generic' '-march=x86-64'
  /tmp/ccujC6sr.o /**我们源文件只有一个helloworld.c，所以只有一个.o，源文件有多个时，就会有读个.o**/
  /**忽略**/
  -lgcc --as-needed -lgcc_s --no-as-needed
- /**C标准函数库**/
+ /**链接libc库(C标准函数库)
+  其实libc只是c标准函数库中的一个子库，libc只包含printf、scanf、strcpy、malloc、time等这些常用函数，
+  正是因为gcc有自动链接libc这个常用函数库，所以我们才能在程序中使用这些常用函数，而不会报错说倒找
+  不到这些函数。
+
+  但是像c标准函数库中的其它函数就不行了，比如使用数学函数，我们必须自己在gcc时自己加-lm去链接
+  c标准函数库的子库——数学库（比如：gcc ***.c -o *** -lm）， 
+  否者无法使用数学库函数，数学库中的函数属于非常用函数，gcc是不会帮你自动链接数学库的。
+  **/
  -lc 
  /**忽略**/
  -lgcc --as-needed -lgcc_s --no-as-needed
- /**下面两行是扫尾代码**/
+ /**下面两行是扫尾代码
+ 用于生成扫尾代码，程序运行结束时，做一些扫尾工作，这两个.o也是由gcc
+ 开发者编写的，为了方便描述，我们往往将扫尾代码认为是启动代码的一部分。
+      crtend.o：扫尾做什么？比如调用c++析构函数，释放全局对象的空间
+      crtn.o：扫尾做什么？比如，接收main函数的返回值并处理
+        - 如果程序是裸机运行的，返回值到扫尾代码这里就结束了，裸机时返回值的意义不大
+        - 如果程序是基于OS运行的，扫尾代码会将返回值交给OS				
+ **/
  /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o
  /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o
   ```
