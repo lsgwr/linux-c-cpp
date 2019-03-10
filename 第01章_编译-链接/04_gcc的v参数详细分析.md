@@ -2,7 +2,8 @@
 > 这里的-v是用于显示编译过程中的详细信息的
 
 ## 演示
-  `gcc helloword.c -o helloworld -v`
+  `gcc helloword.c -o helloworld -v`  
+  下面代码中红色的是我自己添加的注释，其他的都是上面命令产生的回显，为了方便看很多地方换行了
   ```shell
   Using built-in specs.
 COLLECT_GCC=gcc
