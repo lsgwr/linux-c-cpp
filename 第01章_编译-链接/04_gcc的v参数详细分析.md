@@ -9,11 +9,11 @@ COLLECT_GCC=gcc
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.8/lto-wrapper
 Target: x86_64-linux-gnu
 /* gcc配置信息*/
-Configured with: ../src/configure 
+Configured with: ../src/configure /*gcc的配置文件路径，常用于大型工程的代码条件编译*/
 -v --with-pkgversion='Ubuntu 4.8.4-2ubuntu1~14.04.3'
---with-bugurl=file:///usr/share/doc/gcc-4.8/README.Bugs 
---enable-languages=c,c++,java,go,d,fortran,objc,obj-c++ 
---prefix=/usr 
+--with-bugurl=file:///usr/share/doc/gcc-4.8/README.Bugs /*如果发现的gcc的bug需要按照README.bufs说明书的内容来提交bug*/
+--enable-languages=c,c++,java,go,d,fortran,objc,obj-c++ /*gcc编译集所支持的语言*/
+--prefix=/usr /*路径固定前缀，也就是说gcc所用的路径都是以/usr开头地，换句话说gcc所用到的文件都在/usr目录下*/
 --program-suffix=-4.8 
 --enable-shared 
 --enable-linker-build-id 
