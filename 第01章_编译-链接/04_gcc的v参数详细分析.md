@@ -65,7 +65,7 @@ gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04.3)
 /**gcc的基本选项，-march=x86-64表示为intell 64位 x86的cpu; -mtune=generic表示编译得到机器指令时，机器指令属于通用指令集，
 即不同版本x86和cpu都支持的指令集，如果需要指定某款cpu的特殊指令集时，就不能是generic，需要写成其他名称**/
 COLLECT_GCC_OPTIONS='-o' 'helloworld' '-v' '-mtune=generic' '-march=x86-64'
-/** 第1步：预编译和编译,下面3行，核心是 cc1 helloworld.c -o /tmp/cc2SMRPO.s **/
+/** 第1、2步：预编译+编译,下面3行，核心是 cc1 helloworld.c -o /tmp/cc2SMRPO.s **/
  /usr/lib/gcc/x86_64-linux-gnu/4.8/cc1 -quiet -v -imultiarch x86_64-linux-gnu helloworld.c
  -quiet -dumpbase helloworld.c -mtune=generic -march=x86-64 -auxbase helloworld
  -version -fstack-protector -Wformat -Wformat-security -o /tmp/cc2SMRPO.s
@@ -91,12 +91,13 @@ GNU C (Ubuntu 4.8.4-2ubuntu1~14.04.3) version 4.8.4 (x86_64-linux-gnu)
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 Compiler executable checksum: a0a649d344b1ed798e33d30772d46437
 COLLECT_GCC_OPTIONS='-o' 'helloworld' '-v' '-mtune=generic' '-march=x86-64'
-/**第2步：汇编， as已经加到环境变量所以无需指定绝对路径**/
+/**第3步：汇编， as已经加到环境变量所以无需指定绝对路径**/
  as -v --64 -o /tmp/ccujC6sr.o /tmp/cc2SMRPO.s
 GNU assembler version 2.24 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.24
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../:/lib/:/usr/lib/
 COLLECT_GCC_OPTIONS='-o' 'helloworld' '-v' '-mtune=generic' '-march=x86-64'
+/**第4步：链接，太复杂，一般直接用gcc命令。这里不看了**/
  /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o helloworld /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. /tmp/ccujC6sr.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o
   ```
 
