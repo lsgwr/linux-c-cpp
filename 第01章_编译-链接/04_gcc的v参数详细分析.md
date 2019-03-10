@@ -461,11 +461,10 @@ COLLECT_GCC_OPTIONS='-o' 'helloworld' '-v' '-mtune=generic' '-march=x86-64'
 ### 6.总结gcc -v显示的详细信息
 
     （1）如果四个过程都有的话
-          详细信息就是：gcc配置信息 + cc1信息(预处理+编译) + as信息 + collect2信息 
+          详细信息就是：gcc配置信息 + cc1信息(预处理+编译) + as信息(汇编) + collect2信息(链接)
 
     （2）如果只是某个过程的话
          比如：gcc -S helloworld.i -o helloworld.s -v
-
          详细信息就是：gcc配置信息 + 单个过程的信息
 
 
