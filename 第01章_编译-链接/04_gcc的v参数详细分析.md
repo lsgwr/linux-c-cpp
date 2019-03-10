@@ -9,12 +9,12 @@ COLLECT_GCC=gcc
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.8/lto-wrapper
 Target: x86_64-linux-gnu
 
-/******************************************************gcc配置信息****************************************************************/
-Configured with: ../src/configure /*gcc的配置文件路径，常用于大型工程的代码条件编译*/
+/**********************************************gcc配置信息*****************************************************/
+Configured with: ../src/configure /**gcc的配置文件路径，常用于大型工程的代码条件编译**/
 -v --with-pkgversion='Ubuntu 4.8.4-2ubuntu1~14.04.3'
---with-bugurl=file:///usr/share/doc/gcc-4.8/README.Bugs /*如果发现的gcc的bug需要按照README.bufs说明书的内容来提交bug*/
---enable-languages=c,c++,java,go,d,fortran,objc,obj-c++ /*gcc编译集所支持的语言*/
---prefix=/usr /*路径固定前缀，也就是说gcc所用的路径都是以/usr开头地，换句话说gcc所用到的文件都在/usr目录下*/
+--with-bugurl=file:///usr/share/doc/gcc-4.8/README.Bugs /**如果发现的gcc的bug需要按照README.bufs说明书的内容来提交bug**/
+--enable-languages=c,c++,java,go,d,fortran,objc,obj-c++ /**gcc编译集所支持的语言**/
+--prefix=/usr /**路径固定前缀，也就是说gcc所用的路径都是以/usr开头地，换句话说gcc所用到的文件都在/usr目录下**/
 --program-suffix=-4.8 
 --enable-shared 
 --enable-linker-build-id 
@@ -22,7 +22,7 @@ Configured with: ../src/configure /*gcc的配置文件路径，常用于大型�
 --without-included-gettext 
 --enable-threads=posix 
 --with-gxx-include-dir=/usr/include/c++/4.8 
---libdir=/usr/lib /*GCC编译器集合自带库所在目录*/
+--libdir=/usr/lib /**GCC编译器集合自带库所在目录**/
 --enable-nls 
 --with-sysroot=/ 
 --enable-clocale=gnu 
@@ -33,10 +33,10 @@ Configured with: ../src/configure /*gcc的配置文件路径，常用于大型�
 --enable-plugin 
 --with-system-zlib 
 --disable-browser-plugin
-/*使用gcc编译带界面的java程序，图形界面底层调用地是ubuntu的gtk基础图形库，下面两行都是*/
+/**使用gcc编译带界面的java程序，图形界面底层调用地是ubuntu的gtk基础图形库，下面两行都是**/
 --enable-java-awt=gtk 
 --enable-gtk-cairo 
-/*gcc编译java需要的运行环境配置信息，下面7行到--enable-objc-gc都是*/
+/**gcc编译java需要的运行环境配置信息，下面7行到--enable-objc-gc都是**/
 --with-java-home=/usr/lib/jvm/java-1.5.0-gcj-4.8-amd64/jre 
 --enable-java-home 
 --with-jvm-root-dir=/usr/lib/jvm/java-1.5.0-gcj-4.8-amd64 
@@ -44,7 +44,7 @@ Configured with: ../src/configure /*gcc的配置文件路径，常用于大型�
 --with-arch-directory=amd64 
 --with-ecj-jar=/usr/share/java/eclipse-ecj.jar 
 --enable-objc-gc 
-/*gcc所运行的cpu的结构，对于cpu结构的详细信息，作为应用开发者只需要简单了解，但是对于做硬件、微电子、编译器开发的需要详细了解，下面8行都是*/
+/**gcc所运行的cpu的结构，对于cpu结构的详细信息，作为应用开发者只需要简单了解，但是对于做硬件、微电子、编译器开发的需要详细了解，下面8行都是**/
 --enable-multiarch 
 --disable-werror 
 --with-arch-32=i686 
@@ -53,26 +53,31 @@ Configured with: ../src/configure /*gcc的配置文件路径，常用于大型�
 --with-tune=generic 
 --enable-checking=release 
 --build=x86_64-linux-gnu 
-/*gcc本身的运行环境：cpu是64位的intel x86 cpi 操作系统是linux*/
+/**gcc本身的运行环境：cpu是64位的intel x86 cpi 操作系统是linux**/
 --host=x86_64-linux-gnu 
 /*gcc编译出的可执行程序的运行环境*/
 --target=x86_64-linux-gnu
 
-/*************************************************gcc的其他信息************************************************************/
+/*******************************************gcc的其他信息****************************************************/
 Thread model: posix
-/*gcc版本，与gcc所运行的ubuntu的版本(Linux发行版操作系统)*/
+/**gcc版本，与gcc所运行的ubuntu的版本(Linux发行版操作系统)**/
 gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04.3) 
-/*gcc的基本选项，-march=x86-64表示为intell 64位 x86的cpu; -mtune=generic表示编译得到机器指令时，机器指令属于通用指令集，
-即不同版本x86和cpu都支持的指令集，如果需要指定某款cpu的特殊指令集时，就不能是generic，需要写成其他名称*/
+/**gcc的基本选项，-march=x86-64表示为intell 64位 x86的cpu; -mtune=generic表示编译得到机器指令时，机器指令属于通用指令集，
+即不同版本x86和cpu都支持的指令集，如果需要指定某款cpu的特殊指令集时，就不能是generic，需要写成其他名称**/
 COLLECT_GCC_OPTIONS='-o' 'helloworld' '-v' '-mtune=generic' '-march=x86-64'
-/** 预编译和编译,核心是 cc1 helloworld.c -o /tmp/cc2SMRPO.s **/
- /usr/lib/gcc/x86_64-linux-gnu/4.8/cc1 -quiet -v -imultiarch x86_64-linux-gnu helloworld.c -quiet -dumpbase helloworld.c -mtune=generic -march=x86-64 -auxbase helloworld -version -fstack-protector -Wformat -Wformat-security -o /tmp/cc2SMRPO.s
+/** 第1步：预编译和编译,下面3行，核心是 cc1 helloworld.c -o /tmp/cc2SMRPO.s **/
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/cc1 -quiet -v -imultiarch x86_64-linux-gnu helloworld.c
+ -quiet -dumpbase helloworld.c -mtune=generic -march=x86-64 -auxbase helloworld
+ -version -fstack-protector -Wformat -Wformat-security -o /tmp/cc2SMRPO.s
+/**下面4行忽略 **/
 GNU C (Ubuntu 4.8.4-2ubuntu1~14.04.3) version 4.8.4 (x86_64-linux-gnu)
         compiled by GNU C version 4.8.4, GMP version 5.1.3, MPFR version 3.1.2-p3, MPC version 1.0.1
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 ignoring nonexistent directory "/usr/local/include/x86_64-linux-gnu"
 ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../x86_64-linux-gnu/include"
+/**包含""所指定的头文件：到程序员自己指定的路径下去找**/
 #include "..." search starts here:
+/**包含<>所指定的文件：到下面的指定的路径下去找**/
 #include <...> search starts here:
  /usr/lib/gcc/x86_64-linux-gnu/4.8/include
  /usr/local/include
@@ -80,11 +85,13 @@ ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../x8
  /usr/include/x86_64-linux-gnu
  /usr/include
 End of search list.
+/**下面5行忽略 **/
 GNU C (Ubuntu 4.8.4-2ubuntu1~14.04.3) version 4.8.4 (x86_64-linux-gnu)
         compiled by GNU C version 4.8.4, GMP version 5.1.3, MPFR version 3.1.2-p3, MPC version 1.0.1
 GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
 Compiler executable checksum: a0a649d344b1ed798e33d30772d46437
 COLLECT_GCC_OPTIONS='-o' 'helloworld' '-v' '-mtune=generic' '-march=x86-64'
+/**第2步：汇编， as已经加到环境变量所以无需指定绝对路径**/
  as -v --64 -o /tmp/ccujC6sr.o /tmp/cc2SMRPO.s
 GNU assembler version 2.24 (x86_64-linux-gnu) using BFD version (GNU Binutils for Ubuntu) 2.24
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/
