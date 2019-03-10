@@ -97,8 +97,38 @@ GNU assembler version 2.24 (x86_64-linux-gnu) using BFD version (GNU Binutils fo
 COMPILER_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/
 LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/4.8/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib/:/lib/x86_64-linux-gnu/:/lib/../lib/:/usr/lib/x86_64-linux-gnu/:/usr/lib/../lib/:/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../:/lib/:/usr/lib/
 COLLECT_GCC_OPTIONS='-o' 'helloworld' '-v' '-mtune=generic' '-march=x86-64'
-/**第4步：链接，太复杂，一般直接用gcc命令。这里不看了**/
- /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed -dynamic-linker /lib64/ld-linux-x86-64.so.2 -z relro -o helloworld /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o -L/usr/lib/gcc/x86_64-linux-gnu/4.8 -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib -L/lib/x86_64-linux-gnu -L/lib/../lib -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. /tmp/ccujC6sr.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o
+/**第4步：链接**/
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/collect2 /**链接器所在的路径，因为collect2没有加入环境变量，所以需要自己指明**/
+ --sysroot=/ --build-id --eh-frame-hdr -m elf_x86_64 --hash-style=gnu --as-needed  -z relro /**各种选项和参数，不需要了解**/
+ -dynamic-linker /lib64/ld-linux-x86-64.so.2 /**给程序指定动态加载器：程序运行起来后，用于加载动态库**/
+ -o helloworld /**最终生成的可执行文件**/
+ /**下面3行是用于生成程序的"启动代码(搭建C/C++运行环境)"，这三个.o是由GCC编译器集合提供的(由GCC开发者编写)，crt=c++ run time=运行时环境，
+ /**crt1.o: 汇编写的，里面的_start是整个程序的开始；调用main函数;建立c函数运行所需要的栈**/
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crt1.o 
+ /**crti.o: 在调用main函数之前，实现c的一些初始化工作，比如全局变量的初始化**/
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crti.o
+ /**在调用main之前，实现c++的一些初始化工作，比如全局构造函数、创建全局对象等**/
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/crtbegin.o
+ /**下面8行指定所有库所在路径，后面链接`库`时就到这些路径下寻找，后面讲C函数时，会介绍-L选项(L是Library的意思)**/
+ -L/usr/lib/gcc/x86_64-linux-gnu/4.8
+ -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu 
+ -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../../../lib 
+ -L/lib/x86_64-linux-gnu 
+ -L/lib/../lib 
+ -L/usr/lib/x86_64-linux-gnu 
+ -L/usr/lib/../lib 
+ -L/usr/lib/gcc/x86_64-linux-gnu/4.8/../../.. 
+ /**链接自己的代码生成的.o文件，这个是前面第3步as汇编helloworld.c时所得到的.o文件**/
+ /tmp/ccujC6sr.o /**我们源文件只有一个helloworld.c，所以只有一个.o，源文件有多个时，就会有读个.o**/
+ /**忽略**/
+ -lgcc --as-needed -lgcc_s --no-as-needed
+ /**C标准函数库**/
+ -lc 
+ /**忽略**/
+ -lgcc --as-needed -lgcc_s --no-as-needed
+ /**下面两行是扫尾代码**/
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/crtend.o
+ /usr/lib/gcc/x86_64-linux-gnu/4.8/../../../x86_64-linux-gnu/crtn.o
   ```
 
 ## 分析gcc -v的详细信息的意义
