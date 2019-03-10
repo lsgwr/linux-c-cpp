@@ -8,7 +8,8 @@
 COLLECT_GCC=gcc
 COLLECT_LTO_WRAPPER=/usr/lib/gcc/x86_64-linux-gnu/4.8/lto-wrapper
 Target: x86_64-linux-gnu
-/* gcc配置信息*/
+
+/******************************************************gcc配置信息****************************************************************/
 Configured with: ../src/configure /*gcc的配置文件路径，常用于大型工程的代码条件编译*/
 -v --with-pkgversion='Ubuntu 4.8.4-2ubuntu1~14.04.3'
 --with-bugurl=file:///usr/share/doc/gcc-4.8/README.Bugs /*如果发现的gcc的bug需要按照README.bufs说明书的内容来提交bug*/
@@ -57,9 +58,14 @@ Configured with: ../src/configure /*gcc的配置文件路径，常用于大型�
 /*gcc编译出的可执行程序的运行环境*/
 --target=x86_64-linux-gnu
 
+/*************************************************gcc的其他信息************************************************************/
 Thread model: posix
-gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04.3) /*gcc版本，与gcc所运行的ubuntu的版本(Linux发行版操作系统)*/
+/*gcc版本，与gcc所运行的ubuntu的版本(Linux发行版操作系统)*/
+gcc version 4.8.4 (Ubuntu 4.8.4-2ubuntu1~14.04.3) 
+/*gcc的基本选项，-march=x86-64表示为intell 64位 x86的cpu; -mtune=generic表示编译得到机器指令时，机器指令属于通用指令集，
+即不同版本x86和cpu都支持的指令集，如果需要指定某款cpu的特殊指令集时，就不能是generic，需要写成其他名称*/
 COLLECT_GCC_OPTIONS='-o' 'helloworld' '-v' '-mtune=generic' '-march=x86-64'
+/** 预编译和编译,核心是 cc1 helloworld.c -o /tmp/cc2SMRPO.s **/
  /usr/lib/gcc/x86_64-linux-gnu/4.8/cc1 -quiet -v -imultiarch x86_64-linux-gnu helloworld.c -quiet -dumpbase helloworld.c -mtune=generic -march=x86-64 -auxbase helloworld -version -fstack-protector -Wformat -Wformat-security -o /tmp/cc2SMRPO.s
 GNU C (Ubuntu 4.8.4-2ubuntu1~14.04.3) version 4.8.4 (x86_64-linux-gnu)
         compiled by GNU C version 4.8.4, GMP version 5.1.3, MPFR version 3.1.2-p3, MPC version 1.0.1
