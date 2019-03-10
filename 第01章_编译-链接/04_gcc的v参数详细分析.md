@@ -441,20 +441,19 @@ COLLECT_GCC_OPTIONS='-o' 'helloworld' '-v' '-mtune=generic' '-march=x86-64'
 
 
 
-```shell
-  /* 简化后的链接过程，链接时，各个模块的顺序很重要 */
-  collect2    //链接程序
+ > 简化后的链接过程，链接时，各个模块的顺序很重要 */
+  collect2    //链接程序  
 
-  -dynamic-linker  /lib64/ld-linux-x86-64.so.2 //动态链接器
+  -dynamic-linker  /lib64/ld-linux-x86-64.so.2 //动态链接器  
 
-  crt1.o  crti.o  crtbegin.o  //启动代码
+  crt1.o  crti.o  crtbegin.o  //启动代码  
 
-  ccyIcm4A.o  								//自己程序的.o，这里目前只有一个
+  ccyIcm4A.o                  //自己程序的.o，这里目前只有一个  
 
-  -lc 												//libc，常用c函数库——c标准库的子库
+  -lc                         //libc，常用c函数库——c标准库的子库  
 
-  crtend.o  crtn.o 						//扫尾代码
-```
+  crtend.o  crtn.o            //扫尾代码  
+
 
 
 
