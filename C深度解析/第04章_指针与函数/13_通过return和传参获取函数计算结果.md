@@ -55,6 +55,8 @@ int main(void)
 
 通过传参返回的意思就是，可以`通过指针来修改实参`，从而返回计算的结果。  
 
+### 13.2.1 例子1：通过return和传参来获取计算结果
+
 ```c
 void fun(int a, int b, int *p1, int *p2)
 {
@@ -110,3 +112,12 @@ int main(void)
     return 0;
 }
 ```
+
+### 例子2：scanf输入数据解析
+
+> scanf是典型的"指针传参"来返回数据的函数
+
+![scanf例子](函数传参例子之scanf.png)  
+![scanf例子2](函数传参例子2之scanf.png)  
+![scanf例子3](函数传参例子3之scanf.png)  
+![scanf例子4](函数传参例子4之scanf.png)  
