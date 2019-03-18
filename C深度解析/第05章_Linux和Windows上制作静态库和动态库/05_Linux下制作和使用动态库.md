@@ -234,26 +234,27 @@ root@9e2614e43d08:/workspace/libuse# ldd ./main
 
 ### 2）在程序中调用“动态库加载函数”来加载
 + （a）Linux下的动态库加载函数  
-    这里特意强调了Linux下，意思就是Windows下的动态库加载函数与Linux是不一样的。  
-     Linux下的动态库加载函数是c库函数，但是不是c标准库提供的，而是Linux这个平台的c库函数，也就是说在windows下不能使用Linux下的动态库加载函数。
+    这里特意强调了Linux下，意思就是Windows下的动态库加载函数与Linux是不一样的。dl的意思是Dynamic Library
+    Linux下的动态库加载函数是c库函数，但是不是c标准库提供的，而是Linux这个平台的c库函数，也就是说`在windows下不能使用Linux下的动态库加载函数`  
     + dlopen：  
-        - 函数原型：
-                ```c
-                #include <dlfcn.h>  
-                void *dlopen(const char *filename, int flags);  
-                ```
+        - 函数原型：  
+            ```c
+            #include <dlfcn.h>  
+            void *dlopen(const char *filename, int flags);  
+            ```
 
-        - 功能：打开动态库文件，将动态库文件中的代码加载到内存中。  
+        - 功能:  
+          打开动态库文件，将动态库文件中的代码加载到内存中。  
 
-        - 参数：
-            `filename`：动态库的路径名，比如./dynamic_lib/libmycaculate.so，此时库的名字一定要写全名，lib和.so不能省略。  
-            flags：打开方式  
-                flags的选项有好多，由于dlopen函数用的并不多，所以这里只介绍我们会用到的RTLD_NOW选项。  
-                RTLD_NOW：简单理解就是，立即打开动态库文件并加载到内存中，当然这个理解并不准确，但是我们目前就先这么理解。如果以后大家真用到了这个函数时，在自己去深入了解这个函数。  
+        - 参数：  
+            + `filename`：动态库的路径名，比如./dynamic_lib/libmycaculate.so，此时库的名字一定要写全名，lib和.so不能省略  
+            + flags：打开方式  
+                flags的选项有好多，由于dlopen函数用的并不多，所以这里只介绍我们会用到的RTLD_NOW选项    
+                RTLD_NOW：简单理解就是，立即打开动态库文件并加载到内存中，当然这个理解并不准确，但是我们目前就先这么理解。如果以后大家真用到了这个函数时，在自己去深入了解这个函数    
 
-        - 返回值：
-            成功：返回一个void *指针，后续利用这个指针就可以去调用“动态库函数”。  
-            失败：返回NULL。  
+        - 返回值：  
+            + 成功：返回一个void *指针，后续利用这个指针就可以去调用“动态库函数”。  
+            + 失败：返回NULL。  
 
 
     + dlclose：  
@@ -271,18 +272,17 @@ root@9e2614e43d08:/workspace/libuse# ldd ./main
             ```
 
         - 功能    
-                动态库被dlopen加载到了内存中后，每个库函数的内存地址就是确定的，此时只要得到了add、sub、mul等函数入口地址（函数指针：绝对地址），自然就能调用这些函数了。  
-                dlsym的作用就是用来返回“每个动态库函数”在内存中函数指针，只不过返回的类型为void *，使用时需要强制转为对应的函数指针类型。  
-                图：  
+            + 动态库被dlopen加载到了内存中后，每个库函数的内存地址就是确定的，此时只要得到了add、sub、mul等函数入口地址（函数指针：绝对地址），自然就能调用这些函数了  
+            + dlsym的作用就是用来返回“每个动态库函数”在内存中函数指针，只不过返回的类型为`void *`，使用时需要强制转为对应的函数指针类型    
 
         - 参数  
-            `handle`：dlopen返回的指针  
-            `symbol`：库函数的名字，为一个字符串，dlsym会通过名字去查找动态库函数的函数指针。  
+            + `handle`：dlopen返回的指针  
+            + `symbol`：库函数的名字，为一个字符串，dlsym会通过名字去查找动态库函数的函数指针。  
 
 
         - 返回值    
-            成功：返回某动态库函数在内存中的函数指针  
-            失败：返回NULL  
+            + 成功：返回某动态库函数在内存中的函数指针  
+            + 失败：返回NULL  
 
 
         - 使用例子  
@@ -346,15 +346,15 @@ root@9e2614e43d08:/workspace/libuse# ldd ./main
         如果不链接libdl.so的话，就没办法对dlopen、dlsym等进行符号解析。  
         提供dlopen、dlsym、dlclose函数的c库是Linxu平台的c库，只在linux平台有效。  
 
-        `疑问`：为什么没有通过-L指定动态库libdl.so的路径？  
-        答：libdl.so动态库的路径加入了环境变量，可以自动找到。
-            不过要注意的是，这个环境变量不是前面说的那个，与动态库加载有关的“动态库环境变量”，而是另外的环境变量，有关这个环境变量我们就不再介绍了，《Linux系统编程、网络编程》会讲。  
-            `libm.so  libptread.so  -lmycaculate`  
-        我们在使用数学库、线程库时，要求指定-lm和-lpthread，比如：  
-        ```shell
-        gcc **.c **.c -o a.out -lm   //libm.so
-        gcc **.c **.c -o a.out -lpthread  //libpthread.so
-        ```
+    + `疑问`：为什么没有通过-L指定动态库libdl.so的路径？  
+         libdl.so动态库的路径加入了环境变量，可以自动找到  
+        不过要注意的是，这个环境变量不是前面说的那个，与动态库加载有关的“动态库环境变量”，而是另外的环境变量，有关这个环境变量我们就不再介绍了，《Linux系统编程、网络编程》会讲  
+        `libm.so  libptread.so  -lmycaculate`  
+         我们在使用数学库、线程库时，要求指定-lm和-lpthread，比如：  
+         ```shell
+         gcc **.c **.c -o a.out -lm   //libm.so
+         gcc **.c **.c -o a.out -lpthread  //libpthread.so
+         ```
 
     +  为什么没有链接libmycaculate.so?  
         因为程序中没有直接调用add、sub等动态库函数，"add"、"sub"等只是dlsym的参数而已，不涉及到对add、sub等函数名的符号解析，所以不需要链接libmycaculate.so。 
