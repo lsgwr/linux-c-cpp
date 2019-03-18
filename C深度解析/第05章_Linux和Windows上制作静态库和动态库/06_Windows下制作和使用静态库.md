@@ -43,12 +43,14 @@
     ```
 
 + 3）设置静态库的链接
-   + （a）指定caculate.h的路径  
-            Settings——>Compiler——>Global compiler settings——>Serch directories——>add——>caculate.h所在路径  
-            当然，我们也可以直接将caculate.h复制到main.c所在的目录，此时直接#include "caculate.h"即可  
+   + （a）指定caculate.h的路径，下面3种方式都是可以的  
+      +   Settings——>Compiler——>Global compiler settings——>Serch directories——>add——>caculate.h所在路径  
+      +   当然，我们也可以直接将caculate.h复制到main.c所在的目录，此时直接#include "caculate.h"即可  
+      +   也可以通过Settings——>Compiler——>Global compiler settings-->Compiler settings-->other compiler options-->添加"-I库文件夹路径"来制定    
 
-   + （b）指定要链接的静态库  
-            Settings——>Compiler——>Global compiler settings——>Linker settings——>add——>选择你要链接的静态库  
+   + （b）指定要链接的静态库，下面3种方式都是可以的      
+      + Settings——>Compiler——>Global compiler settings——>Linker settings——>add——>选择你要链接的静态库    
+      + 也可以通过Settings——>Compiler——>Global compiler settings-->Compiler settings-->other compiler options-->添加"-L库文件路径 -l库名字"来指定  
 
 + 4）编译链接、并运行程序  
         编辑链接时就会链接我们指定的静态库，然后程序即可正常运行  
