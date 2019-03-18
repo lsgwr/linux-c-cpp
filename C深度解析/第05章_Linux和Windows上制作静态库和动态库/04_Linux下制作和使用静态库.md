@@ -113,10 +113,14 @@ ar  -crv  ./libcaculate.a  add_sub.o  mul_div.o
 	要打包为静态库文件的.o（原料）  
 
 如果制作成功，使用ls查看时，你会发现在当前目录下就有一个libcaculate.a文件。file命令查看时，会告诉你静态库文件其实是一个归档文件。  
+```shell
+root@9e2614e43d08:/workspace/libmake# file libcaculate.a 
+libcaculate.a: current ar archive
+```
 
 再说说ar命令：  
-ar命令其实“归档命令”，专门用来实现对文件进行归档，所以说制作静态库文件其实就是制作一个归档文件。  
-归档文件和压缩文件很相似，只不过归档文件只打包不压缩，但是压缩文件不仅会打包，而且还会进行压缩。  
+ar命令其实“归档命令”(archive的前两个字母)，专门用来实现对文件进行归档，所以说制作静态库文件其实就是制作一个归档文件  
+归档文件和压缩文件很相似，只不过归档文件只打包不压缩，但是压缩文件不仅会打包，而且还会进行压缩  
 
 静态库文件放在了ubuntu桌面下的static_lib目录下。  
 				
@@ -179,12 +183,12 @@ int main(void)
 + （b）链接静态库	
 
     ```shell
-    gcc main.c -o main -L./static_lib -lcaculate -I./static_lib
+    gcc main.c -o main -L../libmake -lcaculate -I../libmake
     ```
 
-   + -I：指定caculat.h所在的路径，路径为./static_lib
+   + -I：指定caculat.h所在的路径，路径为../static_lib
 
-   + -L：指定静态库所在的路径（路径为./static_lib），链接时会到该路径下去查寻找静态库。  
+   + -L：指定静态库所在的路径（路径为../static_lib），链接时会到该路径下去查寻找静态库。  
         `疑问` ：能不能省略静态库的路径？  
         答：可以  
             只要将所在路径加入了环境变量，链接时会指定到该路径下寻找静态库，此时我们不用自己指定静态库所在的路径。   
