@@ -1,5 +1,5 @@
 #include <stdio.h>		
-#include "./static_lib/caculate.h"  //包含静态库的头文件
+#include "caculate.h"  //包含静态库的头文件
 
 int main(void)
 {
