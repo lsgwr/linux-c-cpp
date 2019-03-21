@@ -2,7 +2,7 @@
 #define H_PUBLIC_H
 
 
-/* 用于想公共代码注册操作信息的结构体 */
+/* 用于向公共代码注册操作信息的结构体 */
 struct Register
 {
     void *buf;      //数组第一个元素的地址
