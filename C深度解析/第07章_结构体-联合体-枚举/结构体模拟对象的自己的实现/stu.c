@@ -33,7 +33,7 @@ void Stu_modify(int n, void *buf)
     for(i=0;i<n;i++){
         if(stu[i].stuNum == stuNum){
             printf("%s %d %f\n", stu[i].name, stu[i].stuNum, stu[i].score);
-            printf("输入新信息：");
+            printf("输入新信息：\n");
             // name本身就是指针，无需再加&
             scanf("%s %d %f\n", stu[i].name, &stu[i].stuNum, &stu[i].score);
             break;
