@@ -33,7 +33,7 @@ void Tea_modify(int n, void *buf)
     for(i=0;i<n;i++){
         if(tea[i].teaNum == teaNum){
             printf("%s %d %d\n", tea[i].name, tea[i].teaNum, tea[i].level);
-            printf("输入新信息：");
+            printf("输入新信息：\n");
             scanf("%s %d %d\n", tea[i].name, &tea[i].teaNum, &tea[i].level);
             break;
         }
