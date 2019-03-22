@@ -264,23 +264,33 @@ cstIntp p;
 ## 4.3 `***_t`类型作用
 
 我们在C库、在OS API、Linux内核源码中，经常看到`***_t`的类型，比如：
-· Linux OS API： time_t time(time_t *tloc)
-	time_t
++  Linux OS API： 
 
-· posix c线程库函数：
 ```c
+// time_t
+time_t time(time_t *tloc)
+```
+
++ posix c线程库函数：
+```c
+// pthread_t、pthread_attr_t
 int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg);
 ```
 
-pthread_t、pthread_attr_t
 
-· Linux OS API：
+
++ Linux OS API：
   ```c
-  ssize_t write(int fd, const void *buf, size_t count);
-  ssize_t、size_t
+  // ssize_t、size_t
+  ssize_t write(int fd, const void *buf, size_t count); 
   ```
 
-· c标准库函数：`void *malloc(size_t size);`
++ c标准库函数：
+
+```c
+// size_t
+void *malloc(size_t size);
+```
 
 · 等等
 
@@ -298,10 +308,11 @@ typedef time_t long int;
 我们将time_t的typedef的过程简化了，实际上中间还经过了多次typedef，我们直接将其省略了。
 以后凡是看到`***_t`类型，你就知道这个typedef后的类型，尾缀t就是typedef的意思。
 
-实际上_t只是命名习惯，不加_t也无所谓，但是在c库、c框架、c语言的OS内核代码中，都习惯于给新类型名加_t。
-事实上我们自己在重命名时不建议使用_t结尾，因为这样容易和c库等源码中的`***_t`类型搞混。
+实际上_t只是命名习惯，不加_t也无所谓，但是在c库、c框架、c语言的OS内核代码中，都习惯于给新类型名加_t 
+
+**事实上我们自己在重命名时不建议使用_t结尾，因为这样容易和c库等源码中的`***_t`类型搞混**
 		
-## 4.5 c库、Linux内核代码中的***_t有什么用		
+## 4.5 c库、Linux内核代码中的`***_t`有什么用		
 
 我们这里举例说明。
 
@@ -315,7 +326,7 @@ typedef time_t long int;
 //windows环境的代码
 long int InitFun(long int arg)
 {
-	...
+    ...
 }
 ```
 
@@ -366,15 +377,15 @@ int32_t Init_Fun(int32_t arg)
 #endif	
 ```
 
-在代码中只需要使用`***_t`即可，当代码需要移植到不同平台时，只要定义`__WINDOWS`或作者`__LINUX`宏，就可以通过条件编译来选择32int_t到底是long int还是int，给移植带了极大的便利。
+在代码中只需要使用`***_t`即可，**当代码需要移植到不同平台时，只要定义`__WINDOWS`或者`__LINUX`宏，就可以通过条件编译来选择32int_t到底是long int还是int**，给移植带了极大的便利。
 
 对条件编译不了解的同学，请看第2章《预编译》，我们有详细介绍。	
 
 
 c库函数、c实现的OS（大多数OS都是c写的）、c框架代码，都是大型c软件，而且大多都涉及到跨平台的问题，
-比如：
-· c标准库：在各大OS（windows/linux/安卓）上都能使用，涉及到跨OS
-· linux OS：能够在ARM cpu上运行，也能在POWRPC的cpu上运行，涉及跨芯片
+比如：  
++ c标准库：在各大OS（windows/linux/安卓）上都能使用，涉及到跨OS  
++ linux OS：能够在ARM cpu上运行，也能在POWRPC的cpu上运行，涉及跨芯片  
 
 以上这些跨平台的代码都是海量级别的，所以如果没有`***_t`这种措施的话，跨平台移植时，就类型这一样就够折腾的。
 
@@ -382,7 +393,8 @@ c库函数、c实现的OS（大多数OS都是c写的）、c框架代码，都是
 
 ### 4.6.1 如果不涉及跨平台
 
-在这种情况下，我们可以直接使用原生类型，尽管如此，我们可能还是会使用typedef来重命名，不过此时只是想使用typedef来缩短类型名字的长度，让使用更加的方便，特别是函数的类型，有时候名字会非常长，如果不缩短名字，用起来非常不方便。
+在这种情况下，我们可以直接使用原生类型，尽管如此，我们可能还是会使用typedef来重命名，  
+不过此时只是想**使用typedef来缩短类型名字的长度**，让使用更加的方便，特别是函数的类型，有时候名字会非常长，如果不缩短名字，用起来非常不方便  
 比如：
 ```c
 void (*funp)(int, float, struct student *);
@@ -395,6 +407,6 @@ typedef void (*funType)(int, float, struct student *);
 funType p1;
 ```
 		
-		
-4.6.2 涉及到跨平台
-	那么此时就需要typedef定义出新类型名，以面对代码在不同平台的移植。
+### 4.6.2 涉及到跨平台
+
+那么此时就需要typedef定义出新类型名，以面对代码在不同平台的移植
