@@ -20,17 +20,17 @@ IO函数读写的较为频繁的就是硬盘（外设）上的文件，向文件
 就算没有标准IO，直接用文件IO一样可以实现数据输入输出，
 				
 ```shell
-			 应用程序
-					|
-					|
-			文件IO API 
-				 
-				 OS 
-				 
-			 驱动程序
-					|
-					|
-				设 备
+ 应用程序
+    |
+    |
+文件IO API
+    |
+    OS
+    |
+ 驱动程序
+    |
+    |
+  设 备
 (硬盘、键盘、USB、网卡)
 ```
 
@@ -64,8 +64,8 @@ c标准IO函数的功能和实现细节都是有统一规范的，由ANSI C这�
 事实上，标准IO函数除了能够基于OS运行外，实际上也能在裸机（单片机）上运行，总之有了c标准IO函数，只要各个平台都支持，我们不管在什么平台下都可以使用同一套熟悉的标准IO函数。
 
 ```shell
-		     	 标准IO函数
-							 										
+          标准IO函数
+
 Windows   Linux   unix    裸机
 ```
 
@@ -117,14 +117,14 @@ Windows   Linux   unix    裸机
 
 
 ```shell
-					打开、关闭文件           输出函数（写）          输入函数（读）           读写定位函数
-标准IO： 	fopen  fclose          fprintf、printf         fscanf、scanf              fseek
-																fputc、putc、            fgetc、getc、              ftell
-																putchar                  getchar                   rewind
-																fputs、puts              fgets、gets
-																fwrite、perror           fread
-                                                                                    
-文件IO：	open   close          write                    read                        lseek
+          打开、关闭文件           输出函数（写）          输入函数（读）           读写定位函数
+标准IO：  fopen  fclose          fprintf、printf         fscanf、scanf              fseek
+                                 fputc、putc、            fgetc、getc、              ftell
+                                 putchar                  getchar                   rewind
+                                 fputs、puts              fgets、gets
+                                 fwrite、perror           fread
+
+文件IO：  open   close          write                    read                        lseek
 ```
 
 + （1）标准IO输出函数和输入函数那么多，但实际上对接的只有个两个函数，read和write所有的输入函数都是基于read封装得到，所有的输出函数都是基于write封装得到。
