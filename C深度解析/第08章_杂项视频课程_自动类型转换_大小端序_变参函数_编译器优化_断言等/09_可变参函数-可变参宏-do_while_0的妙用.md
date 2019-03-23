@@ -139,21 +139,15 @@ int main(void)
 
 #### （1）可变参函数的定义格式
 
-返回类型
-
 ```c
-fun(type fmt, ...)
-```
+返回类型 fun(type fmt, ...)
 
-返回类型
-
-```c
-fun(type fmt, type fm, ...)
-```
+返回类型 fun(type fmt, type fm, ...)
 
 .......
+```
 
-`...`代表可变参数，其它的为固定参数，而且至少包含一个固定参数，...只能在最后。
+`...`代表可变参数，其它的为固定参数，而且至少包含一个固定参数，可变参数`...`只能在最后。
 
 scanf和printf的函数原型：
 
@@ -187,31 +181,34 @@ int main(void)
 
 fun的第一个形参的类型为`char *`，这个是定参，类型是写死的，而...中每个变参的类型则是由实参的类型来决定的。
 
-不过需要注意的是，在变参中当实参为int，short，char时，变参统统以int来接收，实参为float、double时则统统以double来接收：
+不过需要注意的是，**在变参中当实参为int，short，char时，变参统统以int来接收，实参为float、double时则统统以double来接收**：
+
 + `10、'a'`：以int接收，也就说会从栈中开辟int空间来存放
 + `123.56`：以double来接收。
 + `xxx`：为字符串常量，实际是存放在了.rodata中，“固定形参fmt”中放的只是字符串指针。
 
 我们假设是“从右到左”入栈。
-图7：
 
 **在fun函数中，如何访问...所代表的每个形参值呢？**
 
-+ 第1步：首先我们使用一个`char *`的指针变量（比如ap），指向...中第一个变参的空间，也就是...最左边的那个。图：
++ 第1步：首先我们使用一个`char *`的指针变量（比如ap），指向...中第一个变参的空间，也就是...最左边的那个。
 
 + 第2步：ap + ...中每个变参空间的大小，然后得到每一个变参空间的地址，然后再以每个变参空间的类型去解释
     “地址”所指向的空间。
     图8：
 
     `疑问`：如何知道...中每个参数的类型呢？
-    答：我们需要通过第一个fmt参数来得知...中每个变参的类型，讲到这里大家应该清楚了为什么scanf和printf函数的第一个参数会指定%d %s %f等格式，
+    答：我们需要通过第一个fmt参数(format)来得知...中每个变参的类型，讲到这里大家应该清楚了为什么scanf和printf函数的第一个参数会指定%d %s %f等格式，
 
     ```c
     printf("%d %f\n", 12, 123.56);
     ```
 
     这些格式就是用来指明每个变参的类型的，如果没有这些格式说明的话，就没有办法去解释每个变参空间。
+
     我们自己再实现“变参函数”时，可以沿用%d %f等这些格式，也可以自己规定新的格式，比如：
+
+    **很重要**
 
     ```c
     c：char
@@ -256,43 +253,42 @@ fun的第一个形参的类型为`char *`，这个是定参，类型是写死的
 + 2）例子代码
 
     ```c
-    #include "stdio.h"
+    #include <stdio.h>
     #include <stdarg.h> //必须包含
+    #include <string.h>
 
-    void fun(char *fmt, ...)
-    {
+    void fun(char *fmt, ...) {
         int i = 0;
+        int ival; // 接收c(char)、s(short)、i(int)
+        double dval; // 接收f(float)、d(double)
 
-        va_list ap = NULL; //等价于char *ap
+        va_list ap; //等价于char *ap
 
         va_start(ap, fmt); //让ap指向f...中的第一个参数
 
-        for(i=0; i<strlen(fmt); i++)
-        {
-            switch(fmt[i])
-            {
-                //c、s、i都以int解释
+        for (i = 0; i < strlen(fmt); i++) {
+            switch (fmt[i]) {
+                // c(char)、s(short)、i(int)都以int解释
                 case 'c':
                 case 's':
                 case 'i':
-                        printf("%d\n", *((int *)ap));
-                        va_arg(ap, int);  	//指向下一个变参空间
-                        break;
+                    ival = va_arg(ap, int);  // 指向下一个变参空间,同时返回当前位置的值,用int来接收不会丢精度
+                    printf("%d\n", ival); // 打印实际收到的值
+                    break;
 
-                //f、double都以double解释
+                // f(float)、d(double)都以double解释
                 case 'f':
                 case 'd':
-                        printf("%lf\n", *((double *)ap));
-                        va_arg(ap, float);	//指向下一个变参空间
-                        break;
+                    dval = va_arg(ap, double); // 指向下一个变参空间
+                    printf("%lf\n", dval);
+                    break;
             }
         }
 
         va_end(ap); //等价于ap = NULL
     }
 
-    int main(void)
-    {
+    int main(void) {
         int a = 10;
         char b = 'a';
         float c = 123.56;
@@ -302,6 +298,14 @@ fun的第一个形参的类型为`char *`，这个是定参，类型是写死的
 
         return 0;
     }
+    ```
+
+    结果为：
+
+    ···shell
+    10
+    97
+    123.559998
     ```
 
 ## 8.2 可变参宏
