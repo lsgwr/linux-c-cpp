@@ -56,287 +56,291 @@ IO函数读写的较为频繁的就是硬盘（外设）上的文件，向文件
  文件IO函数
     OS
 ```
-         
-		
-		c标准IO函数的功能和实现细节都是有统一规范的，由ANSI C这个专门制定各种标准的组织来制定。
-	不同的OS都会有自己的文件IO函数，基于不同OS运行的标准IO函数，会封装对接该OS的文件IO函数。
-		
-		正是由于有标准IO这个玩意，所以我们不论在什么OS上使用printf、scanf函数，函数效果都是一样的，现在几乎
-	所有的OS都支持C标准IO库，所以都能使用标准IO函数。
-		
-		事实上，标准IO函数除了能够基于OS运行外，实际上也能在裸机（单片机）上运行，总之有了c标准IO函数，只要
-	各个平台都支持，我们不管在什么平台下都可以使用同一套熟悉的标准IO函数。
-		
-						     	 标准IO函数
-											 										
-				Windows   Linux   unix    裸机        
-		
-		
-2.2.3 标准IO函数库（标准IO库）
-	基于OS运行时，标准IO库大多都是动态库，在裸机上运行时标准IO库则是静态库。
-	
-	“标准IO库”属于“C标准库”的一部分，使用标准IO函数时必须包含stdio.h头文件，因为调用标准IO函数所需的
-函数声明、相关宏定义、结构体类型定义等等都在stdio.h。
-	
-	
-2.3 常用c标准IO函数有哪些 
-	对于标准IO函数来说，重点是理解如何使用，而不是死记硬背，忘记时查阅笔记或者百度即可。
-	
-2.3.1 打开、关闭文件的函数
-（1）fopen：打开文件
-（2）fclose：关闭文件
-		
-		
-2.3.1 输出函数
-（1）fprintf、printf：格式化输出
-（2）fputc、putc、putchar：输出单个字符
-（3）fputs、puts：输出字符串
-（4）fwrite：输出二进制数据
 
-2.3.2 输入函数
-（1）fscanf、scanf：格式化输入
-（2）fgetc、getc、getchar：输入单个字符
-（3）fgets、gets：输入字符串
-（4）fread：输入二进制数据
-		
-2.3.3 调整读写位置的函数
-（1）fseek：调整文件读写指针的位置（调整读写的位置）
-（2）ftell：返回“文件读写指针”所在位置
-（3）rewind：将读写位置调整到文件头，从头开始读写
+c标准IO函数的功能和实现细节都是有统一规范的，由ANSI C这个专门制定各种标准的组织来制定。不同的OS都会有自己的文件IO函数，基于不同OS运行的标准IO函数，会封装对接该OS的文件IO函数。
 
-2.3.4 fflush：刷新标准IO的库缓存
-	
+正是由于有标准IO这个玩意，所以我们不论在什么OS上使用printf、scanf函数，函数效果都是一样的，现在几乎所有的OS都支持C标准IO库，所以都能使用标准IO函数。
 
-2.3.5 feof：判断是否读到了文件的末尾
-	
-	
-2.4 标准IO与文件IO的对应关系
-	基于OS运行的标准io函数，是基于文件io封装得到的。
-	
-	标准IO函数与文件IO函数的对应关系如下：
-	不同的OS都有自己的文件IO函数，我们这里是以Linux为例来介绍。
-	
-	
-						打开、关闭文件         输出函数（写）          输入函数（读）           读写定位函数
-	标准IO： 	fopen  fclose         fprintf、printf         fscanf、scanf                fseek
-																	fputc、putc、           fgetc、getc、                ftell
-																	putchar                 getchar                      rewind
-																	fputs、puts             fgets、gets
-																	fwrite、perror          fread
-                                                                                      
-	文件IO：	open   close          write                    read                        lseek
-	
-	
-（1）标准IO输出函数和输入函数那么多，但实际上对接的只有个两个函数，read和write
-		所有的输入函数都是基于read封装得到，所有的输出函数都是基于write封装得到。
-			
-		疑问：文件IO的读写只有read和write函数，但是为什么标准io的输入输出确封装出了一堆的函数？
-		答：方便用户使用，满足各种输入、输出需要。
-		
-（2）feof和fflush是一个纯粹的库函数，不对应任何OS API
-		
+事实上，标准IO函数除了能够基于OS运行外，实际上也能在裸机（单片机）上运行，总之有了c标准IO函数，只要各个平台都支持，我们不管在什么平台下都可以使用同一套熟悉的标准IO函数。
 
-2.5 常见标准IO函数的用法
+```shell
+		     	 标准IO函数
+							 										
+Windows   Linux   unix    裸机
+```
 
-2.5.1 如何查看标准IO函数的手册
-（1）在windows下
+### 2.2.3 标准IO函数库（标准IO库）
+
+基于OS运行时，标准IO库大多都是动态库，在裸机上运行时标准IO库则是静态库。
+
+“标准IO库”属于“C标准库”的一部分，使用标准IO函数时必须包含stdio.h头文件，因为调用标准IO函数所需的函数声明、相关宏定义、结构体类型定义等等都在stdio.h  
+
+## 2.3 常用c标准IO函数有哪些
+
+对于标准IO函数来说，重点是理解如何使用，而不是死记硬背，忘记时查阅笔记或者百度即可。
+
+### 2.3.1 打开、关闭文件的函数
+
++ （1）`fopen`：打开文件
++ （2）`fclose`：关闭文件
+
+### 2.3.1 输出函数
+
++ （1）`fprintf`、`printf`：格式化输出
++ （2）`fputc`、`putc`、`putchar`：输出单个字符
++ （3）`fputs`、`puts`：输出字符串
++ （4）`fwrite`：输出二进制数据
+
+### 2.3.2 输入函数
+
++ （1）`fscanf`、`scanf`：格式化输入
++ （2）`fgetc`、`getc`、`getchar`：输入单个字符
++ （3）`fgets`、`gets`：输入字符串
++ （4）`fread`：输入二进制数据
+
+### 2.3.3 调整读写位置的函数
+
++ （1）fseek：调整文件读写指针的位置（调整读写的位置）
++ （2）ftell：返回“文件读写指针”所在位置
++ （3）rewind：将读写位置调整到文件头，从头开始读写
+
+### 2.3.4 fflush：刷新标准IO的库缓存
+
+### 2.3.5 feof：判断是否读到了文件的末尾
+
+## 2.4 标准IO与文件IO的对应关系
+
+基于OS运行的标准io函数，是基于文件io封装得到的。
+
+标准IO函数与文件IO函数的对应关系如下：
+不同的OS都有自己的文件IO函数，我们这里是以Linux为例来介绍。
+
+
+```shell
+					打开、关闭文件           输出函数（写）          输入函数（读）           读写定位函数
+标准IO： 	fopen  fclose          fprintf、printf         fscanf、scanf              fseek
+																fputc、putc、            fgetc、getc、              ftell
+																putchar                  getchar                   rewind
+																fputs、puts              fgets、gets
+																fwrite、perror           fread
+                                                                                    
+文件IO：	open   close          write                    read                        lseek
+```
+
++ （1）标准IO输出函数和输入函数那么多，但实际上对接的只有个两个函数，read和write所有的输入函数都是基于read封装得到，所有的输出函数都是基于write封装得到。
+		`疑问`：文件IO的读写只有read和write函数，但是为什么标准io的输入输出确封装出了一堆的函数？
+		 答：方便用户使用，满足各种输入、输出需要。
+
+###（2）feof和fflush是一个纯粹的库函数，不对应任何OS API
+
+## 2.5 常见标准IO函数的用法
+
+### 2.5.1 如何查看标准IO函数的手册
+
++ （1）在windows下
 		我们需要单独下载c标准库手册，里面包含标准IO函数的手册。
 		事实上每一个函数在百度百科里面都有详细说明，我们直接查看百度百科也是可以的。
-		
-（2）Linux自带函数手册（man手册），使用man命令即可查看，除了查看c标准库的函数外，还可以查看Linux OS API
-		使用man命令查看c标准库的函数时，需要加数字3，这个在“Linux基础”课程中早就介绍过了。
-		
-		
-2.5.2 fopen
-（1）函数原型
-		#include <stdio.h>
-		FILE *fopen(const char *path, const char *mode);
 
-（2）函数功能
-		打开文件，供后续进行读写等的操作。
-		
-（3）参数
-		1）path：为一个字符串，用于指定你要打开文件的“路径名”。
-		2）mode：也一个字符串，用于指定打开方式
-		（a）r：以只读方式打开文件，此时只能读不能写
-						以这种方式打开时，要求文件必须存在，如果不存在，fopen时会返回NULL，表示出错了。
-		
-						指定方式："r"
-		
-		（b）r+：以读写方式打开，此时可以读可以写，也要求文件必须存在，否者这就会报错
-		
-		
-		（c）w：以只写方式打开文件
-				· 如果文件存在，打开成功后，会将文件原有内容全部清空
-				· 如果文件不存在则会创建这个文件，然后再打开
-		
-		（d）w+：以读写方式打开，文件存在的话，打开后将原有内容清空，不存在就创建该文件
-		
-		
-		（e）a：只写方式打开文件，但是与w不同的是
-				· 如果文件存在的话，打开成功后，不会清空文件中原有的内容
-					向文件写数据时，会在原有内容的末尾追加数据，a就是add的首字母。
-				
-				· 不存在就创建该文件	
-					
-				
-		（f）a+：以可读可写的追加方式打开文件，如果文件不存在就创建该文件
-	
-	
-	
-		（g）t和b
-				除了以上r、w外，还有b、t，不过b、t是与r/w/a等配合使用的，比如rt/rt+/rb、wt/wb等，如果不明写
-			出b/t的话，默认就为t。
-				
-				t：以文本方式打开文件
-				b：以二进制方式打开文件
-					在Linux这边并没有这两种打开方式的区别，只有windows才有，而我们的课程方向主要时面对Linux方向，
-				而且b和t区别理解起来很繁琐，就算在windows下，大多数情况下也没有必要区分，因此我们这里不介
-				绍t、b的区别。
-			
-			
-		FILE *fopen(const char *path, const char *mode);			
++ （2）Linux自带函数手册（man手册），使用man命令即可查看，除了查看c标准库的函数外，还可以查看Linux OS API
+    使用man命令查看c标准库的函数时，需要加数字3，这个在“Linux基础”课程中早就介绍过了。
 
-（4）返回值
-		1）成功
-				返回一个指针 FILE *的指针，我们称为这个“文件指针”，得到这个指针后，就表示文件打开成功了，之后就
-			可以使用这个“文件指针”来读写文件了。
-				
-		2）失败
-				返回NULL，并且errno被设置相应错误的错误号。
-				之后我们就可以调用perror或者strerror将错误号翻译为字符串，以提示具体出了什么错误。
-				
-（5）类型FILE
-		1）如何查看FILE这个类型
-				FILE在stdio.h中，为typedef之后的类型名，
-				
-				windows下：在IDE的安装目录下可以搜索到stdio.h，比如我可以到Codeblocks IDE的安装目录下找到stdio.h
-				Linux：Linux系统自带有c标准库的头文件，在/usr/include/目录下，可以找几乎所有的c标准库头文件，
-					其中就包括stdio.h。
-				
-				
-		2）FILE所对应的原类型			
-		（a）windows
-					typedef struct _iobuf FILE; 
-		
-					typedef struct _iobuf {
-						char *_ptr;     //文件输入的下一个位置
-						int   _cnt;     //当前缓冲区的相对位置
-						char *_base;    //应该是文件的起始位置
-						int   _flag;    //文件标志
-						int   _file;    //文件的有效性验证
-						int   _charbuf; //标记缓冲的类型
-						int   _bufsiz;  //缓存大小
-						char *_tmpfname;//临时文件名
-					} FILE;
-					
-					直接就定义在了stdio.h中，原类型为struct _iobuf。
-			 
-			 
-			（b）Linux：
-					typedef struct _IO_FILE FILE; 
-					
-					原类型为struct _IO_FILE，struct _IO_FILE这个结构体定义在了/usr/include/libio.h中，stdio.h会间接
-				包含libio.h。
-						struct _IO_FILE 
-						{
-								int _flags;           /* High-order word is _IO_MAGIC; rest is flags. */
-								char* _IO_read_ptr;   /* Current read pointer */
-								char* _IO_read_end;   /* End of get area. */
-								char* _IO_read_base;  /* Start of putback+get area. */
-								char* _IO_write_base; /* Start of put area. */
-								char* _IO_write_ptr;  /* Current put pointer. */
-								char* _IO_write_end;  /* End of put area. */
-								char* _IO_buf_base;   /* Start of reserve area. */
-								char* _IO_buf_end;    /* End of reserve area. */
-								/* The following fields are used to support backing up and undo. */
-								char *_IO_save_base; /* Pointer to start of non-current get area. */
-															char* _IO_buf_end;    /* End of reserve area. */
-								/* The following fields are used to support backing up and undo. */
-								...
-								...
-								int _fileno;  //访问文件描述符用的，这是Linux这边特有的
-						};
+### 2.5.2 fopen
+
+####（1）函数原型
+
+```c
+#include <stdio.h>
+FILE *fopen(const char *path, const char *mode);
+```
+
+####（2）函数功能
+
+打开文件，供后续进行读写等的操作。
+
+####（3）参数
+
++ 1）path：为一个字符串，用于指定你要打开文件的“路径名”。
++ 2）mode：也一个字符串，用于指定打开方式
+    + （a）r：以只读方式打开文件，此时只能读不能写
+				以这种方式打开时，要求文件必须存在，如果不存在，fopen时会返回NULL，表示出错了。
+
+				指定方式："r"
+
+    + （b）r+：以读写方式打开，此时可以读可以写，也要求文件必须存在，否者这就会报错
+
+
+    + （c）w：以只写方式打开文件
+    		+ 如果文件存在，打开成功后，会将文件原有内容全部清空
+    		+ 如果文件不存在则会创建这个文件，然后再打开
+    
+    + （d）w+：以读写方式打开，文件存在的话，打开后将原有内容清空，不存在就创建该文件
+    
+    
+    + （e）a：只写方式打开文件，但是与w不同的是
+    		+ 如果文件存在的话，打开成功后，不会清空文件中原有的内容
+    			向文件写数据时，会在原有内容的末尾追加数据，a就是add的首字母。
+    		
+    		+ 不存在就创建该文件
+
+    + （f）a+：以可读可写的追加方式打开文件，如果文件不存在就创建该文件
+
+    + （g）t和b
+    		除了以上r、w外，还有b、t，不过b、t是与r/w/a等配合使用的，比如rt/rt+/rb、wt/wb等，如果不明写出b/t的话，默认就为t。
+    		
+    		+ t：以文本方式打开文件
+    		+ b：以二进制方式打开文件
+    			在Linux这边并没有这两种打开方式的区别，只有windows才有，而我们的课程方向主要时面对Linux方向，而且b和t区别理解起来很繁琐，就算在windows下，大多数情况下也没有必要区分，因此我们这里不介绍t、b的区别。
+
+
+#### （4）返回值
+
++ 1）成功
+	返回一个指针 FILE *的指针，我们称为这个“文件指针”，得到这个指针后，就表示文件打开成功了，之后就可以使用这个“文件指针”来读写文件了。
+
++ 2）失败
+	返回NULL，并且errno被设置相应错误的错误号。
+	之后我们就可以调用perror或者strerror将错误号翻译为字符串，以提示具体出了什么错误。
+
+#### （5）类型FILE
+
++ 1）如何查看FILE这个类型
+		FILE在stdio.h中，为typedef之后的类型名，
+
+		+ windows下：在IDE的安装目录下可以搜索到stdio.h，比如我可以到Codeblocks IDE的安装目录下找到stdio.h
+		+ Linux：Linux系统自带有c标准库的头文件，在/usr/include/目录下，可以找几乎所有的c标准库头文件，其中就包括stdio.h。
+
++ 2）FILE所对应的原类型
+  +（a）windows
+
+			```c
+      typedef struct _iobuf FILE; 
+
+			typedef struct _iobuf {
+				char *_ptr;     //文件输入的下一个位置
+				int   _cnt;     //当前缓冲区的相对位置
+				char *_base;    //应该是文件的起始位置
+				int   _flag;    //文件标志
+				int   _file;    //文件的有效性验证
+				int   _charbuf; //标记缓冲的类型
+				int   _bufsiz;  //缓存大小
+				char *_tmpfname;//临时文件名
+			} FILE;
+      ```
 			
+			直接就定义在了stdio.h中，原类型为struct _iobuf。
+	 
+	 
+	+ （b）Linux：
+
+      ```c
+      typedef struct _IO_FILE FILE;
+      ``` 
 			
+			原类型为struct _IO_FILE，struct _IO_FILE这个结构体定义在了/usr/include/libio.h中，stdio.h会间接包含libio.h。
 			
-			（c）FILE是个什么结构体
-					打开文件时，这个结构体中放的是标准库函数操作文件的一些基本信息，在后续使用标准IO函数读写
-				文件时需要用到这些基本信息，这也是需事先打开文件的原因，如果不事先打开文件并建立基本信息，后
-				续无法使用标准IO函数来操作文件。
-					
-					我们这里介绍FILE的结构体原型，只是想让大家知道FILE大概是咋回事，并不是想大家去深究，我们也无
-				法深究，因为我们并不清楚标准io函数源码的具体实现，而且作为应用工程师来说，深究这些没有意义。
-				
-					
-			（d）为什么windows这边FILE和Linux那边的FILE的原型不一致
-					不一致的原有如下：
-					· 只要按照c标准的要求，提供规定功能与格式的标准库io函数即可，至于内部实现完全可以不一样
-					
-					· windows与Linux本来就是不同的OS，针对这两个平台的标准IO函数在对接各自的OS时，必然会有所不同
-					
-					· 针对不同OS的标准库，大多由不同的团队开发，不同的开发团队在实现时，细节必然会有所不同
-					
-						所以对于标准IO函数来说，只要函数功能、函数格式符合c标准的要求即可，至于代码实现细节不必一样，
-					也不可能完全一样。
-					
-					
-				
-（6）使用举例
-			#include <stdio.h>
-			
-			#define print_error(str) \
-			do{\
-					fprintf(stderr, "File %s, Line %d, Function %s error\n", __FILE__, __LINE__, str);\
-					perror("error Reason");\
-					exit(-1);\
-			}while(0);
-			
-			void main()
+      ```c
+      struct _IO_FILE 
 			{
-				FILE *fp = NULL;
-				
-				//fp = fopen("/home/zxf/Desktop/file.txt", "r"); 								//Linux
-				fp = fopen("C:\\Users\\Administrator\\Desktop\\file.txt", "r"); //whindows
-				if(NULL == fp) print_error("fopen")
-				
-				printf("%p\n", fp); 
+					int _flags;           /* High-order word is _IO_MAGIC; rest is flags. */
+					char* _IO_read_ptr;   /* Current read pointer */
+					char* _IO_read_end;   /* End of get area. */
+					char* _IO_read_base;  /* Start of putback+get area. */
+					char* _IO_write_base; /* Start of put area. */
+					char* _IO_write_ptr;  /* Current put pointer. */
+					char* _IO_write_end;  /* End of put area. */
+					char* _IO_buf_base;   /* Start of reserve area. */
+					char* _IO_buf_end;    /* End of reserve area. */
+					/* The following fields are used to support backing up and undo. */
+					char *_IO_save_base; /* Pointer to start of non-current get area. */
+												char* _IO_buf_end;    /* End of reserve area. */
+					/* The following fields are used to support backing up and undo. */
+					...
+					...
+					int _fileno;  //访问文件描述符用的，这是Linux这边特有的
+			};
+      ```
 			
-				return 0;
-			}
 			
-			运行结果为：
-				File C:\Users\Administrator\Desktop\EGEProj\qq\a.c, Line 16, Function fopen error
-				error Reason: No such file or directory
 			
-				以r只读方式打开文件时，文件必须存在，如果不存在就返回NULL，并设置errno报错。
-				
+	+ （c）FILE是个什么结构体
+			打开文件时，这个结构体中放的是标准库函数操作文件的一些基本信息，在后续使用标准IO函数读写文件时需要用到这些基本信息，这也是需事先打开文件的原因，如果不事先打开文件并建立基本信息，后续无法使用标准IO函数来操作文件。
 			
-（7）fopen如何对接open（文件IO函数）				
-			我们以Linux这边的标准io函数中fopen为例来介绍？
-				
-				FILE *fopen(const char *path， const char *mode)
-						| 创建FILE结构体，在FILE结构体中保存标准IO函数操作时所需的基本信息，其中包括open这个文件IO函数所返回的“文件描述符”
-						| 
-						|  struct _IO_FILE {
-						|  	...
-						|		int _fileno; //存放open返回的“文件描述符”
-						|  }
-						|
-						V
-				int open(const char *pathname, int flags, mode_t mode);
-					  |  open这个文件IO函数打开文件时，会建立文件的管理信息，这些管理信息是后续操作文件的基础。
-						|  open成功后会返回“文件描述符”，文件IO的读写函数通过“文件描述符”即可读写文件。
-						|
-					  OS
-						|
-						|
-						V
-           文件
+			我们这里介绍FILE的结构体原型，只是想让大家知道FILE大概是咋回事，并不是想大家去深究，我们也无法深究，因为我们并不清楚标准io函数源码的具体实现，而且作为应用工程师来说，深究这些没有意义。
 
-			访问的过程：文件指针 ————>FILE结构体de _fileno成员（文件描述符） ————> 操作文件
-					 
-					 
+	+ （d）为什么windows这边FILE和Linux那边的FILE的原型不一致不一致的原有如下：
+			+  只要按照c标准的要求，提供规定功能与格式的标准库io函数即可，至于内部实现完全可以不一样
+			
+			+  windows与Linux本来就是不同的OS，针对这两个平台的标准IO函数在对接各自的OS时，必然会有所不同
+			
+			+  针对不同OS的标准库，大多由不同的团队开发，不同的开发团队在实现时，细节必然会有所不同
+			
+			所以对于标准IO函数来说，只要函数功能、函数格式符合c标准的要求即可，至于代码实现细节不必一样，也不可能完全一样。
+
+#### （6）使用举例
+
+```c
+#include <stdio.h>
+
+#define print_error(str) \
+do{\
+		fprintf(stderr, "File %s, Line %d, Function %s error\n", __FILE__, __LINE__, str);\
+		perror("error Reason");\
+		exit(-1);\
+}while(0);
+
+void main()
+{
+	FILE *fp = NULL;
+	
+	//fp = fopen("/home/zxf/Desktop/file.txt", "r"); 								//Linux
+	fp = fopen("C:\\Users\\Administrator\\Desktop\\file.txt", "r"); //whindows
+	if(NULL == fp) print_error("fopen")
+	
+	printf("%p\n", fp); 
+
+	return 0;
+}
+```
+
+运行结果为：
+
+```shell
+File C:\Users\Administrator\Desktop\EGEProj\qq\a.c, Line 16, Function fopen error
+error Reason: No such file or directory
+```
+
+以r只读方式打开文件时，文件必须存在，如果不存在就返回NULL，并设置errno报错。
+
+#### （7）fopen如何对接open（文件IO函数）				
+我们以Linux这边的标准io函数中fopen为例来介绍？
+	
+```c
+FILE *fopen(const char *path， const char *mode)
+		| 创建FILE结构体，在FILE结构体中保存标准IO函数操作时所需的基本信息，其中包括open这个文件IO函数所返回的“文件描述符”
+		| 
+		|  struct _IO_FILE {
+		|  	...
+		|		int _fileno; //存放open返回的“文件描述符”
+		|  }
+		|
+		V
+int open(const char *pathname, int flags, mode_t mode);
+	  |  open这个文件IO函数打开文件时，会建立文件的管理信息，这些管理信息是后续操作文件的基础。
+		|  open成功后会返回“文件描述符”，文件IO的读写函数通过“文件描述符”即可读写文件。
+		|
+	  OS
+		|
+		|
+		V
+   文件
+```
+
+访问的过程：
+
+```c
+文件指针 ————>FILE结构体de _fileno成员（文件描述符） ————> 操作文件
+```
+
 2.6 fclose
 2.6.1 函数原型
 	 #include <stdio.h>
