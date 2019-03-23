@@ -528,15 +528,15 @@ int fun()
 
     ret = fun1(ptr); //返回1代表Ok
     if(ret != 1)
-            goto FREE;
+        goto FREE;
 
     ret = fun2(ptr); //返回1代表Ok
     if(ret != 1)
-            goto FREE;
+        goto FREE;
 
     ret = fun3(ptr); //返回1代表Ok
     if(ret != 1)
-            goto FREE;
+        goto FREE;
 
 FREE:
     free(ptr);
@@ -544,7 +544,7 @@ FREE:
 }
 ```
 
-因为goto的缺点，在c实际上不建议大量使用goto，但是这里确使用了很多的goto，显然不好，此时我们可以改为
+因为goto的缺点，**在c实际上不建议大量使用goto**, 但是这里确使用了很多的goto，显然不好，此时我们可以改为
 如下形式：
 
 ```c
@@ -591,15 +591,15 @@ int fun()
 
     do
     {
-        ret = fun1(ptr); 
+        ret = fun1(ptr);
+        if(ret != 1) break; // break退出循环
+
+        ret = fun2(ptr);
         if(ret != 1) break;
 
-        ret = fun2(ptr); 
+        ret = fun3(ptr);
         if(ret != 1) break;
-
-        ret = fun3(ptr); 
-        if(ret != 1) break;
-    }while(0);
+    }while(0); // while(0)实际只执行一次就退出了
 
     free(ptr);
     return 0;
