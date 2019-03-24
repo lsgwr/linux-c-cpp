@@ -117,8 +117,8 @@ Windows   Linux   unix    裸机
 
 
 ```shell
-          打开、关闭文件           输出函数（写）          输入函数（读）           读写定位函数
-标准IO：  fopen  fclose          fprintf、printf         fscanf、scanf              fseek
+          打开、关闭文件           输出函数（写）           输入函数（读）            读写定位函数
+标准IO：  fopen  fclose           fprintf、printf         fscanf、scanf              fseek
                                  fputc、putc、            fgetc、getc、              ftell
                                  putchar                  getchar                   rewind
                                  fputs、puts              fgets、gets
@@ -128,8 +128,8 @@ Windows   Linux   unix    裸机
 ```
 
 + （1）标准IO输出函数和输入函数那么多，但实际上对接的只有个两个函数，read和write所有的输入函数都是基于read封装得到，所有的输出函数都是基于write封装得到。
-		`疑问`：文件IO的读写只有read和write函数，但是为什么标准io的输入输出确封装出了一堆的函数？
-		 答：方便用户使用，满足各种输入、输出需要。
+	`疑问`：文件IO的读写只有read和write函数，但是为什么标准io的输入输出确封装出了一堆的函数？
+	 答：方便用户使用，满足各种输入、输出需要。
 
 ###（2）feof和fflush是一个纯粹的库函数，不对应任何OS API
 
@@ -162,119 +162,108 @@ FILE *fopen(const char *path, const char *mode);
 + 1）path：为一个字符串，用于指定你要打开文件的“路径名”。
 + 2）mode：也一个字符串，用于指定打开方式
     + （a）r：以只读方式打开文件，此时只能读不能写
-				以这种方式打开时，要求文件必须存在，如果不存在，fopen时会返回NULL，表示出错了。
-
-				指定方式："r"
-
+			以这种方式打开时，要求文件必须存在，如果不存在，fopen时会返回NULL，表示出错了。指定方式："r"
     + （b）r+：以读写方式打开，此时可以读可以写，也要求文件必须存在，否者这就会报错
 
-
     + （c）w：以只写方式打开文件
-    		+ 如果文件存在，打开成功后，会将文件原有内容全部清空
-    		+ 如果文件不存在则会创建这个文件，然后再打开
+    	+ 如果文件存在，打开成功后，会将文件原有内容全部清空
+    	+ 如果文件不存在则会创建这个文件，然后再打开
     
     + （d）w+：以读写方式打开，文件存在的话，打开后将原有内容清空，不存在就创建该文件
-    
-    
-    + （e）a：只写方式打开文件，但是与w不同的是
-    		+ 如果文件存在的话，打开成功后，不会清空文件中原有的内容
-    			向文件写数据时，会在原有内容的末尾追加数据，a就是add的首字母。
-    		
-    		+ 不存在就创建该文件
+
+    + （e）a：只写方式打开文件，但是与w不同的是  
+    	+ 如果文件存在的话，打开成功后，不会清空文件中原有的内容  
+    	  向文件写数据时，会在原有内容的末尾追加数据，a就是add的首字母。
+    	+ 不存在就创建该文件
 
     + （f）a+：以可读可写的追加方式打开文件，如果文件不存在就创建该文件
 
     + （g）t和b
-    		除了以上r、w外，还有b、t，不过b、t是与r/w/a等配合使用的，比如rt/rt+/rb、wt/wb等，如果不明写出b/t的话，默认就为t。
-    		
-    		+ t：以文本方式打开文件
-    		+ b：以二进制方式打开文件
-    			在Linux这边并没有这两种打开方式的区别，只有windows才有，而我们的课程方向主要时面对Linux方向，而且b和t区别理解起来很繁琐，就算在windows下，大多数情况下也没有必要区分，因此我们这里不介绍t、b的区别。
+    	除了以上r、w外，还有b、t，不过b、t是与r/w/a等配合使用的，比如rt/rt+/rb、wt/wb等，如果不明写出b/t的话，默认就为t。
+
+    	+ t：以文本方式打开文件
+    	+ b：以二进制方式打开文件  
+    	 在Linux这边并没有这两种打开方式的区别，只有windows才有，而我们的课程方向主要时面对Linux方向，而且b和t区别理解起来很繁琐，就算在windows下，大多数情况下也没有必要区分，因此我们这里不介绍t、b的区别。
 
 
 #### （4）返回值
 
-+ 1）成功
++ 1）成功  
 	返回一个指针 FILE *的指针，我们称为这个“文件指针”，得到这个指针后，就表示文件打开成功了，之后就可以使用这个“文件指针”来读写文件了。
 
-+ 2）失败
++ 2）失败  
 	返回NULL，并且errno被设置相应错误的错误号。
 	之后我们就可以调用perror或者strerror将错误号翻译为字符串，以提示具体出了什么错误。
 
 #### （5）类型FILE
 
-+ 1）如何查看FILE这个类型
-		FILE在stdio.h中，为typedef之后的类型名，
-
-		+ windows下：在IDE的安装目录下可以搜索到stdio.h，比如我可以到Codeblocks IDE的安装目录下找到stdio.h
-		+ Linux：Linux系统自带有c标准库的头文件，在/usr/include/目录下，可以找几乎所有的c标准库头文件，其中就包括stdio.h。
++ 1）如何查看FILE这个类型 
+	FILE在stdio.h中，为typedef之后的类型名，
+	+ windows下：在IDE的安装目录下可以搜索到stdio.h，比如我可以到Codeblocks IDE的安装目录下找到stdio.h
+	+ Linux：Linux系统自带有c标准库的头文件，在/usr/include/目录下，可以找几乎所有的c标准库头文件，其中就包括stdio.h。
 
 + 2）FILE所对应的原类型
-  +（a）windows
+  + （a）windows
 
-			```c
-      typedef struct _iobuf FILE; 
+	```c
+    typedef struct _iobuf FILE;
 
-			typedef struct _iobuf {
-				char *_ptr;     //文件输入的下一个位置
-				int   _cnt;     //当前缓冲区的相对位置
-				char *_base;    //应该是文件的起始位置
-				int   _flag;    //文件标志
-				int   _file;    //文件的有效性验证
-				int   _charbuf; //标记缓冲的类型
-				int   _bufsiz;  //缓存大小
-				char *_tmpfname;//临时文件名
-			} FILE;
-      ```
-			
-			直接就定义在了stdio.h中，原类型为struct _iobuf。
-	 
-	 
+	typedef struct _iobuf {
+		char *_ptr;     //文件输入的下一个位置
+		int   _cnt;     //当前缓冲区的相对位置
+		char *_base;    //应该是文件的起始位置
+		int   _flag;    //文件标志
+		int   _file;    //文件的有效性验证
+		int   _charbuf; //标记缓冲的类型
+		int   _bufsiz;  //缓存大小
+		char *_tmpfname;//临时文件名
+	} FILE;
+    ```
+
+	直接就定义在了stdio.h中，原类型为struct _iobuf。
+
 	+ （b）Linux：
 
       ```c
       typedef struct _IO_FILE FILE;
-      ``` 
-			
-			原类型为struct _IO_FILE，struct _IO_FILE这个结构体定义在了/usr/include/libio.h中，stdio.h会间接包含libio.h。
+      ```
+	  原类型为struct _IO_FILE，struct _IO_FILE这个结构体定义在了/usr/include/libio.h中，stdio.h会间接包含libio.h。
 			
       ```c
-      struct _IO_FILE 
-			{
-					int _flags;           /* High-order word is _IO_MAGIC; rest is flags. */
-					char* _IO_read_ptr;   /* Current read pointer */
-					char* _IO_read_end;   /* End of get area. */
-					char* _IO_read_base;  /* Start of putback+get area. */
-					char* _IO_write_base; /* Start of put area. */
-					char* _IO_write_ptr;  /* Current put pointer. */
-					char* _IO_write_end;  /* End of put area. */
-					char* _IO_buf_base;   /* Start of reserve area. */
-					char* _IO_buf_end;    /* End of reserve area. */
-					/* The following fields are used to support backing up and undo. */
-					char *_IO_save_base; /* Pointer to start of non-current get area. */
-												char* _IO_buf_end;    /* End of reserve area. */
-					/* The following fields are used to support backing up and undo. */
-					...
-					...
-					int _fileno;  //访问文件描述符用的，这是Linux这边特有的
-			};
+      struct _IO_FILE
+	  {
+	  	int _flags;           /* High-order word is _IO_MAGIC; rest is flags. */
+	  	char* _IO_read_ptr;   /* Current read pointer */
+	  	char* _IO_read_end;   /* End of get area. */
+	  	char* _IO_read_base;  /* Start of putback+get area. */
+	  	char* _IO_write_base; /* Start of put area. */
+	  	char* _IO_write_ptr;  /* Current put pointer. */
+	  	char* _IO_write_end;  /* End of put area. */
+	  	char* _IO_buf_base;   /* Start of reserve area. */
+	  	char* _IO_buf_end;    /* End of reserve area. */
+	  	/* The following fields are used to support backing up and undo. */
+	  	char *_IO_save_base; /* Pointer to start of non-current get area. */
+		char* _IO_buf_end;    /* End of reserve area. */
+		/* The following fields are used to support backing up and undo. */
+		...
+		...
+		int _fileno;  //访问文件描述符用的，这是Linux这边特有的
+	  };
       ```
-			
-			
-			
+
 	+ （c）FILE是个什么结构体
-			打开文件时，这个结构体中放的是标准库函数操作文件的一些基本信息，在后续使用标准IO函数读写文件时需要用到这些基本信息，这也是需事先打开文件的原因，如果不事先打开文件并建立基本信息，后续无法使用标准IO函数来操作文件。
-			
-			我们这里介绍FILE的结构体原型，只是想让大家知道FILE大概是咋回事，并不是想大家去深究，我们也无法深究，因为我们并不清楚标准io函数源码的具体实现，而且作为应用工程师来说，深究这些没有意义。
+		打开文件时，这个结构体中放的是标准库函数操作文件的一些基本信息，在后续使用标准IO函数读写文件时需要用到这些基本信息，这也是需事先打开文件的原因，如果不事先打开文件并建立基本信息，后续无法使用标准IO函数来操作文件。
+
+		我们这里介绍FILE的结构体原型，只是想让大家知道FILE大概是咋回事，并不是想大家去深究，我们也无法深究，因为我们并不清楚标准io函数源码的具体实现，而且作为应用工程师来说，深究这些没有意义。
 
 	+ （d）为什么windows这边FILE和Linux那边的FILE的原型不一致不一致的原有如下：
-			+  只要按照c标准的要求，提供规定功能与格式的标准库io函数即可，至于内部实现完全可以不一样
-			
-			+  windows与Linux本来就是不同的OS，针对这两个平台的标准IO函数在对接各自的OS时，必然会有所不同
-			
-			+  针对不同OS的标准库，大多由不同的团队开发，不同的开发团队在实现时，细节必然会有所不同
-			
-			所以对于标准IO函数来说，只要函数功能、函数格式符合c标准的要求即可，至于代码实现细节不必一样，也不可能完全一样。
+		+  只要按照c标准的要求，提供规定功能与格式的标准库io函数即可，至于内部实现完全可以不一样
+
+		+  windows与Linux本来就是不同的OS，针对这两个平台的标准IO函数在对接各自的OS时，必然会有所不同
+
+		+  针对不同OS的标准库，大多由不同的团队开发，不同的开发团队在实现时，细节必然会有所不同
+
+		所以对于标准IO函数来说，只要函数功能、函数格式符合c标准的要求即可，至于代码实现细节不必一样，也不可能完全一样。
 
 #### （6）使用举例
 
@@ -283,9 +272,9 @@ FILE *fopen(const char *path, const char *mode);
 
 #define print_error(str) \
 do{\
-		fprintf(stderr, "File %s, Line %d, Function %s error\n", __FILE__, __LINE__, str);\
-		perror("error Reason");\
-		exit(-1);\
+	fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, str);\
+	perror("error Reason");\
+	exit(-1);\
 }while(0);
 
 void main()
@@ -311,28 +300,28 @@ error Reason: No such file or directory
 
 以r只读方式打开文件时，文件必须存在，如果不存在就返回NULL，并设置errno报错。
 
-#### （7）fopen如何对接open（文件IO函数）				
+#### （7）fopen如何对接open（文件IO函数）
 我们以Linux这边的标准io函数中fopen为例来介绍？
-	
+
 ```c
 FILE *fopen(const char *path， const char *mode)
-		| 创建FILE结构体，在FILE结构体中保存标准IO函数操作时所需的基本信息，其中包括open这个文件IO函数所返回的“文件描述符”
-		| 
-		|  struct _IO_FILE {
-		|  	...
-		|		int _fileno; //存放open返回的“文件描述符”
-		|  }
-		|
-		V
+        | 创建FILE结构体，在FILE结构体中保存标准IO函数操作时所需的基本信息，其中包括open这个文件IO函数所返回的“文件描述符”
+        |
+        |  struct _IO_FILE {
+        |    ...
+        |    int _fileno; //存放open返回的“文件描述符”
+        |  }
+        |
+        V
 int open(const char *pathname, int flags, mode_t mode);
-	  |  open这个文件IO函数打开文件时，会建立文件的管理信息，这些管理信息是后续操作文件的基础。
-		|  open成功后会返回“文件描述符”，文件IO的读写函数通过“文件描述符”即可读写文件。
-		|
-	  OS
-		|
-		|
-		V
-   文件
+        |  open这个文件IO函数打开文件时，会建立文件的管理信息，这些管理信息是后续操作文件的基础。
+        |  open成功后会返回“文件描述符”，文件IO的读写函数通过“文件描述符”即可读写文件。
+        |
+        OS
+        |
+        |
+        V
+       文件
 ```
 
 访问的过程：
@@ -341,207 +330,236 @@ int open(const char *pathname, int flags, mode_t mode);
 文件指针 ————>FILE结构体de _fileno成员（文件描述符） ————> 操作文件
 ```
 
-2.6 fclose
-2.6.1 函数原型
-	 #include <stdio.h>
-	 int fclose(FILE *stream);
+## 2.6 fclose
 
-2.6.2 功能：关闭打开的文件
-2.6.3 参数：fopen返回的文件指针
-2.6.4 返回值
-	成功返回0，失败返回EOF宏（宏值为-1），并且errno被设置。
+### 2.6.1 函数原型
 
-2.6.4 例子：关闭之前fopen的文件
+```c
+#include <stdio.h>
+int fclose(FILE *stream);
+```
+
+### 2.6.2 功能：关闭打开的文件
+
+### 2.6.3 参数：fopen返回的文件指针
+
+### 2.6.4 返回值
+
+成功返回0，失败返回EOF宏（宏值为-1），并且errno被设置。
+
+### 2.6.4 例子：关闭之前fopen的文件
+
+```c
+fclose(fp);
+```
+fclose函数一般很少出错，所以一般不进行出错处理。
+
+就算你不主动使用fclose关闭文件，程序结束时也会自动关闭文件，但是如果程序长时间一直运行，而且不会结束的话，但是你又需要关闭某文件时，那么你就需要主动调用fclose来关闭文件了。
+
+关闭文件后，fopen函数所开辟的“FILE结构体空间”就会被释放。
+
+## 2.7 输出函数
+
++ fprintf
++ printf
++ sprintf
++ fputc
++ putc
++ putchar
++ fputs
++ puts
++ perror
+
+### 2.7.1 fprintf
+
++ 1）函数原型
+	```c
+    #include <stdio.h>
+	int fprintf(FILE *stream, const char *format, ...);
+	int printf(const char *format, ...);
+    ```
+
++ 2） 功能
+	向“文件指针stream”所指向的目标中，格式化输出数据。
+	与printf函数相比，这个函数除多了stream参数外，后面的format、...与printf函数一模一样的。
+			
++ 3） 参数
+    + （a）stream：文件指针，指向了输出目标
+    + （b）format：“可变参数”的格式
+    + （c）...：可变参数
+
+    比如：
+
+    ```c
+    fprintf(fp, "score：%f, age：%d", 98.5, 20);
+    ```
+    函数会将98.5和20转为字符串"98.5"和"20"，然后将字符串"name：98.5, age：20"写入fp指向的目标（文件）。
+
++ 4） 返回值
+	+ （a）成功，返回成功输出的字符个数
+	+ （b）失败返回一个负数，具体返回什么负数，手册中并没有强调
+
++ 5）使用举例
+	```c
+    #include <stdio.h>
+
+	#define print_error(str) \
+	do{\
+		fprintf(stderr, "File %s, Line %d, Function %s error\n", __FILE___LINE__, str);\
+		perror("error Reason");\
+		exit(-1);\
+	}while(0);
+
+	void main(void)
+	{
+		FILE *fp = NULL;
+		//fp = fopen("/home/zxf/Desktop/file.txt", "w");
+            //Linux
+		fp = fopen("C:\\Users\\Administrator\\Desktop\\file.txt", "w"); //whindows
+		if(NULL == fp) print_error("fopen");
+		int ret = fprintf(fp, "score:%f, age:%d", 98.5, 25);
+		if(ret < 0) print_error("fprintf");
+		//fprintf(stdout, "score:%f, age:%d", 98.5, 25);
 		fclose(fp);
-		
-		fclose函数一般很少出错，所以一般不进行出错处理。
-		
-		就算你不主动使用fclose关闭文件，程序结束时也会自动关闭文件，但是如果程序长时间一直运行，而且不会结
-	束的话，但是你又需要关闭某文件时，那么你就需要主动调用fclose来关闭文件了。
+		return 0;
+	}
+    ```
+
++ 6） 再说说fprintf的第一个参数stream
+	```c
+    int fprintf(FILE *stream, const char *format, ...);
+    ```
+	fprintf第一个参数指向了输出目标，stream可以设置的值有如下三种情况：stdout/stderr/fp。
 	
-		关闭文件后，fopen函数所开辟的“FILE结构体空间”就会被释放。
+	+ （a）stdout：标准输出
+		默认指向了显示器或者打印设备，向显示器、打印设备输出正常信息时，就使用stdout。
+		stdout所指向的输出目标为显示器或者打印设备。
+		
+		`疑问`：stdout定义在了哪里呢？
+		答：这个玩意定义在了stdio.h中，是现成的，可以直接用，同样的stderr也定义在了stdio.h。
 
+		当fprintf的第一个参数为stdout时，此时功能与printf完全一样。
 
-2.7 输出函数
-  fprintf、printf、sprintf、fputc、putc，putchar，fputs、puts、perror。
+	+ （b）stderr：标准出错输出
+		默认也指向了显示器或者打印设备，专门打印各种报错信息时，就是用stderr。
 
-2.7.1 fprintf
-（1）fprintf
-		1）函数原型
-			#include <stdio.h>	
-			int fprintf(FILE *stream, const char *format, ...);
-			
-			
-			
-										 int printf(const char *format, ...);
-										 
-		2） 功能
-			向“文件指针stream”所指向的目标中，格式化输出数据。
-			与printf函数相比，这个函数除多了stream参数外，后面的format、...与printf函数一模一样的。
-			
-		3） 参数
-			（a）stream：文件指针，指向了输出目标
-			（b）format：“可变参数”的格式
-			（c）...：可变参数
-				
-				比如：fprintf(fp, "score：%f, age：%d", 98.5, 20);
-				
-				函数会将98.5和20转为字符串"98.5"和"20"，然后将字符串"name：98.5, age：20"写入fp指向的目标（文件）。
-				
-	4） 返回值
-		（a）成功，返回成功输出的字符个数
-		（b）失败返回一个负数，具体返回什么负数，手册中并没有强调
-				
-			
-	5）使用举例
-		#include <stdio.h>
+		stderr指向的目标也为显示器或者打印设备。
 
-		#define print_error(str) \
+		print_error中使用的fprintf，就是用来打印函数出错信息的，所以我们才写为了stderr
+        ```c
+        #define print_error(str) \
 		do{\
-						fprintf(stderr, "File %s, Line %d, Function %s error\n", __FILE__, __LINE__, str);\
-						perror("error Reason");\
-						exit(-1);\
+			fprintf(stderr, "File %s, Line %d, Function %s error\n", __FILE__, __LINE__, str);\
+			perror("error Reason");\
+			exit(-1);\
 		}while(0);
+        ```
 
-		void main(void)
-		{
-				FILE *fp = NULL;
-
-				//fp = fopen("/home/zxf/Desktop/file.txt", "w"); 								//Linux
-				fp = fopen("C:\\Users\\Administrator\\Desktop\\file.txt", "w"); //whindows
-				if(NULL == fp) print_error("fopen");
-
-				int ret = fprintf(fp, "score:%f, age:%d", 98.5, 25);
-				if(ret < 0) print_error("fprintf");
-				
-				//fprintf(stdout, "score:%f, age:%d", 98.5, 25);
-				
-				fclose(fp);
-
-				return 0;
-		}
-
-	6） 再说说fprintf的第一个参数stream
-			int fprintf(FILE *stream, const char *format, ...);
-	
-			fprintf第一个参数指向了输出目标，stream可以设置的值有如下三种情况：
-			stdout/stderr/fp。
+		stderr与stdout的区别：按照c标准的规定，它们的之前区别如下：
+		+ stdout
+		  使用stdout输出数据时，数据会缓冲（积压），当不满足刷新条件时，数据会积压在缓存中而不会被立即输出显示。
 		
-		（a）stdout：标准输出
-				默认指向了显示器或者打印设备，向显示器、打印设备输出正常信息时，就使用stdout。
-				stdout所指向的输出目标为显示器或者打印设备。
-				
-				疑问：stdout定义在了哪里呢？
-				答：这个玩意定义在了stdio.h中，是现成的，可以直接用，同样的stderr也定义在了stdio.h。
-				
-				当fprintf的第一个参数为stdout时，此时功能与printf完全一样。
-				
-				
-		（b）stderr：标准出错输出
-				默认也指向了显示器或者打印设备，专门打印各种报错信息时，就是用stderr。
-				
-				stderr指向的目标也为显示器或者打印设备。
-				
-				
-				print_error中使用的fprintf，就是用来打印函数出错信息的，所以我们才写为了stderr
-				#define print_error(str) \
-				do{\
-								fprintf(stderr, "File %s, Line %d, Function %s error\n", __FILE__, __LINE__, str);\
-								perror("error Reason");\
-								exit(-1);\
-				}while(0);
-				
-				
-				stderr与stdout的区别：
-				按照c标准的规定，它们的之前区别如下：
-				· stdout
-					使用stdout输出数据时，数据会缓冲（积压），当不满足刷新条件时，数据会积压在缓存中而不会被立即
-				输出显示。
-				
-				· stderr
-					使用stderr输出时不会缓冲（积压）数据，只要有一个字符的数据就会被立即输出显示，对于报错信息来
-				说，错误信息非常的紧急，不能被积压，需要被立即输出，然后告诉“程序员”除了什么出错。
+		+ stderr
+		  使用stderr输出时不会缓冲（积压）数据，只要有一个字符的数据就会被立即输出显示，对于报错信息来说，错误信息非常的紧急，不能被积压，需要被立即输出，然后告诉“程序员”除了什么出错。
 
-				
-		（c）fopen返回的文件指针，指向被打开的文件
+	+ （c）fopen返回的文件指针，指向被打开的文件
 
-		
-		
-2.7.2 printf
-		fprintf(stdout, fmat, ...)可以将数据输出到显示器显示，由于向显示器输出的操作实在是太频繁，而fprintf
-	有三个参数，太麻烦，然后就有了printf这个更方便的写法，printf默认就是stdout输出的。
-	
-		printf其实就是fprintf(stdout, fmat, ...)的简化形式。
-	
-	
-	
-	
-		
-2.7.3 补充：sprintf
-	我们再补充一个sprintf，这个函数很有作用，会给我们带来不少的便利。
-	
-	#include <stdio.h>
-	int sprintf(char *str, const char *format, ...);
+### 2.7.2 printf
 
-	它与fprintf唯一不同的只是第一个参数，sprintf的第一个参数也用于指向输出目标，只不过这个输出目标是一个
-字符串数组。
-	当我们想将整形、浮点数等组合为一串字符串并存放到字符串数组中时，这个函数就能帮到大忙，比如：
-	char buf[100] = {};
-	
-	char name[] = "zhangsan";
-	float score = 60.5;
-	int age 		= 25;
+fprintf(stdout, fmat, ...)可以将数据输出到显示器显示，由于向显示器输出的操作实在是太频繁，而fprintf三个参数，太麻烦，然后就有了printf这个更方便的写法，printf默认就是stdout输出的。
 
-	sprintf(buf, "people inormation: %s %f %d", name, score, age);
-  fprintf(stdout, "%s\n", buf); //打印验证
-	
-	这个函数的输出目标只是一个数组，所以不需要对接什么文件IO函数，如果让大家自己模拟一个my_sprintf函数，
-其实也是能写出来的，大家可以思考一下，这么是实现一个my_sprintf。
+printf其实就是fprintf(stdout, fmat, ...)的简化形式。
 
+### 2.7.3 补充：sprintf
 
-2.7.4 fputc
-（1） fputc
-		1）函数原型
-			#include <stdio.h>
-			int fputc(int c, FILE *stream);
-			
-		2）功能
-			将字符c输出到stream所指向的目标。
-	
-		3）参数
-			1）c：你想输出的字符
-			2）stream：文件指针，指向输出目标
-				
-				疑问：有同学可能会问，为什么第一个参数是int而不是char，原因有很多，我们这里不去纠结这一点。
-				
-				
-		4）返回值
-			1）成功：返回输出字符的编码
-			2）失败：返回EOF（-1）
-				
-				EOF宏定义在了stdio.h中，定义形式为#define	EOF	-1。
-				前面说过，读文件时读到了文件的末尾，或者函数出错时就会返回EOF。
-				
-		5）例子
-			fputc('a', stdout);
-			fputc('a', stderr);
-			fputc('a', fp);
-			
-2.7.5 putc
-		函数原型：int putc(int c, FILE *stream)
+我们再补充一个sprintf，这个函数很有作用，会给我们带来不少的便利。
+
+```c
+#include <stdio.h>
+int sprintf(char *str, const char *format, ...);
+```
+
+它与fprintf唯一不同的只是第一个参数，sprintf的第一个参数也用于指向输出目标，只不过这个输出目标是一个字符串数组。
+
+当我们想将整形、浮点数等组合为一串字符串并存放到字符串数组中时，这个函数就能帮到大忙，比如：
+```c
+char buf[100] = {};
+
+char name[] = "zhangsan";
+float score = 60.5;
+int age = 25;
+
+sprintf(buf, "people inormation: %s %f %d", name, score, age);
+fprintf(stdout, "%s\n", buf); //打印验证
+```
+
+这个函数的输出目标只是一个数组，所以不需要对接什么文件IO函数，如果让大家自己模拟一个my_sprintf函数，其实也是能写出来的，大家可以思考一下，这么是实现一个my_sprintf。
+
+### 2.7.4 fputc
+
++ 1）函数原型
+	```c
+    #include <stdio.h>
+	int fputc(int c, FILE *stream);
+    ```
+
++ 2）功能
+    将字符c输出到stream所指向的目标。
+
++ 3）参数
+	+ 1）c：你想输出的字符
+	+ 2）stream：文件指针，指向输出目标
 		
-		功能上是完全等价于fputc，虽然有点细微区别，但是我们不关心这点细微区别，实际上只要使用fputc就可以了。
+	疑问：有同学可能会问，为什么第一个参数是int而不是char，原因有很多，我们这里不去纠结这一点。
+
++ 4）返回值
+	+ 1）成功：返回输出字符的编码
+	+ 2）失败：返回EOF（-1）
 		
+	EOF宏定义在了stdio.h中，定义形式为
+    ```c
+    #define	EOF	-1
+    ```
+	前面说过，读文件时读到了文件的末尾，或者函数出错时就会返回EOF。
 		
-2.7.6 putchar
-	int putchar(int c);
-	等价于putc(c, stdout)和fputc(c, stdout)，为这两个的简化版。
-	
-	putchar('a');
-	
-2.7.7 fputs
-		专门用于输出字符串，输出字符串时，你可以使用前面fprintf和printf这两个格式化函数，也可以使用这个输出
-	字符串的函数。
++ 5）例子
+    ```c
+    fputc('a', stdout);
+	fputc('a', stderr);
+	fputc('a', fp);
+    ```
+
+### 2.7.5 putc
+
+函数原型：
+```c
+int putc(int c, FILE *stream)
+```
+
+功能上是完全等价于fputc，虽然有点细微区别，但是我们不关心这点细微区别，实际上只要使用fputc就可以了。
+
+### 2.7.6 putchar
+
+```c
+int putchar(int c);
+```
+等价于
+```c
+putc(c, stdout)
+```
+和
+```c
+fputc(c, stdout)
+```
+为这两个的简化版。
+
+```c
+putchar('a');
+```
+
+### 2.7.7 fputs
+
+专门用于输出字符串，输出字符串时，你可以使用前面fprintf和printf这两个格式化函数，也可以使用这个输出字符串的函数。
 
 （1）函数原型
 		#include <stdio.h>
