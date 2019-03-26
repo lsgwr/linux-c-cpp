@@ -1,4 +1,3 @@
-
 # 第01章 文件io
 	
 ## 0. 文件io讲些什么
@@ -603,3 +602,13 @@ ssize_t read(int fd, void *buf, size_t count);
             后面讲到标准io时，还会讲到标准输入、标准输出、标准出错输出，到时候会介绍标准输出、标准出错输出的区别。
 
 
++ 4）`STDIN_FILENO`、`STDOUT_FILENO`、`STDERR_FILENO`
+    系统为了方便使用0/1/2，系统分别对应的给了三个宏
+
+    + `0`：`STDIN_FILENO`
+    + `1`：`STDOUT_FILENO`
+    + `2`：`STDERR_FILENO`
+
+    可以使用三个宏，来代替使用0/1/2。
+
+    这三个宏定义在了open或者read、write函数所需要的头文件中，只要你包含了open或者read、write的头文件，这三个宏就能被正常使用。
