@@ -20,19 +20,16 @@ int open(const char *pathname, int flags, mode_t mode);
 
 ### 2.2 open函数返回值
 
-如果打开成功，返回一个非负整数的文件描述符  
-
-如果打开失败，返回-1，并且设置错误号给系统定义的全局变量errno，用于标记函数到底出了什么错误  
-
-有关errno和错误号，后面会详细介绍  
-
++ 如果打开成功，返回一个`非负整数`的文件描述符  
++ 如果打开失败，返回`-1`，并且`设置错误号给系统定义的全局变量errno`，用于标记函数到底出了什么错误  
 
 ### 2.3 open函数的重点：flags参数
 
-+ 参数1：`pathname`，表示路径名，很简单
-+ 参数3：`mode`，创建文件时，用于指定文件的原始权限，其实就是`rwxrwxr--`
++ 参数1：`pathname`, 表示路径名，很简单
++ 参数2：`flags`, 文件的打开方式
++ 参数3：`mode`, 创建文件时，用于指定文件的原始权限，其实就是`rwxrwxr--`
 
-#### 2.3.1、flags 之 O_RDONLY、O_WRONLY、O_RDWR、O_TRUNC、O_APPEND
+#### 2.3.1 flags 之 O_RDONLY、O_WRONLY、O_RDWR、O_TRUNC、O_APPEND
 
 + flags的作用  
   flags用于指定文件的打开方式，这些宏还可以使用|组合，比如O_RDONLY | O_APPEND，同时指定多个宏
