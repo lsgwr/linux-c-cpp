@@ -4,7 +4,7 @@
 
 #define print_error(str) \
 do{\
-  fprintf(stderr, "File %s, Line %d, Function %s error\n", __FILE___LINE__, __func__);\
+  fprintf(stderr, "File %s, Line %d, Function %s error\n", __FILE__, __LINE__, __func__);\
   perror(str);\
   exit(-1);\
 }while(0);
