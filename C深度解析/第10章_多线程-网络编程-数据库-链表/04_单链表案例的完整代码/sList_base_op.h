@@ -4,10 +4,10 @@
 
 #define print_error(str) \
 do{\
-    fprintf(stderr, "File %s, Line %d, Function %s error\n", __FILE__, __LINE__, str);\
-    perror("error Reason");\
-    exit(-1);\
-}while(0); 
+  fprintf(stderr, "File %s, Line %d, Function %s error\n", __FILE___LINE__, __func__);\
+  perror(str);\
+  exit(-1);\
+}while(0);
 
 typedef struct SignalNode  //单链表结构
 {
