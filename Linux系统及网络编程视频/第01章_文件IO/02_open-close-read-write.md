@@ -1,4 +1,4 @@
-# 02_open-close-read
+# 02_open-close-read-write
 
 ## 2. open函数
 	
