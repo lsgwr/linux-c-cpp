@@ -1,14 +1,3 @@
-+ 4）`STDIN_FILENO`、`STDOUT_FILENO`、`STDERR_FILENO`
-    系统为了方便使用0/1/2，系统分别对应的给了三个宏
-
-    + `0`：`STDIN_FILENO`
-    + `1`：`STDOUT_FILENO`
-    + `2`：`STDERR_FILENO`
-
-    可以使用三个宏，来代替使用0/1/2。
-
-    这三个宏定义在了open或者read、write函数所需要的头文件中，只要你包含了open或者read、write的头文件，这三个宏就能被正常使用。
-			
 ## 4	lseek函数
 	
 我们在前面的例子中，简单的用过，在这一小节，我们就来详细的介绍一下，这个lseek函数的一些具体的情况。
