@@ -302,7 +302,7 @@ ssize_t write(int fd, const void *buf, size_t count);
 + （1）功能：向fd所指向的文件写入数据 
 + （2）参数  
   +  1）fd：指向打开的文件  
-  +  2）buf：保存数据的缓存空间的起始地址  
+  +  2）**buf：保存数据的缓存空间的`起始地址`**  
   +  3）count：从起地址开始算起，把缓存中count个字符，写入fd指向的文件  
     数据中转的过程：  
     
@@ -316,7 +316,52 @@ ssize_t write(int fd, const void *buf, size_t count);
 
 #### 3.2.2 使用write
 
-+ （1）代码演示	
++ （1）
+  ```c
+  #include <stdio.h>
+  #include <string.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+  #include <unistd.h>
+  #include <errno.h>
+
+  #include <stdlib.h>
+
+  #define print_error(str) \
+  do{\
+      fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+      perror(str);\
+      exit(-1);\
+  }while(0);
+
+  int main(void)
+  {
+      int fd = 0;
+      fd = open("file.txt", O_RDWR | O_CREAT, 0664);
+      if(fd < 0){
+          print_error("open fail");
+      }else{
+          printf("open successfully! fd = %d\n", fd);
+      }
+
+      char buf_w[] = "hello wolrd";
+      // 返回成功写入了多少个字节
+      int ret = write(fd, (void *)buf_w, strlen(buf_w));
+
+      // int ret = write(fd, (void *)buf_w + 1, strlen(buf_w)); // 数组越位,会报错
+
+      // int ret = write(fd, (void *)buf_w + 1, strlen(buf_w) - 1); // 少写入一个字符
+      if(ret < 0){
+          print_error("write error");
+      }else{
+          printf("write successgully! ret = %d\n", ret);
+      }
+
+      close(fd);
+      return 0;
+  }
+  ```
 + （2）思考1：`write(fd, buf+1, 10)` 写入时，是一个什么情况
 + （3）思考2：`write(fd, "hello world", strlen("hello world"))`,直接写字符串，可不可以？
 + （4）为什么直接写字符串可以？
@@ -368,7 +413,56 @@ ssize_t read(int fd, void *buf, size_t count);
 
 #### 3.2.2 使用read		
 
-+ （1）代码演示
++ （1）
+
+  ```c
+  #include <stdio.h>
+  #include <string.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+  #include <unistd.h>
+  #include <errno.h>
+
+  #include <stdlib.h>
+
+  #define print_error(str) \
+  do{\
+      fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+      perror(str);\
+      exit(-1);\
+  }while(0);
+
+  int main(void)
+  {
+      int fd = 0;
+      fd = open("file.txt", O_RDWR | O_CREAT, 0664);
+      if(fd < 0){
+          print_error("open fail");
+      }else{
+          printf("open successfully! fd = %d\n", fd);
+      }
+
+      // 字符数组一定要初始化，否则当不懂下标为0的位置开始存时，其他位置是空，到时候打印不出来buf_r字符串
+      char buf_r[30]={0}; 
+      // 成功读取了多少个字符
+      int ret = read(fd, buf_r, sizeof(buf_r)); // 把buf_r读满
+
+      // int ret = read(fd, buf_r, 5); // 读取少于实际的字符
+
+      int ret = read(fd, buf_r, 5); // 读入的时候从第3个位置开始存，但是buf_r必须初始化，要不print不出来
+
+      if(ret < 0){
+          print_error("read error");
+      }else{
+          printf("read successgully! ret = %d\n", ret);
+          printf("result : %s\n", buf_r);
+      }
+
+      close(fd);
+      return 0;
+  }
+  ```
 + （2）思考
     
     ```c
