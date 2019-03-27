@@ -72,11 +72,11 @@ int open(const char *pathname, int flags, mode_t mode);
 + 如果打开成功，返回一个`非负整数`的文件描述符  
 + 如果打开失败，返回`-1`，并且`设置错误号给系统定义的全局变量errno`，用于标记函数到底出了什么错误  
 
-### 2.3 open函数的重点：flags参数
+### 2.3 open函数的参数
 
-+ 参数1：`pathname`, 表示路径名，很简单
-+ 参数2：`flags`, 文件的打开方式
-+ 参数3：`mode`, 创建文件时，用于指定文件的原始权限，其实就是`rwxrwxr--`
++ 参数1：`pathname`, 表示路径名，很简单,传入字符串指针即可,不作介绍
++ 参数2：`flags`, 文件的打开方式，重点讲解
++ 参数3：`mode`, 创建文件时，用于指定文件的原始权限，其实就是`rwxrwxr--`，用默认值也行
 
 #### 2.3.1 flags 之 O_RDONLY、O_WRONLY、O_RDWR、O_TRUNC、O_APPEND
 
@@ -119,20 +119,34 @@ int open(const char *pathname, int flags, mode_t mode);
     ```
     这个权限就是文件属性中的`rwxrwxr--`
 
-+ （2）`O_EXCL`
-    当O_EXCL与O_CREAT同时被指定，打开文件时，如果文件之前就存在的话，就报错。  代码演示：
++ （2）`O_EXCL`(EXist CLear)
+    **当O_EXCL与O_CREAT同时被指定**，打开文件时，**如果文件之前就存在的话，就报错**  
 
-    意义：保证每次open的是一个新的文件，如果文件以前就存在，提醒你open的不是一个新文件。
+    意义：**保证每次open的是一个新的文件**，如果文件以前就存在，提醒你open的不是一个新文件. 后面具体用到了，你自然就知道O_EXCL的实用价值了
 
-    后面具体用到了，你自然就知道O_EXCL的实用价值了。
+#### 2.3.3 mode参数：文件的读写和执行权限
+
+> 用16进制来制指定文件权限(读、写、执行)，常用的参数如下：
+
++ `S_IRWXU`  `00700`  user (file owner) has read, write and execute permission
++ `S_IRUSR`  `00400`  user has read permission
++ `S_IWUSR`  `00200`  user has write permission
++ `S_IXUSR`  `00100`  user has execute permission
++ `S_IRWXG`  `00070`  group has read, write and execute permission
++ `S_IRGRP`  `00040`  group has read permission
++ `S_IWGRP`  `00020`  group has write permission
++ `S_IXGRP`  `00010`  group has execute permission
++ `S_IRWXO`  `00007`  others have read, write and execute permission
++ `S_IROTH`  `00004`  others have read permission
++ `S_IWOTH`  `00002`  others have write permission
 
 ### 2.4 详论文件描述符
 
 #### 2.4.1 什么是文件描述符
 
-open成功就会返回一个非负整数（0、1、2、3...）的文件描述符，比如我们示例程序中open返回的文件描述符是3。
+open成功就会返回一个非负整数（0、1、2、3...）的文件描述符，比如我们示例程序中open返回的文件描述符是3  
 
-文件描述符指向了打开的文件，后续的read/write/close等函数的文件操作，都是通过文件描述符来实现的。
+文件描述符指向了打开的文件，后续的read/write/close等函数的文件操作，都是通过文件描述符来实现的  
 
 #### 2.4.2 文件描述符池 
 
@@ -148,7 +162,7 @@ open成功就会返回一个非负整数（0、1、2、3...）的文件描述符
 open返回文件描述符是由规则的：  
 规则就是，open返回文件描述符池中，当前最小没用的哪一个  
 进程一运行起来，0/1/2默认就被使用了，最小没被用的是3，所以返回3  
-如果又打开一个文件，最小没被用的就应该是4，所以open返回的应该是4。演示：
+如果又打开一个文件，最小没被用的就应该是4，所以open返回的应该是4
 
 疑问：0、1、2被用来干嘛了，后面解释
 
@@ -199,7 +213,7 @@ open失败，如何具体打印出详细的出错信息呢？这就不得不提e
 errno是Linux系统定义的全局变量，可以直接使用  
 
 错误号和errno全局变量被定义在了哪里?  
-都被定义在了errno.h头文件，使用errno时需要包含这个头文件  
+都被定义在了errno.h头文件，使用errno时需要包含这个头文件, 在Linux上的路径为`/usr/include/asm-generic/errno.h`
 
 man errno，就可以查到errno.h头文件  
 
@@ -216,8 +230,9 @@ man errno，就可以查到errno.h头文件
   ```shell
   man perror
   ```
+ 
+  perror是一个C库函数，不是一个系统函数  
   
-  perror是一个C库函数，不是一个系统函数。
   perror的工作原理？  
   调用perror函数时，它会自动去一张对照表，将errno中保存的错误号，换成具体的文字信息并打印出来，我们就能知道函数的具体错误原因了。
 
@@ -227,8 +242,8 @@ man errno，就可以查到errno.h头文件
     Liunx为了让错误号能够见名识意，都给这些整形的错误号定义了对应的宏名，这些宏定义都被定义在了error.h头文件中  
     man perror这个函数，也可以看到这个头文件  
     
-    疑问：我是不是要必须记住这些错误号？
-    答：反正我是记不住，记不住怎么办？
+    疑问：我是不是要必须记住这些错误号？  
+    答：反正我是记不住，记不住怎么办？  
 
     根本不需要记住，使用perror函数，它可以自动翻译，我们讲错误号，只是希望你理解错误号这个东西，后面的课程会经常见到东西，到了后面我就不再介绍。
 			
