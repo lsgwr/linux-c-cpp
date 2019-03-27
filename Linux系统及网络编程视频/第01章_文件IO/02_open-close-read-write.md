@@ -492,18 +492,37 @@ lrwxrwxrwx 1 root root 15 Mar 25 03:46 /dev/stdout -> /proc/self/fd/1
 
 #### （2）依次打开的三个文件分别是`/dev/stdin`、`/dev/stdout`、`/dev/stderr`
 
-+ 1）`/dev/stdin`：标准输入文件 
++ 1）`/dev/stdin`：标准输入文件   
+
+  ```c
+  #include <stdio.h>
+  #include <unistd.h>
+  #include <errno.h>
+
+  int main(void)
+  {
+      char buf[30] = {0};
+      int ret = read(0, (void *)buf, sizeof(buf)); // 第一个参数fd = 0，表示从键盘读
+      if(ret < 0){
+          perror("read fail");
+          return -1;
+      }
+      printf("buf = %s\n", buf);
+      return 0;
+  }
+  ```
+  
   + （a）程序开始运行时，默认会调用open("/dev/stdin", O_RDONLY)将其打开，返回的文件描述符是0
-  + （b）使用0这个文件描述符，可以从键盘输入的数据
+  + （b）使用0这个文件描述符，可以从键盘输入的数据  
         简单理解就是，/dev/stdin这个文件代表了键盘
-  + （c）思考：read(0, buf, sizeof(buf))实现的是什么功能
+  + （c）思考：read(0, buf, sizeof(buf))实现的是什么功能  
     实现的是，从键盘读取数据到到缓存buf中，数据中转的过程是：
 
     ```txt
     read应用缓存buf <—————— open /dev/stdin时开辟的内核缓存 <——————键盘驱动程序的缓存 <——————键盘
     ```
 
-    疑问：能够像读普通文件一样读键盘吗？
+    疑问：能够像读普通文件一样读键盘吗？  
     答：在Linux下，应用程序通过OS API操作底层硬件时，都是以文件形式来操作的，不管是读键盘，还是向显示器输出文字显示，都是以文件形式来读写的，在Linux下有句很经典的话，叫做“在Linux下一切皆文件”，说的就是这么个意思。
 
   + （d）思考：为什么在我们的程序中，默认就能使用scanf函数从键盘输入数据  
@@ -552,13 +571,13 @@ lrwxrwxrwx 1 root root 15 Mar 25 03:46 /dev/stdout -> /proc/self/fd/1
 
 
 + 2）/dev/stdout：标准输出文件
-  + （a）程序开始运行时，默认open("/dev/stdout", O_WRONLY)将其打开，返回的文件描述符是1	
-      为什么返回的是1，先打开的是/dev/stdin，把最小的0用了，剩下最小没用的是1，因此返回的肯定是1。
+  + （a）程序开始运行时，默认open("/dev/stdout", O_WRONLY)将其打开，返回的文件描述符是1	  
+      为什么返回的是1，先打开的是/dev/stdin，把最小的0用了，剩下最小没用的是1，因此返回的肯定是1  
       
   + （b）通过1这个文件描述符，可以将数据写（打印）到屏幕上显示  
-      简单理解就是，/dev/stdout这个文件代表了显示器  
+      简单理解就是，`/dev/stdout这个文件代表了显示器`  
       
-  + （c）思考：write(1, buf, strlen(buf))实现的是什么功能
+  + （c）思考：`write(1, buf, strlen(buf))`实现的是什么功能  
       将buf中的数据写到屏幕上显示，数据中转的过程是：
 
       ```
@@ -597,14 +616,15 @@ lrwxrwxrwx 1 root root 15 Mar 25 03:46 /dev/stdout -> /proc/self/fd/1
           输出'6'、'5'时，其实输出的是'6'、'5'这两个字符的ASCII编码，然后会被自动的翻译为6和5这两个图形  
           总之将整形65，转为字符'6'、'5'输出即可  
 
-      + 为什么printf会对wirte进行封装
-        + 库函数可以很好的兼容不同的OS
-        + 封装时，叠加了很多的功能，比如格式化转换  
-          通过指定%d、%f等，自动将其换为对应的字符，然后write输出，完全不用自己来转换  
+      + 为什么printf会对wirte进行封装  
+        + 库函数可以很好的兼容不同的OS  
+        + 封装时，叠加了很多的功能，比如格式化转换   
+          通过指定%d、%f等，自动将其换为对应的字符，然后write输出，完全不用自己来转换
+          
           思考：printf使用%s、%c输出字符串和字符时，还用转吗？  
           其实不用转，因为要输出的本来就是字符，printf直接把字符给write就行了，当然也不是一点事情也不做，还是会做点小处理的。
 
-   + （f）思考：close(1)，printf函数还能正常工作吗？
+   + （f）思考：close(1)，printf函数还能正常工作吗？  
       
       ```txt
       printf("*****")
@@ -614,11 +634,15 @@ lrwxrwxrwx 1 root root 15 Mar 25 03:46 /dev/stdout -> /proc/self/fd/1
       ```
 
 + 3）/dev/stderr：标准出错输出文件
-   + （a）默认open("/dev/stderr", O_WRONLY)将其打开，返回的文件描述符是2	
-   + （b）通过2这个文件描述符，可以将报错信息写（打印）到屏幕上显示
-   + （c）思考：write(2, buf, sizeof(buf))实现的是什么功能
+   + （a）默认open("/dev/stderr", O_WRONLY)将其打开，返回的文件描述符是2	 
+   + （b）通过2这个文件描述符，可以将报错信息写（打印）到屏幕上显示  
+   + （c）思考：write(2, buf, sizeof(buf))实现的是什么功能  
         将buf中的数据写道屏幕上，数据中转的过程是：
+        
+        ```shell
         write应用缓存buf ——————> open /dev/stderr时开辟的内核缓存 ——————> 显示器驱动程序的缓存 ——————> 显示器
+        ```
+        
    + （d）疑问：1和2啥区别？
 
         + 使用这两个文件描述符，都能够把文字信息打印到屏幕。
@@ -637,25 +661,24 @@ lrwxrwxrwx 1 root root 15 Mar 25 03:46 /dev/stdout -> /proc/self/fd/1
 
         + printf和perror调用write时，使用的是什么描述符
 
-          - printf
-            printf用于输出普通信息，向下调用write时，使用的是1。
-            前面已经验证过，close(1)后，printf无法正常输出。
+          - printf  
+            printf用于输出普通信息，向下调用write时，使用的是1  
+            前面已经验证过，close(1)后，printf无法正常输出  
 
-          - perror
-              perror专门用于输出报错信息的，因为输出的是报错信息，因此write使用的是2。
+          - perror  
+              perror专门用于输出报错信息的，因为输出的是报错信息，因此write使用的是2  
               
-            验证：将2关闭，perror就会无法正常输出。
+            验证：将2关闭，perror就会无法正常输出  
 
-            后面讲到标准io时，还会讲到标准输入、标准输出、标准出错输出，到时候会介绍标准输出、标准出错输出的区别。
-
+            后面讲到标准io时，还会讲到标准输入、标准输出、标准出错输出，到时候会介绍标准输出、标准出错输出的区别  
 
 + 4）`STDIN_FILENO`、`STDOUT_FILENO`、`STDERR_FILENO`
-    系统为了方便使用0/1/2，系统分别对应的给了三个宏
+    系统为了方便使用0/1/2，`系统`分别对应的给了三个宏
 
-    + `0`：`STDIN_FILENO`
-    + `1`：`STDOUT_FILENO`
-    + `2`：`STDERR_FILENO`
+    + `0`：`STDIN_FILENO`  
+    + `1`：`STDOUT_FILENO` 
+    + `2`：`STDERR_FILENO`  
 
-    可以使用三个宏，来代替使用0/1/2。
+    可以使用三个宏，来代替使用0/1/2  
 
-    这三个宏定义在了open或者read、write函数所需要的头文件中，只要你包含了open或者read、write的头文件，这三个宏就能被正常使用。
+    `这三个宏定义在了open或者read、write函数所需要的头文件中，只要你包含了open或者read、write的头文件，这三个宏就能被正常使用`
