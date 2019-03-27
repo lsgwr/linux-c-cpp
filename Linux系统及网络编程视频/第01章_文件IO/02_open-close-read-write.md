@@ -1,7 +1,7 @@
 # 02_open-close-read-write
 
 ## 2. open函数
-	
+
 ### 2.1 函数原型
 
 ```c
