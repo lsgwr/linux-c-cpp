@@ -241,7 +241,6 @@ int dup(int oldfd);
 + （1）功能
   复制某个已经打开的文件描述符，得到一个新的描述符，这个新的描述符，也指向被复制描述符所指向的文件。
 
-
   比如：4指向了某个文件，从4复制出5，让5也指向4指向的文件。
 
    ```c
@@ -261,8 +260,68 @@ int dup(int oldfd);
 
 + （3）参数
   oldfd：会被复制的、已经存在的文件描述符。
+  
+#### 6.1.2 代码演示
 
-### 	6.2 dup2
+```c
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdlib.h>
+
+#define FILE_NAME "file.txt"
+
+#define print_error(str) \
+do{\
+    fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+    perror(str);\
+    exit(-1);\
+}while(0);
+
+int main(void)
+{
+    int fd1 = -1;
+    int fd2 = -1;
+    
+    fd1 = open(FILE_NAME, O_RDWR | O_TRUNC);
+    
+    if(fd1 < 0){
+        print_error("open fd1 fail");
+    }
+    
+    fd2 = dup(fd1);
+    if(fd1 < 0){
+        print_error("dup fd2 fail");
+    }
+    
+    printf("fd1 = %d, fd2 = %d\n", fd1, fd2);
+    
+    write(fd1, "hello1\n", 7);
+    write(fd2, "hello2\n", 7);
+    
+    return 0;   
+}
+```
+
+结果为：
+
+```shel
+fd1 = 3, fd2 = 4
+```
+
+文件内容为：
+
+```txt
+hello1
+hello2
+
+```
+
+###  6.2 dup2
 
 #### 6.2.1 函数原型
 
@@ -271,8 +330,8 @@ int dup(int oldfd);
 int dup2(int oldfd, int newfd);
 ```
 
-+ （1）功能
-    功能同dup，只不过在dup2里面，我们可以自己指定新文件描述符  如果这个新文件描述符已经被打开了，dup2会把它给关闭后，再使用  
++ （1）功能  
+    功能同dup，只不过在dup2里面，我们**可以自己指定新文件描述符**  **如果这个新文件描述符已经被打开了，dup2会把它给关闭后再使用**  
 
     比如：
     
@@ -280,7 +339,7 @@ int dup2(int oldfd, int newfd);
     dup(2, 3); // 从2复制出3，让3也指向2所指向的文件，如果3之前被打开过了，dup2会关闭它，然后在使用
     ```
 
-    dup2和dup的不同之处在于：  
+    dup2和dup的**不同之处**在于：  
     + `dup`：自己到文件描述符池中找新文件描述符
     + `dup2`：我们可以自己指定新文件描述符
 
@@ -292,16 +351,65 @@ int dup2(int oldfd, int newfd);
 + （3）参数
   +  `oldfd`：会被复制的、已经存在的文件描述符。
   +  `newfd`：新的文件描述符
+  
+#### 6.2.2 代码演示
+
+```c
+ fd2 = dup(fd1); // dup自定选择未用的最小fd,结果是fd1 = 3, fd2 = 4
+ fd2 = dup2(fd1, 5); // dup2可以自己强制指定fd，结果是fd1 = 3, fd2 = 5
+```
 
 ### 6.3 dup、dup2复制的意义
 
 #### 6.3.1 实现文件共享操作
 
 + （1）代码演示：
-+ （2）为什么没有出现相互覆盖情况？图：文件描述符表  
+  ```c
+  #include <stdio.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+  #include <stdlib.h>
+  #include <unistd.h>
+
+  #define FILE_NAME "file.txt"
+
+  #define print_error(str) \
+  do{\
+      fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+      perror(str);\
+      exit(-1);\
+  }while(0);
+
+  int main(void)
+  {
+    int fd1 = 0;
+    int fd2 = 0;
+    fd1 = open(FILE_NAME, O_RDWR|O_TRUNC);
+    if(-1 == fd1) print_error("1 open fail");
+
+    //fd2 = dup(fd1);
+    fd2 = dup2(fd1, 4);
+
+    printf("fd1 = %d, fd2 = %d\n", fd1, fd2);
+
+    while(1)
+    {
+      write(fd1, "hello\n", 6);
+      sleep(1);
+      write(fd2, "world\n", 6);
+    }
+
+    return 0;
+  }
+  ```
+   
+   **结果**：交替输出hello 和 world 不会互相影响和覆盖
+   
++ （2）为什么没有出现相互覆盖情况？
   `为什么没有覆盖？`  
   **`使用dup、dup2复制方式实现文件共享时，不管复制出多少个文件描述符，它们永远只有一个文件表，所以使用所有描述符去操作文件时，最后使用的都是通过同一个文件位移量，不管谁操作后文件位移量都会被更新，因此不会出现覆盖`**
-
+  ![为什么没有出现相互覆盖情况](https://i.loli.net/2019/03/27/5c9b5ecfd3fd9.jpg)
 #### 6.3.2 实现重定位 
 
 + （1） 什么是重定位  
@@ -309,7 +417,52 @@ int dup2(int oldfd, int newfd);
   所谓重定位，说白了就是，文件描述符所指向的文件该变了，使得数据输出的目标文件也随之变  
 
 + （2） 举例使用dup、dup2实现重定位
+ 
+  ```c
+  #include <stdio.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+  #include <stdlib.h>
+  #include <unistd.h>
 
+  #define FILE_NAME "file.txt"
+
+  #define print_error(str) \
+  do{\
+    fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+    perror(str);\
+    exit(-1);\
+  }while(0);
+
+  int main(void)
+  {
+      int fd1 = 0;
+      int fd2 = 0;
+      fd1 = open(FILE_NAME, O_RDWR|O_TRUNC);
+      if(-1 == fd1) print_error("1 open fail");
+
+      close(1); // 关闭stdout的指针，方便下面重定向到文件中
+      fd2 = dup(fd1); // fd2一定会把上面关掉的stout文件描述符重定向过来，所以下面的printf的东西都会输出到file.txt中
+      
+      // 上面的两行代码等下于下面的一行,dup2检测到文件描述符1被占用会先自动关闭，不用我们手动close了
+      // fd2 = dup2(fd1, 1);
+
+      printf("fd1 = %d, fd2 = %d\n", fd1, fd2);
+
+      printf("hello world\n");
+
+      return 0;
+  }
+  ```
+  
+  结果file.txt的内容为：
+  
+  ```txt
+  fd1 = 3, fd2 = 1
+  hello world
+
+  ```
 
   + 1）回顾printf与write的关系
 
@@ -321,18 +474,20 @@ int dup2(int oldfd, int newfd);
     ```
     printf输出时，原本通过1，将数据输出到标准输出文件（显示器）的，但是现在，我想让printf输出到file.txt文件，而不是输出到屏幕，应该怎么办？  
     
-    最简单的办法是就是，把printf函数调用的write函数里面的1，改成指向file.txt文件的新描述符即可，但是不幸的是write中的1写死了，1这个数字改不了，怎么办？1这个数改不了，但是可以对1进行重定位，让1不再指向标准输出文件，而是指向file.txt，printf的数据，就输出到了file.txt文件中。
+    最简单的办法是就是，把printf函数调用的write函数里面的1，改成指向file.txt文件的新描述符即可，但是不幸的是write中的1写死了，1这个数字改不了，怎么办？  
+    1这个数改不了，但是可以对1进行重定位，让1不再指向标准输出文件，而是指向file.txt，printf的数据，就输出到了file.txt文件中。
 
   + 2）实现步骤
-    + （a）open file.txt文件，返回一个文件描述符，比如3
+    + （a）`open file.txt文件`，返回一个文件描述符，比如3
 
         ```txt
         3 ————> file.txt
         ```
-    + （b）close(1)，不要再让1指向标准输出文件（/dev/stdout）
+        
+    + （b）`close(1)`，不要再让1指向标准输出文件（/dev/stdout）
 
 
-    + （c） 使用dup、dup2把3复制到1上，让1也指向file.txt文件
+    + （c）使用dup、dup2把3复制到1上，让1也指向file.txt文件
 
         ```shell
         3——————>file.txt
@@ -343,7 +498,8 @@ int dup2(int oldfd, int newfd);
 
        1这个文件描述符就被重定位了，凡是通过1输出的数据，都被写到了file.txt中，printf底层调用的是write(1, ...)，用的也是1，printf的数据就被输出到了file.txt中。相当于printf函数的输出目的地，被重定位为了新的文件，这就是重定位。
 
-       思考题：scanf默认从标准输入文件（键盘）读数据，请大家自行写代码对0进行重定位，重定位后，让scanf从file.txt。
+       思考题：scanf默认从标准输入文件（键盘）读数据，请大家自行写代码对0进行重定位，重定位后，让scanf从file.txt
+       
         ```txt
         scanf(....)
           |
@@ -351,12 +507,12 @@ int dup2(int oldfd, int newfd);
         read(0, ...)
         ```
 
-+ （3） 什么时候会使用dup、dup2，来实现从定位
++ （3） 什么时候会使用dup、dup2，来实现从定位？  
+    **函数中的文件描述符值写死了，无法修改为新的描述符，但是你又希望该函数，把数据输出到其它文件中**，此时就可以使用dup、dup2对该函数中的文件描述符，进行重定位，指向新的文件，函数就会将数据输出到这个新文件
 
-    函数中的文件描述符值写死了，无法修改为新的描述符，但是你又希望该函数，把数据输出到其它文件中，此时就可以使用dup、dup2对该函数中的文件描述符，进行重定位，指向新的文件，函数就会将数据输出到这个新文件
-
-+ （4） 重定位 `>` 
-  重定位 命令（>）是dup、dup2的典型应用，这个命令在重定位时，就是调用dup、dup2函数来实现的。
++ （4） 重定位 `>`   
+  
+  > 重定位 命令（>）是dup、dup2的典型应用，这个命令在重定位时，就是调用dup、dup2函数来实现的。
 
   + 1）>使用的例子
 
