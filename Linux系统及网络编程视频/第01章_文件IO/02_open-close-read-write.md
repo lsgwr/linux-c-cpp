@@ -2,6 +2,55 @@
 
 ## 2. open函数
 
+```c
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+
+#include <stdlib.h>
+
+#define print_error(str) \
+do{\
+    fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+    perror(str);\
+    exit(-1);\
+}while(0);
+
+int main(void)
+{
+    int fd = 0;
+    fd = open("file.txt", O_RDWR);
+    if(fd < 0){
+        print_error("open fail");
+    }else{
+        printf("open successfully!\n");
+    }
+    
+    char buf_w[] = "hello wolrd";
+    int ret = write(fd, (void *)buf_w, strlen(buf_w));
+    if(ret < 0){
+        print_error("write error");
+    }else{
+        printf("write successgully!\n");
+    }
+    
+    // 读之前需要把文件指针拨回到文件头
+    lseek(fd, SEEK_SET, 0);
+    
+    char buf_r[30];
+    read(fd, buf_r, sizeof(buf_w));
+    
+    printf("buf_r = %s\n", buf_r);
+    
+    close(fd);
+    return 0;
+}
+```
+
 ### 2.1 函数原型
 
 ```c
