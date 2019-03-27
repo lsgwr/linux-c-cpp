@@ -768,6 +768,8 @@ int main(void)
 }
 ```
 
+结果是hello和world交替打印，互补影响，实现了共同操作一个文件的目的
+
 ## 9. ioctl
 
 ### 9.1 为什么有ioctl这个函数
