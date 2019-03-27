@@ -481,7 +481,14 @@ ssize_t read(int fd, void *buf, size_t count);
 
 ### 3.3 `0/1/2`这三个文件描述符
 
-#### （1）程序开始运行时，有三个文件被自动打开了，打开时分别使用了这三个文件描述符  
+#### （1）程序开始运行时，有三个文件被自动打开了，打开时分别使用了这三个文件描述符 
+
+```shell
+root@6fb4b72f0c7c:/usr/include# ls /dev/std* -l
+lrwxrwxrwx 1 root root 15 Mar 25 03:46 /dev/stderr -> /proc/self/fd/2
+lrwxrwxrwx 1 root root 15 Mar 25 03:46 /dev/stdin -> /proc/self/fd/0
+lrwxrwxrwx 1 root root 15 Mar 25 03:46 /dev/stdout -> /proc/self/fd/1
+```
 
 #### （2）依次打开的三个文件分别是`/dev/stdin`、`/dev/stdout`、`/dev/stderr`
 
