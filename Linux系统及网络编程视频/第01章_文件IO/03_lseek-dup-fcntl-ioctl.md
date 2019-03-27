@@ -604,13 +604,170 @@ int fcntl(int fd, int cmd, ... /* arg */ );
 
 + （1）fcntl模拟dup, 代码演示
 
+   ```c
+  #include <stdio.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+  #include <stdlib.h>
+  #include <unistd.h>
+  
+  #define FILE_NAME "file.txt"
+  
+  #define print_error(str) \
+  do{\
+    fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+    perror(str);\
+    exit(-1);\
+  }while(0);
+  
+  int main(void)
+  {
+      int fd = -1;
+      fd = open(FILE_NAME, O_RDWR);
+      if(-1 == fd) print_error("1 open fail");
+  
+      close(1); // 关闭stdout的指针，方便下面重定向到文件中
+      int fd_tmp = fcntl(fd, F_DUPFD, 0); // 第三个参数不想传就设置为0
+  
+  
+      printf("hello world fd_tmp = %d\n", fd_tmp);
+  
+      return 0;
+  }
+  ```
+
+  会把printf的内容重定向输出到file.txt中，内容为
+
+   ```shell
+   hello world fd_tmp = 1
+
+   ```
+
 + （2）fcntl模拟dup2,代码演示
-  dup2进行复制时，如果新的文件描述符已经被用，dup2函数会关闭它，然后再复制，但是fcntl模拟dup2时，必须自己手动的调用close来关闭，然后再进行复制。
+  dup2进行复制时，如果新的文件描述符已经被用，dup2函数会关闭它，然后再复制，但是fcntl模拟dup2时，必须自己手动的调用close来关闭，然后再进行复制  
+
+  ```c
+  #include <stdio.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+  #include <stdlib.h>
+  #include <unistd.h>
+  
+  #define FILE_NAME "file.txt"
+  
+  #define print_error(str) \
+  do{\
+    fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+    perror(str);\
+    exit(-1);\
+  }while(0);
+  
+  int main(void)
+  {
+      int fd = -1;
+      fd = open(FILE_NAME, O_RDWR);
+      if(-1 == fd) print_error("1 open fail");
+  
+      /* 模拟dup */
+	    //close(1);
+	    //dup(fd);
+	    
+	    //close(1);
+	    //fcntl(fd, F_DUPFD, 0);
+	    
+	    /* 模拟dup2 */
+	    //dup2(fd, 1);
+	    close(1);
+	    int fd_tmp = fcntl(fd, F_DUPFD, 1);
+
+      printf("hello world fcntl fd_tmp = %d\n", fd_tmp);
+  
+      return 0;
+  }
+  ```
+
+  和上面模拟dup的结果相同，file.txt内容如下
+
+  ```txt
+  hello world fcntl fd_tmp = 1
+  
+  ```
 
 #### 8.5.2 fcntl补设O_APPEND文件状态标志
 
-代码演示：
-							
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+
+#define FILE_NAME "file.txt"
+
+#define print_error(str) \
+do{\
+  fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+  perror(str);\
+}while(0);
+
+int open_fun1(void)
+{
+	int fd = open(FILE_NAME, O_RDWR);
+	if(-1 == fd) 
+	{
+		print_error("open fail");
+		return 0;
+	}
+	return fd;
+}	
+
+int open_fun2(void)
+{
+	int fd = open(FILE_NAME, O_RDWR);
+	if(-1 == fd)
+	{
+		print_error("open fail");
+		return 0;
+	}
+	return fd;
+}	
+
+int main(void)
+{
+	int fd1 = 0;
+	int fd2 = 0;
+	int flag = 0;
+
+	fd1 = open_fun1();
+	fd2 = open_fun2();
+	
+	/* 直接制定F_SETFL时，会直接使用新的标志，去修改掉就的标志
+	   返回的是新设置的标志
+	 */
+	flag = O_WRONLY|O_TRUNC|O_APPEND;
+	fcntl(fd1, F_SETFL, flag);
+
+	/* 保留原有标志，然后在原有标志的基础上，叠加新标志 */
+	flag = fcntl(fd2, F_GETFL, 0);//获取原有标志
+	flag = flag | O_TRUNC | O_APPEND;//叠加
+	fcntl(fd2, F_SETFL, flag); //设置回去
+	
+
+	while(1)
+	{
+		write(fd1, "hello\n", 6);
+		sleep(1);
+		write(fd2, "world\n", 6);
+	}
+		
+	
+	return 0;
+}
+```
+
 ## 9. ioctl
 
 ### 9.1 为什么有ioctl这个函数
