@@ -1836,7 +1836,7 @@
 								3）把文件名给lstat，获取属性
 
 								
-14. chmode、fchmod
+14. chmod、fchmod
 
 	14.1 函数原型
 			#include <sys/stat.h>
