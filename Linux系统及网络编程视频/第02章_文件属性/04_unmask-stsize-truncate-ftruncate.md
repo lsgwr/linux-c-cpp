@@ -6,7 +6,7 @@ open函数创建新的文件时，如果指定的是0777满级权限的话，实
 
 ### （1）为什么不是满级权限
 
-因为被文件权限掩码做了限制。
+> 因为被文件权限掩码做了限制,文件掩码越大对文件权限设置的限制越大
 
 ```shell
   111 111 111  (0777)
@@ -44,7 +44,62 @@ mode_t umask(mode_t mask);
 
 ## 4.2 函数举例
 
-代码演示：
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+#define FILE_NAME "file.txt"
+
+#define print_error(str) \
+do{\
+    fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+    perror(str);\
+    exit(-1);\
+}while(0);
+
+
+int main(void)
+{
+    int fd = -1;
+    
+    // 下面这3行可以把系统掩码的限制(系统本来有个值为18的掩码,不同机器掩码可能不一样)放开
+    // 使得777设置的权限就是rwxrwxrwx; 注释掉这3行结果就是rwxr-xr-x
+    mode_t ret = 0;
+    ret = umask(0);
+    printf("oldMask = %d\n", ret);
+    
+    fd = open(FILE_NAME, O_RDWR | O_CREAT, 0777);
+    
+    if(fd < 0){
+        print_error("open fail");
+    }
+    return 0;
+}
+```
+
+结果输出：
+
+```shell
+oldMask = 18
+```
+
+命令查看文件信息的前后回显如下：
+
+```shell
+root@6fb4b72f0c7c:/workspace/chapter03# ll -ah file.txt 
+-rwxr-xr-x 1 root root 0 Mar 29 03:11 file.txt*
+root@6fb4b72f0c7c:/workspace/chapter03# ll -ah file.txt 
+-rwxrwxrwx 1 root root 0 Mar 29 03:12 file.txt*
+root@6fb4b72f0c7c:/workspace/chapter03# ./
+file.txt     unmask_test  
+root@6fb4b72f0c7c:/workspace/chapter03# ./unmask_test 
+oldMask = 18
+root@6fb4b72f0c7c:/workspace/chapter03# 
+```
 
 ## 4.3 每一个进程都有一个文件权限掩码
 
@@ -71,7 +126,11 @@ pfile -> file.txt
 
 ## 7. 文件截断函数truncate、	ftruncate		
 
-我们学习open时，可以指定了O_TRUNC后，文件里面有数据的话，会将打开的文件截短（清空）为0，这一小节我们将要学习一个文件截短的函数truncate，它不仅能够将文件截为0，还可以把文件截短为任意长度。
+我们学习open时，可以指定了O_TRUNC后，文件里面有数据的话，会将打开的文件截短（清空）为0
+
+这一小节我们将要学习一个文件截短的函数truncate，**它不仅能够将文件截为0，还可以把文件截短为任意长度**
+
+截取的长度length超过文件大小会产生文件空洞
 
 ## 7.1 函数原型和所需头文件
 
@@ -96,3 +155,6 @@ int ftruncate(int fd, off_t length);
 + 失败返回-1, errno被设置
 
 ## 7.4 测试用例
+
++ `truncate("./file.txt", 10);`
++ `ftruncate(fd, 5);`
