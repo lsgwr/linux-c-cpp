@@ -31,6 +31,35 @@ DIR *opendir(const char *name);
 
 ### 13.1.2 代码演示
 
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <dirent.h>
+
+#define print_error(str) \
+do{\
+    fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+    perror(str);\
+    exit(-1);\
+}while(0);
+
+
+int main(void)
+{
+    DIR *dirp = NULL;
+    dirp = opendir("file.txt");
+    if(NULL == dirp){
+        print_error("opendir error");
+    }
+    
+    return 0;
+}
+```
+
 ## 13.2 readdir
 
 ### 13.2.1 函数原型
@@ -68,24 +97,80 @@ struct dirent
 + 1）读到目录的末尾时，返回NULL
 + 2）函数调用失败时，也返回NULL, 不过errno被设置
 
-怎么判断函数是否调用失败了呢，如果ernno==0，表示没有设置错误号，返回NULL是因为读到了文件的末尾  
-如果errno!=0，表示是因为函数调用出错而返回的NULL  
+怎么判断函数是否调用失败了呢
++ 如果`ernno==0`, 表示没有设置错误号，返回NULL是因为读到了文件的末尾  
++ 如果`errno!=0`, 表示是因为函数调用出错而返回的NULL  
 
 #### （5）代码演示
 
-## 13.3 修改my_ls
+```c
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <dirent.h>
+#include <errno.h>
 
-> 修改该代码，实现一个功能：当跟的参数是目录时，将目录中所有文件的属性信息全部都显示出来。
+#define print_error(str) \
+do{\
+    fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+    perror(str);\
+    exit(-1);\
+}while(0);
 
-### （1）实现方法
 
-判断文件是不是目录
+int main(void)
+{
+    // 1.打开当前文件夹
+    DIR *dirp = NULL;
+    dirp = opendir(".");
+    if(NULL == dirp){
+        print_error("opendir error");
+    }
+    
+    // 2.循环读取当前文件夹下的文件
+    while(1){
+        struct dirent  *direntp = NULL;
+        direntp = readdir(dirp);
+        
+        // 2.1 读文件出错
+        if((NULL == direntp)&& (errno !=0)){
+            print_error("readdir errnr");
+        }
+        
+        // 2.2 说明到达了目录的尾部
+        if((NULL == direntp)&& (errno == 0)) break;
+        
+        // 2.3 没到末尾就打印出当前所在条目的名字
+        printf("inode id = %ld, file name = %s\n", direntp->d_ino, direntp->d_name);
+    }
+    
+    return 0;
+}
+```
 
-+ （a）如果不是，直接调用lstat显示属性
-+ （b）如果是目录
-  +  1）打开目录
-  +  2）获取每一条目录项中的文件名
-  +  3）把文件名给lstat，获取属性
+结果如下：
+
+```shell
+inode id = 2308408, file name = unmask_test
+inode id = 2308426, file name = unmask_test.c
+inode id = 2308411, file name = file.txt
+inode id = 2308436, file name = getcwd_test
+inode id = 2308435, file name = readlink_test
+inode id = 2308432, file name = syslink_test.c
+inode id = 2308425, file name = .
+inode id = 2308444, file name = opendir
+inode id = 2308373, file name = ..
+inode id = 2308416, file name = truncate.c
+inode id = 2308441, file name = opendir.c
+inode id = 2308437, file name = readlink_test.c
+inode id = 2308434, file name = syslink_test
+inode id = 2308403, file name = getcwd_test.c
+inode id = 2308440, file name = pfile
+inode id = 2308430, file name = truncate
+```
   
 # 14. chmode、fchmod
 
@@ -103,11 +188,14 @@ int fchmod(int fd, mode_t mode);
   + `chmod`：使用路径名操作
   + `fchmod`：使用文件描述符操作
 
-+ （2）返回值：成功返回0，失败返回-1，errno被设置、
++ （2）返回值
+  + 成功返回0
+  + 失败返回-1，errno被设置
 
 # 14.2 代码演示
 
   ```c
   chmod("./file.txt", 0644);
+  fchmod(fd, 0644);
   ```
 
