@@ -16,23 +16,23 @@ ln -s xxx.txt pxxx
 
 ### 11.1.2 什么是符号链接文件
 
-符号链接文件就是一个快捷图标，它指向了另一个文件. 演示：
+符号链接文件就是一个快捷图标，它指向了另一个文件. 
 
 ### 11.1.3 符号链接 与 硬链接的对比
 
 #### （1）创建硬连接
 
-同一个文件有多个不同的名字，它们指向是同一个inode节点。
+同一个文件有多个不同的名字，它们指向是同一个inode节点(**删一个硬链接就全删除了**)
 
 #### （2）创建符号链接文件
 
-符号链接文件与它所指向的文件，是两个完全不同的独立的文件，拥有自己独立的inode节点。
+符号链接文件与它所指向的文件，是两个完全不同的独立的文件，拥有自己独立的inode节点(**删除软链接不影响原始文件**)
 
-符号链接文件的数据就是指向文件的文件名，文件大小就是名字的字符个数。图1：
+符号链接文件的数据就是指向文件的文件名，**文件大小就是名字的字符个数**
 
-#### （3）不能给目录创建硬链接，但是可以给目录创建符号链接文
+#### （3）不能给目录创建硬链接，但是可以给目录创建符号链接
 
-只要你有需要，可以给任何文件创建符号链接文件。
+只要你有需要，可以给任何文件创建符号链接文件
 
 #### （4）可以给符号链接文件，创建硬链接吗
 
@@ -49,11 +49,12 @@ int symlink(const char *oldpath, const char *newpath);
 ```
 
 + （1）功能：为oldpath，创建符号连接文件newpath。
+  + 使用`ln`创建硬链接时，调用的是link函数。
+  + 使用`ln -s`创建符号链接时，调用的是symlink，sym就是符号的意思。
 
-  使用`ln`创建硬链接时，调用的是link函数。
-  使用`ln -s`创建符号链接时，调用的是symlink，sym就是符号的意思。
-
-+ （2）函数返回值：调用成功返回0，失败返回-1，errno被设置
++ （2）函数返回值
+  + 调用成功返回0
+  + 失败返回-1, errno被设置
 
 ### 11.1.2 代码演示
 
@@ -75,8 +76,41 @@ int symlink(const char *oldpath, const char *newpath);
   + 调用成功，返回读到的字节数
   + 失败返回-1，errno被设置
 + （3）代码演示
-+ （4）修改my_ls
+  ```c
+  #include <stdio.h>
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+  #include <unistd.h>
+  #include <stdlib.h>
 
+
+  #define print_error(str) \
+  do{\
+      fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+      perror(str);\
+      exit(-1);\
+  }while(0);
+
+
+  int main(void)
+  {
+      int ret = symlink("file.txt", "pfile"); // 创建软链接
+      if(ret < 0)print_error("symlink error");
+
+      char buf[30] = {0};
+      ret = readlink("pfile", buf, sizeof(buf)); // 读取软链接指向的文件的文件名
+      if(ret < 0) print_error("readlink error");
+
+      printf("symbol link is %s\n", buf); // 读取软链接ppfile得到它实际指向的文件pfile
+
+  }
+  ```
+  回显为：
+  
+  ```shell
+  symbol link is file.txt
+  ```
 ## 11.4 符号跟随函数 与 符号不跟随函数
 
 ### (1) 符号跟随函数
