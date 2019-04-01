@@ -41,11 +41,73 @@ int execve(const char *filename, char **const argv, char **const envp);
 + （3）返回值：函数调用成功不返回，失败则返回-1，且errno被设置
 + （4）代码演示
 
-  ```c
-             命令行参数/环境表                    命令行参数/环境表                命令行参数/环境表
-  终端窗口进程——————————————————>a.out（父进程）——————————————————————>a.out（子进程）——————————————>新程序
-                 fork                                 exec
-  ```
+    ```c
+    // fork.c 父进程调用子进程
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <sys/types.h>
+    #include <unistd.h>
+
+    int main(int argc, char **argv)
+    {
+        pid_t ret = 0;
+        ret = fork();
+        if(ret > 0){
+            sleep(1);
+        }else if(ret == 0){
+            extern char **environ; // 系统环境变量数组
+            //int execve(const char *filename, char **const argv, char **const envp);
+            char *my_argv[] = {"fds", "dsfds", NULL};
+            char *my_env[] = {"AA=aaaaa", "BB=bbbbb", NULL};
+            // 加载当前目录new_process.c编译生成的可执行文件，并把自定义命令行参数和全局变量传进去
+            execve("./new_process", my_argv, my_env);
+        }
+        return 0;
+    }
+    ```
+
+    ```c
+
+    // new_process.c，用于编译生成可执行文件然后给fork.c调用
+    #include <stdio.h>
+    #include <stdlib.h>
+
+    //extern char **environ;
+
+    int main(int argc, char **argv, char **environ)
+    {
+        int i = 0;
+
+        // 打印命令行参数
+        for(i=0; i<argc; i++){
+            printf("%s ", argv[i]);
+        }
+        printf("\n---------------------\n");
+        // 打印系统的全部环境变量
+        for(i=0; NULL!=environ[i]; i++){
+            printf("%s\n", environ[i]);
+        }
+        printf("\n---------------------\n");
+
+        return 0;
+    }
+    ```
+
+    结果如下：
+
+    ```shell
+    fds dsfds
+    ---------------------
+    AA=aaaaa
+    BB=bbbbb
+    ---------------------
+    ```
+
+    ```c
+               命令行参数/环境表                    命令行参数/环境表                命令行参数/环境表
+    终端窗口进程——————————————————>a.out（父进程）——————————————————————>a.out（子进程）——————————————>新程序
+                   fork                                 exec
+    ```
 
   exec的作用：将新程序代码加载（拷贝）到子进程的内存空间，替换掉原有的与父进程一模一样的代码和数据，让子进程空间运行全新的程序。
 
