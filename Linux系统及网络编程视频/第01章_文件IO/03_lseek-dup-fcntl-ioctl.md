@@ -117,8 +117,45 @@ int main(void)
 
 #### （1）前面我们介绍过`task_struct`结构体，这个结构体又叫进程表。
 
-这个结构体的成员项非常多，多达近300个。
+进程主要由以下几部分组成：
 
++ 代码段：编译后形成的一些指令
++ 数据段：程序运行时需要的数据
+  + 只读数据段：常量
+  + 已初始化数据段：全局变量，静态变量
++ 未初始化数据段（bss)：未初始化的全局变量和静态变量
++ 堆栈段：程序运行时动态分配的一些内存
++ PCB：进程信息，状态标识等
+
+Linux内核中进程用task_struct结构体表示，称为进程描述符，该结构体相对比较复杂，有几百行代码，结构体的成员项非常多，多达近300个,记载着该进程相关的所有信息，比如进程地址空间，进程状态，打开的文件等。对内核而言，进程或者线程都称为任务task。内核将所有进程放入一个双向循环链表结构的任务列表(task list)
+
+![task_struct](http://gityuan.com/images/linux/process/task_struct.jpg)
+
+```c
+struct task_struct {
+   volatile long state; //进程状态
+   struct mm_struct *mm, *active_mm; //内存地址空间
+   pid_t pid;
+     pid_t tgid;
+
+   struct task_struct __rcu *real_parent; //真正的父进程，fork时记录的
+   struct task_struct __rcu *parent; // ptrace后，设置为trace当前进程的进程
+   struct list_head children;  //子进程
+     struct list_head sibling;	//父进程的子进程，即兄弟进程
+   struct task_struct *group_leader; //线程组的领头线程
+
+   char comm[TASK_COMM_LEN];  //进程名，长度上限为16字符
+   struct fs_struct *fs;  //文件系统信息
+   struct files_struct *files; // 打开的文件
+
+   struct signal_struct *signal;
+   struct sighand_struct *sighand;
+   struct sigpending pending;
+   
+   void *stack;    //  指向内核栈的指针
+   ...
+}    
+```
 
 ##### （2）每一个进程运行起来后，Linux系统都会为其在内存中开辟一个`task_struct`结构体
 
