@@ -179,14 +179,14 @@ wait函数，在实际开发中用的很少，但是我们这里还是要介绍�
 + （2）任意位置调用exit
 + （3）任意位置调用_exit
 
-不管哪种方式来正常终止，最终都是通过_exit返回到OS内核的。
+不管哪种方式来正常终止，最终都是通过_exit返回到OS内核的  
 
 ### 6.1.2 异常终止
 
-如果是被某个信号终止的，就是异常终止。
+如果是被某个信号终止的，就是异常终止  
 
-+ （1）自杀：自己调用abort函数，自己给自己发一个SIGABRT信号将自己杀死。
-+ （2）他杀：由别人发一个信号，将其杀死。
++ （1）自杀：自己调用abort函数，自己给自己发一个SIGABRT信号将自己杀死  
++ （2）他杀：由别人发一个信号，将其杀死  
 
 ### 6.1.3 进程终止状态
 
@@ -194,9 +194,11 @@ wait函数，在实际开发中用的很少，但是我们这里还是要介绍�
 
 我们在上一章里面将return、exit、_exit的返回值称为“进程终止状态”，严格来说应该叫“退出状态”，
 
-return（退出状态）、exit（退出状态）或_exit（退出状态）  
+return（退出状态）、exit（退出状态）或_exit(退出状态) 
 
-当退出状态被_exit函数交给OS内核，OS对其进行加工之后得到的才是“进程终止状态”，父进程调用wait函数便可以得到这个“进程终止状态”。图：
+当退出状态被_exit函数交给OS内核，OS对其进行加工之后得到的才是“进程终止状态”，父进程调用wait函数便可以得到这个“进程终止状态”  
+
+通过 `echo $?`可以查看最近程序的执行结果状态  
 
 #### （2）OS是怎么加工的？
 
@@ -206,7 +208,7 @@ return（退出状态）、exit（退出状态）或_exit（退出状态）
  进程终止状态 = 终止原因（正常终止）<< 8 | 退出状态的低8位
  ```
 
- 不管return、exit、_exit返回的返回值有多大，只有低8位有效，所以如果返回值太大，只取低8位的值。验证：
+ 不管return、exit、_exit返回的返回值有多大，只有低8位有效，所以如果返回值太大，只取低8位的值(大于256只能取低8位)
 
 + 2）异常终止
 
@@ -216,24 +218,27 @@ return（退出状态）、exit（退出状态）或_exit（退出状态）
 
 #### （3）父进程调用wait函数，得到“进程终止状态”有什么用
 
-父进程得到进程终止状态后，就可以判断子进程终止的原因是什么，如果是正常终止的，可以提取出返回值，如果是异常终止的，可以提取出异常终止进程的信号编号。
+父进程得到进程终止状态后，就可以判断子进程终止的原因是什么，如果是正常终止的，可以提取出返回值，如果是异常终止的，可以提取出异常终止进程的信号编号  
 
-讲到这里大家就明白了，当有OS支持时，进程return、exit、_exit正常终止时，所返回的返回值（退出状态），最终通过“进程终止状态”返回给了父进程。
+讲到这里大家就明白了，当有OS支持时，进程return、exit、_exit正常终止时，所返回的返回值(退出状态), 最终通过“进程终止状态”返回给了父进程  
 
-这有什么用，比如，父进程可以根据子进程的终止状态来判断子进程的终止原因，返回值等等，以决定是否重新启动子进程，或则做一些其它的操作，不过一般来说，子进程的终止状态对父进程并没有太大意义。
+这有什么用，比如，父进程可以根据子进程的终止状态来判断子进程的终止原因，返回值等等，以决定是否重新启动子进程，或则做一些其它的操作，不过一般来说，子进程的终止状态对父进程并没有太大意义   
 
 ## 6.2 父进程如何从内核获取子终止状态
 
-> 父进程可以获取，也可以不获取，父进程可以根据自己的具体需要来定。
+> 父进程可以获取，也可以不获取，父进程可以根据自己的具体需要来定  
 
 ### 6.2.1 如何获取
 
-图：
++ （1）父进程调用wait等子进程结束，如果子进程没有结束的话，父进程调用wait时会一直休眠的等(或者说阻塞的等)  
++ （2）子进程终止返回内核，内核构建“进程终止状态”  
+  如果，  
+  + 1）子进程是调用return、exit、_exit正常终止的，将退出状态返回给内核后，内核会通过如下表达式构建“进程终止状态”
+  
+     ```shell
+     进程终止状态 = 终止原因（正常终止）<< 8 | 退出状态的低8位
+     ```
 
-+ （1）父进程调用wait等子进程结束，如果子进程没有结束的话，父进程调用wait时会一直休眠的等（或者说阻塞的等）。
-+ （2）子进程终止返回内核，内核构建“进程终止状态”
-  如果，
-  + 1）子进程是调用return、exit、_exit正常终止的，将退出状态返回给内核后，内核会通过如下表达式构建“进程终止状态”进程终止状态 = 终止原因（正常终止）<< 8 | 退出状态的低8位
   + 2）子进程是被某个信号异常终止的，内核会使用如下表达式构建“进程终止状态”
 
       ```shell
@@ -241,7 +246,7 @@ return（退出状态）、exit（退出状态）或_exit（退出状态）
       ```
 
 + （3）内核向父进程发送SIGCHLD信号，通知父进程子进程结束了，你可以获取子进程的“进程终止状态”了  
-    如果父进程没有调用wait函数的话，会忽略这个信号，表示不关心子进程的“进程终止状态”  
+    如果父进程没有调用wait函数的话，会忽略这个信号，表示不关心子进程的“进程终止状态”    
     如果父进程正在调用wait函数等带子进程的“进程终止状态”的话，wait会被SIGCHLD信号唤醒，并获取进"进程终止状态"  
 
 一般情况下，父进程都不关心子进程的终止状态是什么，所以我们经常看到的情况是，不管子进程返回什么返回值，其实都无所谓，因为父进程不关心。
@@ -259,15 +264,103 @@ pid_t wait(int *status);
 + （2）参数：用于存放“进程终止状态”的缓存
 + （3）返回值：成功返回子进程的PID，失败返回-1，errno被设置。
 + （4）代码演示
+  
+  ```c
+  // fork.c 调用子进程代码并通过wait获取子进程状态
+  #include <stdio.h>
+  #include <unistd.h>
+  #include <sys/types.h>
+  #include <sys/wait.h>
+
+  int main(int argc, char **argv, char **environ)
+  {
+      pid_t ret = -1;
+      ret = fork();
+
+      if(ret > 0){
+          // 父进程
+          int status = 0; // 子进程执行状态
+          wait(&status); // 获取子进程执行状态到status中
+          printf("子进程退出状态为：%d\n", status);
+      }else if(ret == 0){
+          // 子进程
+          execve("./new_process", argv, environ); // execve调用外部自定义子进程
+      }
+      return 0;
+  }
+  ```
+  
+  ```c
+  // new_process.c，用于编译生成可执行文件然后给fork.c调用
+  #include <stdio.h>
+
+  int main(int argc, char **argv, char **environ)
+  {
+
+      printf("当前所在程序：new_process.c\n");
+      int i = 0;
+
+      printf("\n-----------命令行参数----------\n");
+
+      for(i = 0; i < argc; i++){
+          printf("%s\n", argv[i]);
+      }
+
+      printf("\n-----------环境变量----------\n");
+      for(i = 0; NULL != environ[i]; i++){
+          printf("%s\n", environ[i]);
+      }
+
+      return 0; // 这个返回码会被fork.c里面的主进程wait函数()获取到
+  }
+  ```
+  
+  结果如下：
+  
+  ```c
+  当前所在程序：new_process.c
+
+  -----------命令行参数----------
+  /workspace/chapter05pid/exec/fork
+
+  -----------环境变量----------
+  HOSTNAME=6fb4b72f0c7c
+  SHELL=/bin/sh
+  TERM=xterm-256color
+  ISOUTPUTPANE=1
+  TMUX=/tmp/tmux-0/cloud91.9,47,318
+  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+  SUPERVISOR_GROUP_NAME=cloud9
+  PWD=/workspace/chapter05pid/exec
+  NODE_PATH=/usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript
+  TMUX_PANE=%318
+  NODE_ENV=production
+  SUPERVISOR_ENABLED=1
+  SHLVL=1
+  HOME=/root
+  SUPERVISOR_PROCESS_NAME=cloud9
+  SUPERVISOR_SERVER_URL=unix:///var/run/supervisor.sock
+  BASE_PROC=/workspace
+  CUSTOM=43
+  _=/usr/bin/node
+  子进程退出状态为：0 # fork.c中的父进程捕获子进程new_process的退出码
+  ```
 
 ### 6.2.3 从进程终止状态中提取进程终止的原因、返回值或者信号编号
 
 #### （1）进程状态中所包含的信息
 
 + 1）正常终止
+   
+   ```shell
    进程终止状态 = 终止原因（正常终止）<< 8 | 退出状态的低8位
+   ```
+   
 + 2）异常终止
+   
+   ```shell
    进程终止状态 = 是否产生core文件位 | 终止原因（异常终止）<< 8 | 终止该进程的信号编号
+   ```
 
 #### （2）如何提取里面的信息
 
@@ -277,15 +370,15 @@ pid_t wait(int *status);
 
 哪里能查到这些带参宏，man查案wait的函数手册，即可看到。
 
-+ 1）WIFEXITED(status)：提取出终止原因，判断是否是正常终止  
++ 1）`WIFEXITED(status)`：提取出终止原因，判断是否是**正常终止**, Wait If Exited    
   + （a）如果表达式为真：表示进程是正常终止的  
-      此时使用WEXITSTATUS(status)，就可以从里面提取出return/exit/_exit返回的“退出状态”。
+      此时使用`WEXITSTATUS(status)`，就可以从里面提取出`return/exit/_exit`返回的“退出状态”。
 
   + （b）为假：不是正常终止的
 
-+ 2）WIFSIGNALED(status)：提取出终止原因，判断是否是被信号杀死的（异常终止）
++ 2）`WIFSIGNALED(status)`：提取出终止原因，判断是否是**被信号杀死的(异常终止)** Wait If Signaled  
   + （a）如果表达式为真：是异常终止的  
-        此时使用WTERMSIG(status)，就可以从里面提取出终止该进程的信号编号。
+      此时使用`WTERMSIG(status)`, 就可以从里面提取出终止该进程的信号编号。
 
   + （b）为假：不是异常终止的
 
@@ -293,7 +386,131 @@ pid_t wait(int *status);
 
 通过判断终止原因、返回值、信号编号，父进程可以决定是否重新运行子进程，不过99%的情况是，父进程不关心子进程是怎么终止的，它的返回值是什么。
 
-有关wait不要去记忆，我们讲wait的主要目的是想告诉你，进程的返回值到底返回给了谁。
+有关wait不要去记忆，我们讲wait的主要目的是想告诉你，进程的返回值到底返回给了谁
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+int main(int argc, char **argv, char **environ)
+{
+    pid_t ret = -1;
+    ret = fork();
+    
+    if(ret > 0){
+        // 父进程
+        int status = 0; // 子进程执行状态
+        wait(&status); // 获取子进程执行状态到status中
+        printf("子进程退出状态为：%d\n", status);
+        if(WIFEXITED(status)){
+            // 如果正常退出的话
+            printf("exited: %d\n", WEXITSTATUS(status));
+        }else if(WIFSIGNALED(status)){
+            // 异常退出
+            printf("killed by signal: %d\n", WTERMSIG(status));   
+        }
+    }else if(ret == 0){
+        // 子进程
+        execve("./new_process", argv, environ); // execve调用外部自定义子进程
+    }
+    return 0;
+}
+```
+
+```c
+// new_process.c，用于编译生成可执行文件然后给fork.c调用
+#include <stdio.h>
+
+int main(int argc, char **argv, char **environ)
+{
+
+    printf("当前所在程序：new_process.c\n");
+    int i = 0;
+
+    printf("\n-----------命令行参数----------\n");
+
+    for(i = 0; i < argc; i++){
+        printf("%s\n", argv[i]);
+    }
+
+    printf("\n-----------环境变量----------\n");
+    for(i = 0; NULL != environ[i]; i++){
+        printf("%s\n", environ[i]);
+    }
+    
+    while(1); // 用于挂起子进程，方便用"kill -信号码 pid号"来干掉进程
+    
+    return 0;
+}
+```
+
+执行 `kill -10 new_process的pid`(用`ps -al`查看)得到如下输出(异常退出，被`WIFSIGNALED`捕获)：
+
+```shell
+cc     fork.c   -o fork
+当前所在程序：new_process.c
+
+-----------命令行参数----------
+/workspace/chapter05pid/exec/fork
+
+-----------环境变量----------
+HOSTNAME=6fb4b72f0c7c
+SHELL=/bin/sh
+TERM=xterm-256color
+ISOUTPUTPANE=1
+TMUX=/tmp/tmux-0/cloud91.9,47,322
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+SUPERVISOR_GROUP_NAME=cloud9
+PWD=/workspace/chapter05pid/exec
+NODE_PATH=/usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript
+TMUX_PANE=%322
+NODE_ENV=production
+SUPERVISOR_ENABLED=1
+SHLVL=1
+HOME=/root
+SUPERVISOR_PROCESS_NAME=cloud9
+SUPERVISOR_SERVER_URL=unix:///var/run/supervisor.sock
+BASE_PROC=/workspace
+CUSTOM=43
+_=/usr/bin/node
+子进程退出状态为：10 # fork.c中的父进程捕获子进程new_process的退出码
+killed by signal: 10 # 异常退出，被WIFSIGNALED(status)捕获
+```
+
+注释掉new_process.c中的while(1)那行，结果如下(正常退出，被`WIFEXITED`捕获):
+
+```shell
+当前所在程序：new_process.c
+
+-----------命令行参数----------
+/workspace/chapter05pid/exec/fork
+
+-----------环境变量----------
+HOSTNAME=6fb4b72f0c7c
+SHELL=/bin/sh
+TERM=xterm-256color
+ISOUTPUTPANE=1
+TMUX=/tmp/tmux-0/cloud91.9,47,320
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+SUPERVISOR_GROUP_NAME=cloud9
+PWD=/workspace/chapter05pid/exec
+NODE_PATH=/usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript
+TMUX_PANE=%320
+NODE_ENV=production
+SUPERVISOR_ENABLED=1
+SHLVL=1
+HOME=/root
+SUPERVISOR_PROCESS_NAME=cloud9
+SUPERVISOR_SERVER_URL=unix:///var/run/supervisor.sock
+BASE_PROC=/workspace
+CUSTOM=43
+_=/usr/bin/node
+子进程退出状态为：0 # fork.c中的父进程捕获子进程new_process的退出码
+exited: 0 # 正常退出，用WIFEXITED(status捕获地)
+```
+
 
 #### （4）wait的缺点
 
