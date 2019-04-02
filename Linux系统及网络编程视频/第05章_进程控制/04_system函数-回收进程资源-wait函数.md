@@ -18,8 +18,17 @@ int system(const char *command);
 + （3）代码演示
 
     ```c
-    system("ls")
-    system("ls -al");
+    #include <stdio.h>
+    #include <stdlib.h>
+
+    int main(void)
+    {
+        system("ls")
+        system("ls -al");
+        // system("可执行文件的绝对路径");
+        return 0;
+    }
+   
     ```
 
 # 5. 回收进程资源
@@ -53,13 +62,105 @@ int system(const char *command);
 
 ### 5.3.3 演示
 
-+ （1）僵尸进程
-  + `ps` 查看到的进程状态
-  + `R` 正在运行
-  + `S` 处于休眠状态
-  + `Z` 僵尸进程，进程运行完了，等待被回收资源。
+#### （1）僵尸进程(父亲活着，儿子死了)
 
-+ （2）孤儿进程
+> 没了儿子的爸爸如同行尸走肉
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main(void)
+{
+    pid_t ret = 0;
+    ret = fork();
+    if(ret > 0){
+        // 父进程
+        while(1);
+    }else if(ret == 0){
+        // 子进程
+        
+    }
+    return 0;
+}
+```
+
+执行后会一直卡在`while(1)`, 所以父进程会一直运行(Run-R), 子进程立马执行完进入僵尸(Zombie-Z)状态  
+
+用`ps -al`命令(查看正在终端运行的进程)查看如下：
+
+```shell
+F S   UID    PID   PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+4 S     0      9      1  0  80   0 - 308404 ep_pol pts/1   00:03:25 node
+0 S     0     49     48  0  80   0 -  4561 wait   pts/1    00:00:00 bash
+0 S     0     91     90  0  80   0 -  4547 wait_w pts/3    00:00:00 bash
+0 S     0   9152      9  0  80   0 - 308503 ep_pol pts/1   00:00:01 node
+0 S     0   9512   9511  0  80   0 -  2384 wait   pts/2    00:00:00 bash
+0 S     0   9515   9512  0  80   0 - 185013 ep_pol pts/2   00:00:00 node
+0 S     0   9528   9515  0  80   0 -  2973 sigsus pts/2    00:00:00 gdbserver
+0 S     0   9530   9528  0  80   0 -  1050 unix_s pts/2    00:00:00 fd_demo
+0 S     0   9533   9515  0  80   0 - 14569 poll_s pts/2    00:00:07 gdb
+0 S     0  10302      9  0  80   0 - 310941 ep_pol pts/1   00:00:01 node
+0 S     0  13430      9  0  80   0 - 326761 ep_pol pts/1   00:00:01 node
+0 S     0  13988      9  0  80   0 - 359466 -     pts/1    00:00:03 node
+0 R     0  15239     49 99  80   0 -  1050 -      pts/1    00:00:15 zombie_orphan  # 15239 < 15240表明为父进程;R代表进程正在运行
+1 Z     0  15240  15239  0  80   0 -     0 exit   pts/1    00:00:00 zombie_orphan <defunct> # 15240 > 15239 表明为子进程;Z代表进程僵尸进程(Zombie)
+0 S     0  15245  15244  0  80   0 -  4547 wait   pts/11   00:00:00 bash
+0 R     0  15264  15245  0  80   0 -  1787 -      pts/11   00:00:00 ps
+```
+第2列的R、S、Z等的含义如下：
++ `ps` 查看到的进程状态
++ `R` 正在运行
++ `S` 处于休眠状态
++ `Z` 僵尸进程，进程运行完了，等待被回收资源
+
+#### （2）孤儿进程(父亲死了，儿子活着)
+
+> 没有爸爸，就成孤儿了
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main(void)
+{
+    pid_t ret = 0;
+    ret = fork();
+    if(ret > 0){
+        // 父进程
+       
+    }else if(ret == 0){
+        // 子进程一直活着不退出
+         while(1);
+    }
+    return 0;
+}
+```
+
+用`ps -al`命令(查看正在终端运行的进程)查看如下：
+
+```shell
+F S   UID    PID   PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+4 S     0      9      1  0  80   0 - 308660 ep_pol pts/1   00:03:26 node
+0 S     0     49     48  0  80   0 -  4561 wait_w pts/1    00:00:00 bash
+0 S     0     91     90  0  80   0 -  4547 wait_w pts/3    00:00:00 bash
+0 S     0   9152      9  0  80   0 - 308503 ep_pol pts/1   00:00:01 node
+0 S     0   9512   9511  0  80   0 -  2384 wait   pts/2    00:00:00 bash
+0 S     0   9515   9512  0  80   0 - 185013 ep_pol pts/2   00:00:00 node
+0 S     0   9528   9515  0  80   0 -  2973 sigsus pts/2    00:00:00 gdbserver
+0 S     0   9530   9528  0  80   0 -  1050 unix_s pts/2    00:00:00 fd_demo
+0 S     0   9533   9515  0  80   0 - 14569 poll_s pts/2    00:00:07 gdb
+0 S     0  10302      9  0  80   0 - 310941 ep_pol pts/1   00:00:01 node
+0 S     0  13430      9  0  80   0 - 326761 ep_pol pts/1   00:00:01 node
+0 S     0  13988      9  0  80   0 - 361260 ep_pol pts/1   00:00:03 node
+0 S     0  15245  15244  0  80   0 -  4547 wait   pts/11   00:00:00 bash
+1 R     0  15285      1 99  80   0 -  1050 -      pts/1    00:04:01 zombie_orphan # 可以看到只有子进程在跑，父进程已经没了
+0 R     0  15394  15245  0  80   0 -  1787 -      pts/11   00:00:00 ps
+```
 
 # 6. wait函数
 
