@@ -39,10 +39,87 @@ int execve(const char *filename, char **const argv, char **const envp);
   + 3）envp：环境变量表
 
 + （3）返回值：函数调用成功不返回，失败则返回-1，且errno被设置
+
 + （4）代码演示
 
     ```c
     // fork.c 父进程调用子进程
+    #include <stdio.h>
+    #include <unistd.h>
+
+    int main(int argc, char **argv, char **environ)
+    {
+        pid_t ret = -1;
+        ret = fork();// 创建子进程
+
+        if(ret > 0){
+            // 父进程必须sleep一下，要不父进程先退出子进程就不会执行完了
+            sleep(1);
+        }else if(ret==0){
+            // 子进程
+            execve("./new_process", argv, environ); 
+        }
+    }
+    ```
+
+    ```c
+
+    // new_process.c，用于编译生成可执行文件然后给fork.c调用
+    #include <stdio.h>
+
+    int main(int argc, char **argv, char **environ)
+    {
+
+        printf("当前所在程序：new_process.c\n");
+        int i = 0;
+
+        printf("\n-----------命令行参数----------\n");
+
+        for(i = 0; i < argc; i++){
+            printf("%s\n", argv[i]);
+        }
+
+        printf("\n-----------环境变量----------\n");
+        for(i = 0; NULL != environ[i]; i++){
+            printf("%s\n", environ[i]);
+        }
+        return 0;
+    }
+    ```
+
+    编译后执行`fork name lsg`结果如下：
+
+    ```shell
+    当前所在程序：new_process.c
+
+    -----------命令行参数----------
+    /workspace/exec/fork
+
+    -----------环境变量----------
+    HOSTNAME=9bcde94681d8
+    SHELL=/bin/sh
+    TERM=xterm-256color
+    ISOUTPUTPANE=1
+    TMUX=/tmp/tmux-0/cloud91.9,1303,37
+    PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    SUPERVISOR_GROUP_NAME=cloud9
+    PWD=/workspace/exec
+    NODE_PATH=/usr/lib/nodejs:/usr/lib/node_modules:/usr/share/javascript
+    TMUX_PANE=%37
+    NODE_ENV=production
+    SUPERVISOR_ENABLED=1
+    SHLVL=1
+    HOME=/root
+    SUPERVISOR_PROCESS_NAME=cloud9
+    SUPERVISOR_SERVER_URL=unix:///var/run/supervisor.sock
+    BASE_PROC=/workspace
+    CUSTOM=43
+    _=/usr/bin/node
+    ```
+
+    也可以自定义argv和environ
+
+    ```c
     #include <stdio.h>
     #include <stdlib.h>
     #include <sys/types.h>
@@ -51,6 +128,7 @@ int execve(const char *filename, char **const argv, char **const envp);
     int main(int argc, char **argv)
     {
         pid_t ret = 0;
+  
         ret = fork();
         if(ret > 0){
             sleep(1);
@@ -59,48 +137,25 @@ int execve(const char *filename, char **const argv, char **const envp);
             //int execve(const char *filename, char **const argv, char **const envp);
             char *my_argv[] = {"fds", "dsfds", NULL};
             char *my_env[] = {"AA=aaaaa", "BB=bbbbb", NULL};
-            // 加载当前目录new_process.c编译生成的可执行文件，并把自定义命令行参数和全局变量传进去
             execve("./new_process", my_argv, my_env);
         }
-        return 0;
+
+      return 0;
     }
     ```
 
-    ```c
-
-    // new_process.c，用于编译生成可执行文件然后给fork.c调用
-    #include <stdio.h>
-    #include <stdlib.h>
-
-    //extern char **environ;
-
-    int main(int argc, char **argv, char **environ)
-    {
-        int i = 0;
-
-        // 打印命令行参数
-        for(i=0; i<argc; i++){
-            printf("%s ", argv[i]);
-        }
-        printf("\n---------------------\n");
-        // 打印系统的全部环境变量
-        for(i=0; NULL!=environ[i]; i++){
-            printf("%s\n", environ[i]);
-        }
-        printf("\n---------------------\n");
-
-        return 0;
-    }
-    ```
-
-    结果如下：
+    new_process不变，执行结果如下，可见这样就完全分隔了父子进程的实现：
 
     ```shell
-    fds dsfds
-    ---------------------
+    当前所在程序：new_process.c
+
+    -----------命令行参数----------
+    fds
+    dsfds
+
+    -----------环境变量----------
     AA=aaaaa
     BB=bbbbb
-    ---------------------
     ```
 
     ```c
