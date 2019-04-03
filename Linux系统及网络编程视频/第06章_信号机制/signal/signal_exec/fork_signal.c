@@ -25,6 +25,7 @@ int main(int argc, char **argv, char **environ)
 	}
 	else if(ret == 0)
 	{
+		// 当有调用exec加载新程序时, 信号的处理方式会被还原为默认处理方式
 		execve("./new_pro", argv, environ);
 	}
 	
