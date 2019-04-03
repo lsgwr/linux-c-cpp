@@ -28,10 +28,10 @@ sighandler_t signal(int signum, sighandler_t handler);
   sighandler_t signal(int signum, void (*handler)(int));
   ```
 
-  + （a）忽略：SIG_IGN
-  + （b）默认：SIG_DFL
-  + （c）捕获：填写类型为void (*)(int)的捕获函数的地址，当信号发生时，会自动调用捕获函数来进行相应的处理。
-      当然这个捕获函数需要我们自己来实现，捕获函数的int参数，用于接收信号编号。
+  + （a）忽略：SIG_IGN `ignore`
+  + （b）默认：SIG_DFL `default`
+  + （c）捕获：填写类型为`void (*)(int)`的捕获函数的地址，当信号发生时，会自动调用捕获函数来进行相应的处理  
+      当然这个捕获函数需要我们自己来实现，捕获函数的int参数，用于接收信号编号  
 
       捕获函数也被称为信号处理函数。
 
