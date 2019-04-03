@@ -8,12 +8,11 @@ typedef void (*sighandler_t)(int);
 sighandler_t signal(int signum, sighandler_t handler);
 ```
 
-
 ### （1）功能：设置某个信号的处理方式。
 
 处理方式可以被设置为忽略，捕获，默认。
 
-进程的进程表（task_struct）中会有一个“信号处理方式登记表”，专门用于记录信号的处理方式，调用signal函数设置某个信号的处理方式时，会将信号的处理方式登记到该表中。
+进程的进程表（task_struct）中会有一个“信号处理方式登记表”，专门用于记录信号的处理方式，调用signal函数设置某个信号的处理方式时，会将信号的处理方式登记到该表中(连续设置多个信号会进行累加而不是覆盖)
 
 每个进程拥有独立的task_struct结构体变量，因而每个进程的“信号处理方式登记表”都是独立的，所以每个进程对信号的处理方式自然也是独立的，互不干扰。
 
@@ -65,6 +64,52 @@ sighandler_t signal(int signum, sighandler_t handler);
 
 
 ## 2.2 代码演示
+
++ 忽略
+  
+  ```c
+  #include <stdio.h>
+  #include <signal.h>
+
+  int main(void)
+  {
+      signal(SIGINT, SIG_IGN); // 忽略SIGINT信号,这时候CTL+C就不管用了
+      while(1);
+
+      return 0;
+  }
+  ```
+  
+  执行上面的代码，按Ctrl+C是无效地，因为代码捕获并跳过了SIGINT信号
+  
++ 捕获
+
+  ```c
+  #include <stdio.h>
+  #include <signal.h>
+
+  void catch_signal(int signo)
+  {
+      printf("信号的编号 = %d\n", signo);
+  }
+
+  int main(void)
+  {
+      signal(SIGINT, catch_signal);
+      signal(SIGQUIT, catch_signal); // "Ctrl + \",signal多次调用就可以注册多个信号处理，累加而不是覆盖
+      while(1);
+      return 0;
+  }
+  ```
+  
+  运行后按Ctrl+C可以得到如下结果：
+  
+  ```shell
+  ^C信号的编号 = 2
+  ^C信号的编号 = 2
+  ^\信号的编号 = 3
+  ......
+  ```
 
 ### 2.2.1 例子1：重新设置SIGINT信号的处理方式
 
