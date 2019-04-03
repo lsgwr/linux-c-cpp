@@ -4,11 +4,9 @@
 #include <unistd.h>
 #include <signal.h>
 
-
 void signal_fun(int signo)
 {
 	printf("parent PID:%d, signo=%d\n", getpid(), signo);
-	
 }
 
 int main(int argc, char **argv, char **environ)
@@ -17,7 +15,7 @@ int main(int argc, char **argv, char **environ)
 	
 	//signal(SIGINT, SIG_IGN); // "忽略"会被子进程继承
 	//signal(SIGINT, SIG_DFL); // "默认"会被子进程继承
-	signal(SIGINT, signal_fun); // 捕获会被子进程覆盖为默认
+	signal(SIGINT, signal_fun); // "捕获"会被子进程覆盖为"默认"
 
 	ret = fork();
 	if(ret > 0)

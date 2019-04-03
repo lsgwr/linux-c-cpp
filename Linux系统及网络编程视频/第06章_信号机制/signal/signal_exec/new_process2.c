@@ -16,6 +16,7 @@ void signal_fun(int signo)
 
 int main(void)
 {
+	signal(SIGINT, signal_fun); // 我就想让新程序去捕获某个信号怎么办? 在新程序里面独立的设置。
 	while(1);
 	return 0;
 }
