@@ -203,24 +203,21 @@ msgid = msgget(key, 0664|IPC_CREAT);
 
 获取别人创建好的消息队列的ID，有两个方法：
 	
-	（a）创建者把ID保存到某文件，共享进程读出ID即可
-			这种情况下，共享进程根本不需要调用msgget函数来返回ID。
-	
-		
-	（b）调用msgget获取已在消息队列的ID
-	
-			· 使用ftok函数，利用与创建者相同的“路径名”和8位整形数，生成相同的key值
-			
-			· 调用msgget函数，利用key找到别人创建好的消息队列，返回ID
-				
-				key = ftok("./file", 'a');
-				msgid = msgget(key, 0664|IPC_CREAT);
-	
-				拿到了消息队列的ID后就能共享操作了。
-			
-			这种方法是最常用的方法，因为ftok所用到的“路径名”和“8位的整形数”比较好记忆，
-		所以，你只要记住别人生成key值时所用的“路径名”和“8位的整形数”，你就一定能共享
-		操作别人创建好的消息队列。
++ （a）创建者把ID保存到某文件，共享进程读出ID即可
+  这种情况下，共享进程根本不需要调用msgget函数来返回ID。
+
++ （b）调用msgget获取已在消息队列的ID
+  + 使用ftok函数，利用与创建者相同的“路径名”和8位整形数，生成相同的key值
+  + 调用msgget函数，利用key找到别人创建好的消息队列，返回ID
+
+    ```c
+    key = ftok("./file", 'a');
+    msgid = msgget(key, 0664|IPC_CREAT);
+    ```
+  
+    拿到了消息队列的ID后就能共享操作了。
+
+    这种方法是最常用的方法，因为ftok所用到的“路径名”和“8位的整形数”比较好记忆，所以，你只要记住别人生成key值时所用的“路径名”和“8位的整形数”，你就一定能共享操作别人创建好的消息队列。
 
 #### e）代码演示
 
@@ -257,177 +254,171 @@ msgid = msgget(key, 0664|IPC_CREAT);
 
 #### （2）msgsnd
 
-		1）函数原型
-				#include <sys/types.h>
-				#include <sys/ipc.h>
-				#include <sys/msg.h>
-				
-				int msgsnd(int msqid, const void *msgp, size_t msgsz, int msgflg);
-								
-			（a）功能：发送消息到消息队列上。
-						说白了就是将消息挂到消息队列上。
-			
-			（b）返回值
-					· 成功：返回0,
-					· 失败：返回-1，errno被设置
-			
-			（c）参数
-					· msqid：消息队列的标识符。
-					· msgp：存放消息的缓存的地址，类型struct msgbuf类型
-							这个缓存就是一个消息包（存放消息的结构体变量）。
-							
-						struct msgbuf
-						{
-									long mtype;         /* 放消息编号，必须 > 0 */
-									char mtext[msgsz];  /* 消息内容（消息正文） */
-						};				
-						
-					· msgsz：消息正文大大小。
-								
-					· msgflg：
-						- 0：阻塞发送消息
-							也就是说，如果没有发送成功的话，该函数会一直阻塞等，直到发送成功为止。
-								
-								
-						- IPC_NOWAIT：非阻塞方式发送消息，不管发送成功与否，函数都将返回
-								也就是说，发送不成功的的话，函数不会阻塞。
-							
-						
-		2）代码演示		
+函数原型如下：
+
+```c
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+int msgsnd(int msqid, const void *msgp, size_t msgsz, int msgflg);
+```
+
++ （a）功能：发送消息到消息队列上。
+  说白了就是将消息挂到消息队列上。
+
++ （b）返回值
+  + 成功：返回0,
+  + 失败：返回-1，errno被设置
+
++ （c）参数
+  + msqid：消息队列的标识符。
+  + msgp：存放消息的缓存的地址，类型struct msgbuf类型, 这个缓存就是一个消息包（存放消息的结构体变量）。
+
+  ```c
+  struct msgbuf
+  {
+      long mtype;         /* 放消息编号，必须 > 0 */
+      char mtext[msgsz];  /* 消息内容（消息正文） */
+  };
+  ```
+
+  + msgsz：消息正文大大小  
+  + msgflg：
+    - 0：阻塞发送消息, 也就是说，如果没有发送成功的话，该函数会一直阻塞等，直到发送成功为止
+    - IPC_NOWAIT：非阻塞方式发送消息，不管发送成功与否，函数都将返回, 也就是说，发送不成功的的话，函数不会阻塞。
+
++ （d）代码演示		
 
 #### （3）msgrcv函数
 
-		1）函数原型
-			#include <sys/types.h>
-			#include <sys/ipc.h>
-			#include <sys/msg.h>
-			ssize_t msgrcv(int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg);						
-			
-			（a）功能：接收消息
-						说白了就是从消息队列中取出别人所放的某个编号的消息。
-						
-			（b）返回值
-					成功：返回消息正文的字节数
-					失败：返回-1，errno被设置
-					
-					
-			（c）参数	
-					· msqid：消息队列的标识符。
-					· msgp：缓存地址，缓存用于存放所接收的消息
-						
-						类型还是struct msgbuf：
-						struct msgbuf
-						{
-									long mtype;         /* 存放消息编号*/
-									char mtext[msgsz];  /*存放 消息正文内容 */
-						};					
-						
-						
-					· msgsz：消息正文的大小
-						
-					· msgtyp：你要接收消息的编号
-						
-					· int msgflg：
-						- 0：阻塞接收消息
-							也就是说如果没有消息时，接收回阻塞（休眠）。
-						
-						- IPC_NOWAIT：非阻塞接收消息
-							也就是说没有消息时，该函数不阻塞
+函数原型
+
+```c
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+ssize_t msgrcv(int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg);
+```
+
++ （a）功能：接收消息
+  说白了就是从消息队列中取出别人所放的某个编号的消息。
+
++ （b）返回值
+  + 成功：返回消息正文的字节数
+  + 失败：返回-1，errno被设置
+
++ （c）参数	
+  + msqid：消息队列的标识符。
+  + msgp：缓存地址，缓存用于存放所接收的消息
+
+    类型还是`struct msgbuf`：
+    
+    ```c
+    struct msgbuf
+    {
+        long mtype;         /* 存放消息编号*/
+        char mtext[msgsz];  /*存放 消息正文内容 */
+    };
+    ```
+    
+    + msgsz：消息正文的大小  
+    + msgtyp：你要接收消息的编号  
+    + int msgflg：  
+      + 0：阻塞接收消息
+        也就是说如果没有消息时，接收回阻塞（休眠）。
+      + IPC_NOWAIT：非阻塞接收消息   
+        也就是说没有消息时，该函数不阻塞  
 				
-		2）代码演示
-			
-			
-			
-			
++ d）代码演示
+	
 #### （4）进程结束时，自动删除消息队列
 			
-			我们需要调用msgctl函数来实现。
-		1）msgctl函数原型
-					#include <sys/types.h>
-					#include <sys/ipc.h>
-					#include <sys/msg.h>
-					
-					int msgctl(int msqid, int cmd, struct msqid_ds *buf);
-					
-			（a）功能
-						ctl就是控制contrl的意思，从这个名字我们就能猜出，这个函数的功能是根据cmd指定的要求，
-					去控制消息队列，比如进行哪些控制呢？
-					
-					· 获取消息队列的属性信息
-					· 修改消息队列的属性信息
-					· 删除消息队列
-					· 等等
-					
-						我们调用msgctl函数的最常见目的就是删除消息队列，事实上，删除消息队列只是各种消息队列
-					控制中的一种。
-				
-				
-			（b）参数
-						int msgctl(int msqid, int cmd, struct msqid_ds *buf);
-					·	msqid：消息队列标识符
-						
-					·	cmd：控制选项，其实cmd有很多选项，我这里只简单介绍三个
-						
-							- IPC_STAT：将msqid消息队列的属性信息，读到第三个参数所指定的缓存。
-								
-							- IPC_SET：使用第三个参数中的新设置去修改消息队列的属性
-									+ 定一个struct msqid_ds buf。
-									+ 将新的属性信息设置到buf中
-									+ cmd指定为IPC_SET后，msgctl函数就会使用buf中的新属性去修改消息队列原有的属性。
-								
-								
-							- IPC_RMID：删除消息队列
-									删除消息队列时，用不到第三个参数，用不到时设置为NULL。
-							
-							- ... ：略
-							
-						
-					·	buf：存放属性信息
-					
-						有的时候需要给第三个参数，有时不需要，取决于cmd的设置。
-						buf的类型为struct msqid_ds，有关这个结构体类型，这里这里只进行简单了解。
-						
-						
-						结构体中的成员都是用来存放消息队列的属性信息的。
-						struct msqid_ds 
-						{
-								struct ipc_perm  msg_perm; /* 消息队列的读写权限和所有者 */
-								time_t  msg_stime;    /* 最后一次向队列发送消息的时间*/
-								time_t  msg_rtime;    /* 最后一次从消息队列接收消息的时间 */
-								time_t  msg_ctime;    /* 消息队列属性最后一次被修改的时间 */
-								unsigned  long __msg_cbytes; /* 队列中当前所有消息总的字节数 */
-								msgqnum_t  msg_qnum;     /* 队列中当前消息的条数*/
-								msglen_t msg_qbytes;  /* 队列中允许的最大的总的字节数 */
-								pid_t  msg_lspid;     /* 最后一次向队列发送消息的进程PID */
-								pid_t  msg_lrpid;     /* 最后一次从队列接受消息的进程PID */
-						};
-								
-						struct ipc_perm 
-						{
-							key_t          __key;       /* Key supplied to msgget(2)：消息队列的key值 */
-							uid_t          uid;         /* UID of owner ：当前这一刻正在使用消息队列的用户 */
-							gid_t          gid;         /* GID of owner ：正在使用的用户所在用户组 */
-							uid_t          cuid;        /* UID of creator ：创建消息队列的用户 */
-							gid_t          cgid;        /* GID of creator ：创建消息队列的用户所在用户组*/
-							unsigned short mode;        /* Permissions：读写权限（比如0664） */
-							unsigned short __seq;       /* Sequence number ：序列号，保障消息队列ID不被立即
-																							重复使用 */
-						};
-					
-						
-		2）代码演示	
-		
-			（a）控制1：获取消息队列属性
-						int msgctl(int msqid, int cmd, struct msqid_ds *buf);
-						
-						当cmd被设置为IPC_STAT时，msgctl将获取消息队列的属性信息，并保存到buf中。					
-							struct msqid_ds buf;
-							
-							msgctl(msgid, IPC_STAT, &buf);
-			
-					
-			（b）控制2：删除消息队列
-						msgctl(msgid, IPC_RMID, NULL);
+我们需要调用msgctl函数来实现, msgctl函数原型
+
+```c
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+int msgctl(int msqid, int cmd, struct msqid_ds *buf);
+```
+
++ （a）功能
+  ctl就是控制contrl的意思，从这个名字我们就能猜出，这个函数的功能是根据cmd指定的要求，去控制消息队列，比如进行哪些控制呢？
+
+  + 获取消息队列的属性信息
+  + 修改消息队列的属性信息
+  + 删除消息队列
+  + 等等
+
+  我们调用msgctl函数的最常见目的就是删除消息队列，事实上，删除消息队列只是各种消息队列控制中的一种。
+
++ （b）参数
+  
+  ```c
+  int msgctl(int msqid, int cmd, struct msqid_ds *buf);
+  ```
+  
+  +	msqid：消息队列标识符  
+  +	cmd：控制选项，其实cmd有很多选项，我这里只简单介绍三个
+    + IPC_STAT：将msqid消息队列的属性信息，读到第三个参数所指定的缓存。
+    + IPC_SET：使用第三个参数中的新设置去修改消息队列的属性
+        + 定一个`struct msqid_ds buf`  
+        + 将新的属性信息设置到buf中  
+        + cmd指定为IPC_SET后，msgctl函数就会使用buf中的新属性去修改消息队列原有的属性  
+    + IPC_RMID：删除消息队列  
+        删除消息队列时，用不到第三个参数，用不到时设置为NULL  
+    + ... ：略
+  +	buf：存放属性信息  
+    + 有的时候需要给第三个参数，有时不需要，取决于cmd的设置。
+    + buf的类型为struct msqid_ds，有关这个结构体类型，这里这里只进行简单了解。
+    
+      ```c
+      结构体中的成员都是用来存放消息队列的属性信息的。
+      struct msqid_ds 
+      {
+          struct ipc_perm  msg_perm; /* 消息队列的读写权限和所有者 */
+          time_t  msg_stime;    /* 最后一次向队列发送消息的时间*/
+          time_t  msg_rtime;    /* 最后一次从消息队列接收消息的时间 */
+          time_t  msg_ctime;    /* 消息队列属性最后一次被修改的时间 */
+          unsigned  long __msg_cbytes; /* 队列中当前所有消息总的字节数 */
+          msgqnum_t  msg_qnum;     /* 队列中当前消息的条数*/
+          msglen_t msg_qbytes;  /* 队列中允许的最大的总的字节数 */
+          pid_t  msg_lspid;     /* 最后一次向队列发送消息的进程PID */
+          pid_t  msg_lrpid;     /* 最后一次从队列接受消息的进程PID */
+      };
+
+      struct ipc_perm 
+      {
+        key_t          __key;       /* Key supplied to msgget(2)：消息队列的key值 */
+        uid_t          uid;         /* UID of owner ：当前这一刻正在使用消息队列的用户 */
+        gid_t          gid;         /* GID of owner ：正在使用的用户所在用户组 */
+        uid_t          cuid;        /* UID of creator ：创建消息队列的用户 */
+        gid_t          cgid;        /* GID of creator ：创建消息队列的用户所在用户组*/
+        unsigned short mode;        /* Permissions：读写权限（比如0664） */
+        unsigned short __seq;       /* Sequence number ：序列号，保障消息队列ID不被立即
+                                        重复使用 */
+      };
+      ```
+
++ （c）代码演示	
+  + 控制1：获取消息队列属性
+    
+    ```c
+    int msgctl(int msqid, int cmd, struct msqid_ds *buf);
+    ```
+
+    当cmd被设置为IPC_STAT时，msgctl将获取消息队列的属性信息，并保存到buf中
+    
+    ```c
+    struct msqid_ds buf;
+    msgctl(msgid, IPC_STAT, &buf);
+    ```
+
+  + 控制2：删除消息队列
+    
+    ```c
+    msgctl(msgid, IPC_RMID, NULL);
+    ```
 
 ### 3.2.3 什么时候合适使用消息队列
 
