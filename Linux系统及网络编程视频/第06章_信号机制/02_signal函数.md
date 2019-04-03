@@ -22,7 +22,7 @@ sighandler_t signal(int signum, sighandler_t handler);
 + 2）handler：信号处理方式
   
   sighandler_t是被typedef后的类型，原类型 `void (*)(int)`，这是一个函数指针类型, `sighandler_t handler`也有直接写成`void (*handler)(int)`
-  
+
   ```c
   sighandler_t signal(int signum, void (*handler)(int));
   ```
@@ -62,11 +62,10 @@ sighandler_t signal(int signum, sighandler_t handler);
 + 成功：返回上一次的处理方式
 + 失败：返回SIG_ERR宏值，并且设置errno。
 
-
 ## 2.2 代码演示
 
 + 忽略
-  
+
   ```c
   #include <stdio.h>
   #include <signal.h>
@@ -79,7 +78,7 @@ sighandler_t signal(int signum, sighandler_t handler);
       return 0;
   }
   ```
-  
+
   执行上面的代码，按Ctrl+C是无效地，因为代码捕获并跳过了SIGINT信号
   
 + 捕获
@@ -101,16 +100,16 @@ sighandler_t signal(int signum, sighandler_t handler);
       return 0;
   }
   ```
-  
+
   运行后按Ctrl+C可以得到如下结果：
-  
+
   ```shell
   ^C信号的编号 = 2
   ^C信号的编号 = 2
   ^\信号的编号 = 3
   ......
   ```
-  
+
 + 返回值
 
   ```c
@@ -145,9 +144,9 @@ sighandler_t signal(int signum, sighandler_t handler);
       return 0;
   }
   ```
-  
+
   输出为：
-  
+
   ```shell
   default
   ```
@@ -187,8 +186,8 @@ void catch_signal(int signo)
 
 void process_exit_deal_fun(void)
 {
-	printf("process over");
-	printf("save list to file");
+    printf("process over");
+    printf("save list to file");
 }
 
 
@@ -233,10 +232,7 @@ process oversave list to file
 
 这几个宏定义在了`<signal.h>`头文件中。
 
-#### （4）除了SIGKILL这两个信号外，其它所有的信号都可被忽略和捕获。
+#### （4）除了SIGKILL这个信号外，其它所有的信号都可被忽略和捕获。
 
-之所以不能忽略的原因，就是怕你把所有的信号都给忽略后，当你的程序跑飞后，除了重启机器外，你还就真没有办法终止跑飞的程序了，所以Linux规定SIGKILL这两个一定不能被忽略和捕获，至少还有一个保底操作。
-
-#### （5）在windows下结束进程是怎么回事, 演示：
-
-在任务管理器里面结束任务，其实就是向进程发送一个信号，进程收到这个信号后，就会被信号终止掉。这一点其实与Linux是一样的。
+之所以不能忽略的原因，就是怕你把所有的信号都给忽略后，当你的程序跑飞后，除了重启机器外，你还就真没有办法终止跑飞的程序了
+**所以Linux规定SIGKILL这个一定不能被忽略和捕获**，至少还有一个保底操作。
