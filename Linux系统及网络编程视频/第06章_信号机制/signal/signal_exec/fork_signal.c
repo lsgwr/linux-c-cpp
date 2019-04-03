@@ -15,9 +15,9 @@ int main(int argc, char **argv, char **environ)
 {
 	pid_t ret = 0;
 	
-	//signal(SIGINT, SIG_IGN);
-	signal(SIGINT, signal_fun);
-	//signal(SIGINT, SIG_DFL);
+	//signal(SIGINT, SIG_IGN); // "忽略"会被子进程继承
+	//signal(SIGINT, SIG_DFL); // "默认"会被子进程继承
+	signal(SIGINT, signal_fun); // 捕获会被子进程覆盖为默认
 
 	ret = fork();
 	if(ret > 0)
