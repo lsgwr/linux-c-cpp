@@ -110,12 +110,53 @@ sighandler_t signal(int signum, sighandler_t handler);
   ^\信号的编号 = 3
   ......
   ```
+  
++ 返回值
+
+  ```c
+  #include <stdio.h>
+  #include <signal.h>
+  typedef void (*sighandler_t)(int);
+
+  void catch_signal(int signo)
+  {
+      printf("信号的编号 = %d\n", signo);
+  }
+
+  int main(void)
+  {
+      sighandler_t ret = NULL;
+
+      // signal执行成功返回地是上一次的信号捕获设置，比如下面代码输出地是default,注释掉第三个signal则结果是ignore
+      ret = signal(SIGINT, SIG_IGN); // 忽略
+      ret = signal(SIGINT, SIG_DFL); // 默认
+      ret = signal(SIGINT, catch_signal); // 捕获
+
+      if(ret == SIG_ERR){
+          printf("signal fail\n");
+      }else if(ret == SIG_IGN){
+          printf("ignore\n");
+      }else if(ret == SIG_DFL){
+          printf("default\n");
+      }else{
+          printf("capture: %p\n", ret);
+      }
+
+      return 0;
+  }
+  ```
+  
+  输出为：
+  
+  ```shell
+  default
+  ```
 
 ### 2.2.1 例子1：重新设置SIGINT信号的处理方式
 
-### 2.2.2 调用捕获函数的过程
+### 2.2.2 调用捕获函数的过程(类似单片机的中断)
 
-#### （1）图：
+#### （1）信号捕获的原理
 
 当信号没有发生时，进程正常运行，当信号发生时，进程的正常运行会被中断，然后去处理信号，一看信号的处理方式是捕获，就会从“信号处理方式登记表”中将捕获函数的地址取出并执行捕获函数，捕获函数执行完毕后，恢复进程的正常运行。
 
@@ -129,7 +170,33 @@ sighandler_t signal(int signum, sighandler_t handler);
 
 将SIGINT的异常终止转为exit正常终止
 
-这样的话，我们就可以调用“进程”终止处理函数，以及刷新“标准io”缓存了。演示：
+这样的话，我们就可以调用“进程”终止处理函数，以及刷新“标准io”缓存了
+
+```c
+#include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
+typedef void (*sighandler_t)(int);
+
+void catch_signal(int signo)
+{
+    printf("信号的编号 = %d\n", signo);
+    exit(-1); // 转为正常终止
+}
+
+int main(void)
+{
+    signal(SIGINT,catch_signal);
+    while(1);
+    return 0;
+}
+```
+
+按Ctrl+C可以得到
+
+```shell
+^C信号的编号 = 2
+```
 
 ### 2.2.3 值得强调的地方
 
@@ -141,18 +208,19 @@ sighandler_t signal(int signum, sighandler_t handler);
   
   进程将不会再接收到这个信号，这信号对进城没有任何影响。
 
-#### （3）设置为捕获时，需要将handler设置为捕获函数的地址，类型为void (*)(int)
-  为了确保和捕获函数的类型统一，SIG_DFL、SIG_IGN和SIG_ERR宏的类型也必须是void (*)(int)。
+#### （3）设置为捕获时，需要将handler设置为捕获函数的地址，类型为`void (*)(int)`
 
-  ```c
-  #define SIG_DFL	((void (*)(int))0)	
-  #define SIG_IGN	((void (*)(int))1)
-  #define SIG_ERR	((void (*)(int))-1)
-  ```
+为了确保和捕获函数的类型统一，SIG_DFL、SIG_IGN和SIG_ERR宏的类型也必须是`void (*)(int)`
 
-  验证这些值。
+```c
+#define SIG_DFL ((void (*)(int))0)
+#define SIG_IGN ((void (*)(int))1)
+#define SIG_ERR ((void (*)(int))-1)
+```
 
-  这几个宏定义在了`<signal.h>`头文件中。
+验证这些值。
+
+这几个宏定义在了`<signal.h>`头文件中。
 
 #### （4）除了SIGKILL这两个信号外，其它所有的信号都可被忽略和捕获。
 
