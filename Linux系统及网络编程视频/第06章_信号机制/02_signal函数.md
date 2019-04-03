@@ -175,18 +175,28 @@ sighandler_t signal(int signum, sighandler_t handler);
 ```c
 #include <stdio.h>
 #include <signal.h>
-#include <unistd.h>
+#include <stdlib.h>
 typedef void (*sighandler_t)(int);
 
 void catch_signal(int signo)
 {
     printf("信号的编号 = %d\n", signo);
-    exit(-1); // 转为正常终止
+    // 这里正常地退出可以把main和atexit注册的函数中的printf内容从缓存中刷新出来
+    exit(-1); // 转为正常终止,注意_exit(-1);是不行地，
 }
+
+void process_exit_deal_fun(void)
+{
+	printf("process over");
+	printf("save list to file");
+}
+
 
 int main(void)
 {
-    signal(SIGINT,catch_signal);
+    signal(SIGINT, catch_signal); // 接受Ctrl+C信号，捕获函数中进行正常退出
+    atexit(process_exit_deal_fun); // 只有程序正常退出(exit)才能执行
+    printf("hello");
     while(1);
     return 0;
 }
@@ -195,7 +205,8 @@ int main(void)
 按Ctrl+C可以得到
 
 ```shell
-^C信号的编号 = 2
+^Chello信号的编号 = 2
+process oversave list to file
 ```
 
 ### 2.2.3 值得强调的地方
@@ -206,7 +217,7 @@ int main(void)
 
 #### （2）信号被设置为SIG_IGN（忽略）时
   
-  进程将不会再接收到这个信号，这信号对进城没有任何影响。
+进程将不会再接收到这个信号，这信号对进程没有任何影响。
 
 #### （3）设置为捕获时，需要将handler设置为捕获函数的地址，类型为`void (*)(int)`
 
@@ -218,7 +229,7 @@ int main(void)
 #define SIG_ERR ((void (*)(int))-1)
 ```
 
-验证这些值。
+验证这些值
 
 这几个宏定义在了`<signal.h>`头文件中。
 
