@@ -87,7 +87,33 @@ int pause(void);
     ```
 
   + 2）pause函数  
-    调用该函数的进程会永久挂起(阻塞或者休眠)，直至被信号(任意一个信号)唤醒为止  
+    调用该函数的进程会永久挂起(阻塞或者休眠)，直至被信号(任意一个信号)唤醒为止 
+    
+    ```c
+    #include <stdio.h>
+    #include <stdlib.h>
+    #include <sys/types.h>
+    #include <unistd.h>
+    #include <signal.h>
+
+    void signal_func(int signo)
+    {
+        printf("wake up!!");
+    }
+
+    int main(int argc, char **argv, char **environ)
+    {
+
+      signal(SIGINT, signal_func); // pause挂起可以用任何信号进行唤醒,结果为^Cwake up!!hello
+
+      pause();
+      printf("hello\n");
+
+      while(1);
+
+      return 0;
+    }
+    ```
 
 + （2）返回值  
   + 1）alarm  
@@ -116,12 +142,7 @@ int pause(void);
   + 2）pause  
     只要一直处于休眠状态，表示pause函数一直是调用成功的, 当被信号唤醒后会返回-1，表示失败了，errno的错误号被设置EINTR(表示函数被信号中断)
 
-### 4.2.2 代码演示
-
-alarm函数的使用
-
-
-
+### 4.2.2 说明
 
 alarm函数用的不多，pause在实际开发中也用的不多，不过在开发中往往会使用pause()函数来帮助调试  
 
@@ -131,4 +152,4 @@ alarm函数用的不多，pause在实际开发中也用的不多，不过在开�
 
 我们前面的课程介绍过，这个函数也被称为叫自杀函数，之所以称为自杀函数，是因为调用该函数时，会向当前进程发一个SIGABRT信号  
 
-这个信号的默认处理方式是终止，因此如果不忽略和捕获的话，会将当前进程终止掉
+这个信号的默认处理方式是终止，因此如果不忽略和捕获的话，会将当前进程终止掉。abort()函数时raise()函数的特例
