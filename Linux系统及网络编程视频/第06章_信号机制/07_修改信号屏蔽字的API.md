@@ -64,10 +64,10 @@ int sigdelset(sigset_t *set, int signum);
 set就是我们前面说的变量，至于变量名也可以定义为其它的名字，不一定非要叫set。
 
 + （1）功能：设置变量的值
-  + 1）sigemptyset：将变量set的64位全部设置为0。
-  + 2）sigfillset：将变量set的64位全部设置为1。
-  + 3）sigaddset：将变量set中，signum（信号编号）对应的那一位设置为1，其它为不变。
-  + 4）sigdelset：将变量set的signum（信号编号）对应的那一位设置为0，其它位不变。
+  + 1）**sigemptyset**：将变量set的64位全部设置为0
+  + 2）**sigfillset**：将变量set的64位全部设置为1
+  + 3）**sigaddset**：将变量set中，signum（信号编号）对应的那一位设置为1，其它为不变
+  + 4）**sigdelset**：将变量set的signum（信号编号）对应的那一位设置为0，其它位不变
 
 
 + （2）返回值
@@ -86,31 +86,76 @@ set就是我们前面说的变量，至于变量名也可以定义为其它的�
 int sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 ```
 
-+ （1）功能：使用设置好的变量set去修改信号屏蔽字。
-+ （2）参数
-  + 1）how：修改方式，前面说过有三种修改方式。
-    + （a）SIG_BLOCK：屏蔽某个信号
++ （1）功能：使用设置好的变量set去修改信号屏蔽字(经过7.2.1几个函数修改好的set变量)  
++ （2）参数  
+  + 1）**how**：修改方式，前面说过有三种修改方式。
+    + （a）**SIG_BLOCK**：屏蔽某个信号
         
         ```shell
         屏蔽字=屏蔽字 | set
         ```
 
-    + （b）SIG_UNBLOCK：打开某个信号（不要屏蔽），实际就是对屏蔽字的某位进行清0操作。
+    + （b）**SIG_UNBLOCK**：打开某个信号（不要屏蔽），实际就是对屏蔽字的某位进行清0操作  
       
       ```shell
       屏蔽字=屏蔽字&(~set)
       ```
 
-    + （c）SIG_SETMASK：直接使用set的值替换掉屏蔽字
+    + （c）**SIG_SETMASK**：直接使用set的值替换掉屏蔽字
 
-  + 2）set：set的地址  
+  + 2）**set**：set的地址  
 
-  + 3）oldset：保存修改之前屏蔽字的值  
+  + 3）**oldset**：保存修改之前屏蔽字的值  
     如果写为NULL的话，就表示不保存
 
 + （3）返回值：函数调用成功返回0，失败返回-1。
 
-### 7.3.3 代码演示
+### 7.3.3 代码演示 参考 [signal_mask.c](signal/signal_mask.c) 
+
+```c
+#include <stdio.h>
+#include <signal.h>
+#include <unistd.h>
+
+void signal_func(int signo)
+{
+    sigset_t set;
+    sigset_t oldset;
+    sigemptyset(&set); // 将变量set的64位全部设置为0
+    sigaddset(&set, SIGINT); // 将变量set中SIGINT对应的那一位设置为1，其它为不变
+    sigprocmask(SIG_UNBLOCK, &set, &oldset); // 第一个参数表示对屏蔽字的某位进行清0操作;最后的参数表示保存旧的set值,不保存用NULL
+
+    printf("hello\n");
+    sleep(3); // 信号处理过程中信号屏蔽字一直为1，这个期间发SIGINT信号不会响应
+    printf("world\n"); // 结果就是不管按下多少次Ctrl+C都能及时响应，因为每次信号处理都有把SIGINT信号清零恢复
+}
+
+int main(int argc, char **argv, char **environ)
+{
+    pid_t ret = 0;    
+    signal(SIGINT, signal_func);
+    
+    while(1);
+    return 0;
+}
+```
+
+结果如下，不管按下多少次Ctrl+C都能及时响应，因为每次信号处理都有把SIGINT信号清零恢复
+
+```shell
+^Chello
+^Chello
+^Chello
+^Chello
+^Chello
+^Chello
+world
+world
+world
+world
+world
+world
+```
 
 ### 7.3.4 sigaction函数			
 sigaction函数相当于是signal函数的复杂版，不过这个函数在平时用的非常少，因此我们这里不做详细讲解，了解有以下即可。
