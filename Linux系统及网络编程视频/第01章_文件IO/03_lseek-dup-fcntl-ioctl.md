@@ -129,7 +129,7 @@ int main(void)
 
 Linux内核中进程用task_struct结构体表示，称为进程描述符，该结构体相对比较复杂，有几百行代码，结构体的成员项非常多，多达近300个,记载着该进程相关的所有信息，比如进程地址空间，进程状态，打开的文件等。对内核而言，进程或者线程都称为任务task。内核将所有进程放入一个双向循环链表结构的任务列表(task list)
 
-![task_struct](http://gityuan.com/images/linux/process/task_struct.jpg)
+![task_struct](task_struct.jpg)
 
 ```c
 struct task_struct {
