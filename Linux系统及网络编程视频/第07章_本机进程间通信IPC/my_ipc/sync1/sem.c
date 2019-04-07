@@ -46,14 +46,13 @@ void init_sem(int semid, int semnum, int val)
  * 删除信号量集合
  * 
  * @param semid 信号量集合标识符id
- * @param nsems 信号量集合中的信号量个数
  **/ 
-void del_sem(int semid, int nsems)
+void del_sem(int semid)
 {
     int i = 0;
     int ret = -1;
     ret = semctl(semid, 0, IPC_RMID);
-    if(ret == -1) print_error("semctl del sem fail");
+	if(ret == -1) print_error("semctl del sem fail");
     remove(SEM_FILE); // 删除信号量文件
 }
 
