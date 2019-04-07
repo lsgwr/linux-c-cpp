@@ -447,23 +447,13 @@ semctl(semid, 0, IPC_RMID);
  * 删除信号量集合
  * 
  * @param semid 信号量集合标识符id
- * @param nsems 信号量集合中的信号量个数
  **/ 
-void del_sem(int semid, int nsems)
+void del_sem(int semid)
 {
     int i = 0;
     int ret = -1;
     ret = semctl(semid, 0, IPC_RMID);
-    if(ret == -1) print_error("semctl del sem fail");
+	if(ret == -1) print_error("semctl del sem fail");
     remove(SEM_FILE); // 删除信号量文件
 }
 ```
-
-### 5.3.3 同步例子2：
-
-使用信号量来解决共享内存的同步问题
-
-+ （1）图：
-+ （2）代码演示
-
-从共享内存和信号量配合中可以看出，在实际的进程间通信中，不同种类的进程间通信往往是相互配合使用的。
