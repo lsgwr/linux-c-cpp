@@ -8,7 +8,7 @@ int semid = -1;
  **/ 
 void signal_func(int signo)
 {
-    del_sem(semid, NSEMS);
+    del_sem(semid);
     exit(-1);
 }
 
