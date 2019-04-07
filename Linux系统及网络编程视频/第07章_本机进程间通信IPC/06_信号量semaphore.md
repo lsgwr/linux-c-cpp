@@ -434,10 +434,29 @@ int semctl(int semid, int semnum, int cmd, ...);
 
 删除信号量集合时，并不需要把所有的信号量都删除掉后才能删除，只需要指定semid和IPC_RMID就可以不把整个信号量集合删除，其中第二个参数semnum没有被用到，所以semnum的值可以随便写，不过我们一般都是把它写为0。
 
-所以删除整个信号量集合时，删除的写法可以统一的为：
+所以删除整个信号量集合时，删除的写法可以统一的为,而且只需要删除一次就能删除整个信号量集合，不管集合内又多少信号量：
 
 ```c
 semctl(semid, 0, IPC_RMID);
+```
+
+所以前面的代码的`void del_sem(int semid, int nsems)`函数都要改成如下的形式：
+
+```c
+/**
+ * 删除信号量集合
+ * 
+ * @param semid 信号量集合标识符id
+ * @param nsems 信号量集合中的信号量个数
+ **/ 
+void del_sem(int semid, int nsems)
+{
+    int i = 0;
+    int ret = -1;
+    ret = semctl(semid, 0, IPC_RMID);
+    if(ret == -1) print_error("semctl del sem fail");
+    remove(SEM_FILE); // 删除信号量文件
+}
 ```
 
 ### 5.3.3 同步例子2：
