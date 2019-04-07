@@ -42,7 +42,6 @@ int main(void)
         }
     }else if(ret == 0){
         // 子进程
-        create_or_get_sem(NSEMS);
         while(1){
             write(fd, "hhhhh ", 6);
             write(fd, "wwwww\n", 6);
