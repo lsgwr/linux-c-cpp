@@ -1,0 +1,802 @@
+## 4.6 TCP通信代码举例
+
++ 写一个TCP服务器程序
++ 写一个客户端程序
+
+不过为了不要让例子太复杂，服务器程序目前只为一个客户服务，至于使用多进程、多线程以及多路io为多客户服务的情况，后面再介绍。
+
+### 4.6.1 实现TCP服务器程序
+
+#### 第1步：调用socket 网络API，创建套接字文件
+
+ > socket函数原型
+ 
+ ```c
+ #include <sys/types.h>
+ #include <sys/socket.h>
+ int socket(int domain, int type, int protocol);
+ ```
+
++ （a）功能：创建一个套接字文件，然后以文件形式来操作通信，不过套接字文件没有文件名。
+  Linux有7种文件，套接字文件就是其中一种。socket翻译为中文就是“套接字”的意思，其实翻译为插座更合适些，因为socket本来就有插座的意思，使用socket创建一个通信的套接字文件，就好比插上了一个通信的插座，有了这个插座就可以和对方通信了。
+
++ （b）返回值
+  + 成功：返回套接字文件描述符。
+  + 失败：返回-1，errno被设置
+
++ （c）参数
+  + **domian** : 族/范围
+    + 作用：指定协议族  
+      为什么要指定协议族？因为你要使用的通信协议一定是属于某个协议族，所以如果不指定协议族，又怎么指定协议族中的某个具体协议呢。
+
+      比如我们想用的是TCP协议，TCP属于TCP/IP协议族中的子协议，所以必须先通过domain指定TCP/IP协议族，不过TCP/IP协议族有两个版本，分别是IPV4是IPV6版本，我们目前使用的还是IPV4版本，因为Ipv6还未普及。
+
+      IPV4是Internet Protocol Version4的缩写，直译为“网络协议第四版”，IPV4和IPV6这两个版本所使用的ip地址格式完全不同，IPV4：ip为32位; IPV6：ip为128位. 不仅IPV4和IPV6的ip地址格式不同，其实所有不同网络协议族所使用ip地址格式都不相同。
+
+    + domain可设置的常见宏值
+
+      可设置的有：AF_UNIX, AF_LOCAL、AF_INET、AF_INET6、AF_IPX、AF_NETLINK、AF_APPLETALKAF_PACKET、AF_UNSPEC，有关每个宏的作用后面再解释，这里先介绍下这些“宏名”。
+
+      AF是address family，表示地址家族的意思，由于每个网络协议族的ip地址格式完全不同，因此在指定ip地址格式时需要做区分，所以这些AF_***宏就是用于说明所使用的是什么协议的IP地址，
+
+      这些个宏定义在了socket.h中，
+      
+      ```c
+      #define AF_UNSPEC	0
+      #define AF_UNIX		1	/* Unix domain sockets 		*/
+      #define AF_LOCAL	1	/* POSIX name for AF_UNIX	*/
+      #define AF_INET		2	/* Internet IP Protocol 	*/
+      #define AF_AX25		3	/* Amateur Radio AX.25 		*/
+      ...
+      ```
+
+      有同学可能会说不对呀，domain是用来指定协议族的吗，但是AF_***确是用来区分不同协议ip格式的，给domain指定AF_***合适吗？
+
+      其实区分不同协议族应该使用PF_UNIX, PF_LOCAL、PF_INET、PF_INET6、PF_IPX、PF_NETLINK、PF_APPLETALK、PF_PACKET、PF_UNSPEC，PF就是protocol family的意思，意思是“协议家族”。
+
+      PF_***与AF_***不同的只是前缀，不过AF_***与PF_***的值完全一样，比如AF_UNIX == PF_UNIX，所以给domain指定AF_***，与指定PF_***完全是一样的。
+
+      `疑问： 为什么AF_*** == PF_***?` AF_***用于区分不同协议族的ip地址格式，而PF_***则用于区分不同的协议族，但是每个协议族的IP格式就一种，所以协议族与自己的IP格式其实是一对一的，因此如果你知道使用的是什么ip地址格式，其实你也就知道了使用的是什么协议族，所以使用AF_***也可以用于区分不同的协议族。不过为了更加正规一点，区分不同协议族的宏还是被命名为了PF_***，只不过它的值就是AF_***的值。
+
+      ```c
+      #define PF_UNSPEC	AF_UNSPEC
+      #define PF_UNIX		AF_UNIX
+      #define PF_LOCAL	AF_LOCAL
+      #define PF_INET		AF_INET
+      #define PF_AX25		AF_AX25
+      ...
+      ```
+
+      总之希望大家理解，domain是用于指定协议族的，设置的宏可以是AF_***，也可以是PF_***，不过正规一点的话还是应该写PF_***，因为这个宏才是专门用来区分协议族的，而AF_***则是用来区分不同协议族的ip地址格式的。不过socket的手册里面写的都是AF_***，没有写PF_***。
+
+    + domain的常见宏值，各自代表是什么协议族
+      
+      ```c
+      AF_UNIX, AF_LOCAL、AF_INET、AF_INET6、AF_IPX、AF_NETLINK、AF_APPLETALK、AF_PACKET、AF_UNSPEC
+      PF_UNIX, PF_LOCAL、PF_INET、PF_INET6、PF_IPX、PF_NETLINK、PF_APPLETALK、PF_PACKET、PF_UNSPEC
+      ```
+
+      + PF_UNIX、PF_LOCAL：域通信协议族
+        这两个宏值是一样（宏值都是1）。给domain指定该宏时就表示，你要使用的是“本机进程间通信”协议族，我们在讲第8章IPC时就说过，还有一种域套接字的IPC，也可以专门用来实现“本机进程间通信”。这个域就是本机的意思，当我们给socket的domain指定这个宏时，创建的就是域套接字文件。后面讲域套接字通信时，会具体的来使用这个宏。
+
+      + PF_INET：指定ipv4的TCP/IP协议族, 我们本章要讲的TCP和UDP就是IPV4的TCP和UDP。
+      + PF_INET6：ipv6的TCP/IP协议族，目前还未普及使用，我们这里不讲。
+      + PF_IPX：novell协议族，几乎用不到，了解即可
+        由美国Novell网络公司开发的一种专门针对局域网的“局域网通信协议”。这个协议的特点是效率较高，所以好多局域网游戏很喜欢使用这个协议来进行局域网通信，比如以前的局域网游戏CS，据说使用的就是novell协议族。之所以使用novell协议族，是因为CS的画面数据量太大，而且协同性要求很高，所以就选择了使用novell协议族这个高效率的局域网协议。
+
+        现在互联网使用的都是TCP/IP协议，而novell和TCP/IP是两个完全不同的协议，所以使用novell协议族的局域网与使用TCP/IP协议族的互联网之间兼容性比较差，如果novell协议的局域网要接入TCP/IP的Internet的话，数据必须进行协议转换。
+
+        所谓协议转换就是，novell局域网的数据包发向TCP/IP的互联网时，将novell协议族的数据包拆包，然后重新封包为TCP/IP协议的数据包。TCP/IP的互联网数据包发向novell局域网时，将TCP/IP协议族的数据包拆包，然后重新封包为novell协议的数据包。
+        windows似乎并不是支持novell协议，但是Linux、unix这边是支持的。我怎么知道是支持的？既然我们在socket手册中查到了PF_IPX，就说明时肯定支持  
+        
+      + PF_APPLETALK：苹果公司专为自己“苹果电脑”设计的局域网协议族  
+      + AF_UNSPEC：不指定具体协议族
+
+        此时可以通过第三个参数protocol指定协议编号来告诉socket，你使用的是什么协议族中的哪个子协议。
+
+        什么是协议编号？每个协议的唯一识别号，制订协议的人给的。
+
+  + **type**：套接字类型，说白了就是进一步指定，你想要使用协议族中的那个子协议来通信  
+    比如，如果你想使用TCP协议来通信，`首先`：将domain指定为PF_INET，表示使用的是IPV4的TCP/IP协议族; 其次：对type进行相应的设置，进一步表示我想使用的是TCP/IP协议族中的TCP协议。
+
+    type的常见设置值：SOCK_STREAM、SOCK_DGRAM、SOCK_RDM、SOCK_NONBLOCK、SOCK_CLOEXEC
+
+    + SOCK_STREAM：
+      将type指定为SOCK_STREAM时，表示想使用的是“有序的、面向连接的、双向通信的、可靠的字节流通信”，并且支持带外数据。有关什么是带外数据后面再介绍。
+
+      如果domain被设置为PF_INET，type被设置为SOCK_STREAM，就表示你想使用TCP来通信，因为在TCP/IP协议族里面，只有TCP协议是“有序的、面向连接的、双向的、可靠的字节流通信”。使用TCP通信时TCP并不是孤立的，它还需要网络层和链路层协议的支持才能工作。
+
+      如果type设置为SOCK_STREAM，但是domain指定为了其它协议族，那就表示使用的是其它“协议族”中类似TCP这样的可靠传输协议。
+
+    + SOCK_DGRAM：
+
+      将type指定为SOCK_DGRAM时，表示想使用的是“无连接、不可靠的、固定长度的数据报通信”。
+
+      固定长度意思是说，分组数据的大小是固定的，不管网络好不好，不会自动去调整分组数据的大小，所以“固定长度数据报”其实就是“固定长度分组数据”的意思。
+      当domain指定为PF_INET、type指定为SOCK_DGRAM时，就表示想使用的是TCP/IP协议族中的中的DUP协议，因为在TCP/IP协议族中，只有UDP是“无连接、不可靠的、固定长度的数据报通信”。同样的UDP不可能独立工作，需要网络层和链路层协议的支持。
+
+      如果type设置为SOCK_DGRAM，但是domain指定为了其它协议族，那就表示使用的是其它“协议族”中类似UDP这样的不可靠传输协议。后面讲UDP时就会使用SOCK_DGRAM。
+
+    + SOCK_RDM：表示想使用的是“原始网络通信”。
+
+      比如，当domain指定为TCP/IP协议族、type指定为SOCK_RDM时，就表示想使用ip协议来通信，使用IP协议来通信，其实就是原始的网络通信。
+
+      为什么称为原始通信？	
+      以TCP/IP协议族为例，TCP/IP之所以能够实现网络通信，最根本的原因是因为IP协议的存在，ip协议才是关键，只是原始的IP协议只能实现最基本的通信，还缺乏很多精细的功能，所以才多了基于IP工作的TCP和UDP，TCP/UDP弥补了IP缺失的精细功能。
+
+      尽管ip提供的只是非常原始的通信，但是我们确实可以使用比较原始的IP协议来进通信，特别是当你不满意TCP和UDP的表现，你想实现一个比TCP和UDP更好的传输层协议时，你就可以直接使用ip协议，然后由自己的应用程序来实现符合自己要求的类似tcp/udp协议，不过我们几乎遇不到这种情况，这里了解下即可。
+
+      如果type设置为SOCK_RDM，但是domain指定为了其它协议族，那就表示使用的是其它“协议族”中类似ip这样最基本的原始通信协议。
+
+    + SOCK_NONBLOCK：将socket返回的文件描述符指定为非阻塞的
+
+      如果不指定这个宏的话，使用socket返回“套接字文件描述符”时，不管是是用来“监听”还是用来通信，都是阻塞操作的，但是指定这个宏的话，就是非阻塞的。
+
+      当然也可以使用fcntl来指定SOCK_NONBLOCK，至于fcntl怎么用，我们在高级IO讲的非常清楚。
+
+      SOCK_NONBLOCK宏可以和前面的宏进行 | 运算，比如：`SOCK_STREAM | SOCK_NONBLOCK`
+
+    + SOCK_CLOEXEC：表示一旦进程exec执行新程序后，自动关闭socket返回的“套接字文件描述符”。图：
+
+      这个标志也是可以和前面的宏进行 | 运算的，不过一般不指定这个标志。`SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC `
+
+  + protocol：指定协议号		
+
+    一般情况下protocol写0，表示使用domain和type所指定的协议。
+
+    不过如果domain和type所对应的协议有好几个时，此时就需要通过具体的协议号来区分了，否者写0即可，表示domain和type所对应的协议就一个，不需要指定协议号来区分。
+
+    疑问：在哪里可以查到协议号？所有协议的协议号都被保存在了/etc/protocols下,查看文件如下
+
+    ```shell
+    协议  编号
+    ip 			0 
+    icmp		1
+    igmp		2
+    tcp 		6
+    udp 		17
+    等
+    ```
+
+    ```c
+    socket(PF_INET, SOCK_STREAM, 0);
+    ```
+
++ 代码演示								
+
+#### 第2步：调用bind 网络API，将套接字文件、ip和端口绑定到一起
+
+> 图：
+
++ 1）bind函数
+  
+  ```c
+  #include <sys/types.h>          
+  #include <sys/socket.h>
+  int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+  ```
+
+
+  + （a）功能：将指定了通信协议（TCP）的套接字文件与IP以及端口绑定起来。
+
+    注意，绑定的一定是自己的Ip和端口，不是对方的，比如对于TCP服务器来说，绑定的就是服务器自己的ip和端口。至于什么是绑定，为什么要绑定，我们后面再详细解释。
+
+  + （b）返回值：成功返回0，失败返回-1，errno被设置。
+  + （c）参数
+    + sockfd：套接字文件描述符，代表socket创建的套接字文件。既然要绑定套接字文件、ip和端口，肯定要有一个东西来代表套接字文件
+    + addrlen：第二个参数所指定的结构体变量的大小
+    + addr：`struct sockaddr`结构体变量的地址，结构体成员用于设置你要绑定的ip和端口
+      + 结构体成员
+
+        ```c
+        struct sockaddr {
+          sa_family_t sa_family;
+          char  			sa_data[14];
+        }
+        ```
+
+        + sa_family：指定AF_***，表示使用的什么协议族的IP，前面说过，协议族不同，ip格式就不同
+        + sa_data：存放ip和端口
+
+        大家可以看出，如果将ip和端口直接写入sa_data数组中，虽然可以做到，但是操作起来有点麻烦，不过好在，我们可以使用更容易操作的struct sockaddr_in结构体来设置。
+
+        不过这个结构体在在bind函数的手册中没有描述。
+
+        ```c
+        struct sockaddr_in 
+        {
+            sa_family_t			sin_family;	//设置AF_***（地址族）
+            __be16					sin_port;		//设置端口号
+            struct in_addr	sin_addr;		//设置Ip
+
+            /* 设置IP和端口时，这个成员用不到，这个成员的作用后面再解释， */
+            unsigned char		__pad[__SOCK_SIZE__ - sizeof(short int) - 
+              sizeof(unsigned short int) - sizeof(struct in_addr)];
+        };
+
+        struct in_addr 
+        {
+            __be32	s_addr; //__be32是32位的unsigned int，因为IPV4的ip是32位的无符号整形数
+        };
+        ```
+
+        在struct sockaddr_in中，存放端口和ip的成员是分开的，所以设置起来很方便. 使用struct sockaddr_in设置后，然后将其强制转为struct sockaddr类型，然后传递给bind函数即可
+
+        + `疑问`：为什么要强制转换？bind要求的是struct sockaddr结构体，但是你设置的是struct sockaddr_in，自然要记性类型转换了
+        + `疑问`：为什么这么麻烦，搞出了struct sockaddr和struct sockaddr_in这两个结构体类型？后面再解释
+
+      + struct sockaddr_in的使用例子：
+
+        ```c
+        struct sockaddr_in addr;
+
+        addr.sin_family = AF_INET;//使用是IPV4 TCP/IP协议族的ip地址（32位）
+        addr.sin_port		= htons(5006);//指定端口
+        addr.sin_addr.s_addr = inet_addr("192.168.1.105");//指定ip地址
+
+        ret = bind(sockfd, (struct sockaddr*)&addr, sizeof(addr));
+        ```
+        
+        注意，如果是跨网通信时，绑定的一定是所在路由器的公网ip。bind会将sockfd代表的套接字文件与addr中设置的ip和端口绑定起来。有关htons和inet_addr这两个函数，我们后面会详细解释，目前我们先用起来。
+
++ 2）代码演示						
+
++ 3）[有关bind的一些必须解释的问题](有关bind的一些必须解释的问题.md) 好好看下
+
+#### 第3步：调用listen 网络API，将套接字文件描述符，从主动变为被动文件描述符
+
+    1）listen函数
+        #include <sys/types.h>          /* See NOTES */
+        #include <sys/socket.h>
+
+        int listen(int sockfd, int backlog);
+
+      （a）功能：将套接字文件描述符，从主动文件描述符变为被动描述符，然后用于被动监听客户的连接
+
+      （b）返回值：成功返回0，失败返回-1，ernno被设置
+
+      （c）参数
+          · sockfd：socket所返回的套接字文件描述符
+            socket返回的“套接字文件描述符”默认是主动的，如果你想让它变为被动的话，你需要自己调用
+            listen函数来实现。
+
+
+          · backlog：指定队列的容量。
+
+              这个队列用于记录正在连接，但是还没有连接完成的客户，一般将队列容量指定为2、3就可以了。
+              这个容量并没有什么统一个设定值，一般来说只要小于30即可。
+
+
+
+    2）代码演示
+
+
+
+
+        不要因为listen有听的意思，就想当然的认为，listen就是用于被动监听客户连接的函数，事实上
+      真正用于被动监听客户连接的函数，并不是listen，而是其它函数。
+
+        listen的作用仅仅只是用于将“套接字文件描述符”变成被动描述符，以供“监听函数”用于被动监听客户
+      连接而已。
+
+
+
+
+
+    3）TCP服务器为什么要listen
+
+      （a）一定要注意，只有TCP服务器才会调用listen
+          图：编程模型
+
+
+
+      （b）TCP服务器调用listen的目的
+
+            TCP服务器监听客户连接时，是使用socket返回的“套接字文件描述符”来实现的，但是这个文件
+          描述符默认是主动文件描述符，所以需要使用listen函数将其转为被动描述符，否者无法用于被动
+          监听客户的连接。
+
+          什么是主动描述符？
+          使用主动描述符可以主动的向对方发送数据。
+
+          被动描述符？
+          只能被动的等别人主动想你发数据，然后再回答数据，不能主动的发送数据。
+
+
+
+          为什么要将“套接字文件描述符”转为被动描述符后，才能监听连接。
+
+            TCP服务器和客户端必须要建立连接，建立连接时的三次握手是由客户端主动先发起的，
+          也就是由客户端率先主动向服务器发送三次握手的数据，而服务器这一端则被动的接收，然后回答。
+
+            图：
+
+
+
+            正式由于服务器在三次握手时的这一被动属性，所以使用“套接字文件描述符”监听客户连接时，
+          描述符必须是被动的描述符。
+
+#### 第4步：调用accept 网络API，被动监听客户的连接
+
+    1）accept函数
+        #include <sys/types.h>          /* See NOTES */
+        #include <sys/socket.h>
+
+        int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+
+
+      （a）功能：被动监听客户发起三次握手的连接请求，三次握手成功，即建立连接成功。
+            accept被动监听客户连接的过程，其实也被称为监听客户上线的过程。
+
+            对于那些只连接了一半，还未连接完成的客户，会被记录到未完成队列中，队列的容量由
+          listen函数的第二个参数（backlog）来指定。
+
+            服务器调用accept函数监听客户连接，而客户端则是调用connect来连接请求的。
+
+            一旦连接成功，服务器这边的TCP协议会记录客户的IP和端口，如果是跨网通信的，记录ip的就是
+          客户所在路由器的公网Ip。
+
+
+      （b）返回值：
+          · 成功：
+              返回一个通信描述符，专门用于与该连接成功的客户的通信，总之后续服务器与该客户间
+            正式通信，使用的就是accept返回的“通信描述符”来实现的。
+
+          · 失败：返回-1，errno被设置
+
+
+        int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+      （c）参数
+          · sockefd：已经被listen转为了被动描述符的“套接字文件描述符”，专门用于被动监听客户的连接。
+              如果sockfd没有被listen转为被动描述符的话，accept是无法将其用来监听客户连接的。
+
+
+            - 有关套接字描述符的阻塞与非阻塞问题
+
+              服务器程序调用socket得到“套接字文件描述符”时，如果socket的第2个参数type，没有指定
+            SOCK_NONBLOCK的话，
+              int socket(int domain, int type, int protocol);
+
+              “套接字文件描述符”默认就是阻塞的，所以accept使用它来监听客户连接时，
+            如果没有客户请求连接的话，accept函数就会阻塞，直到有客户连接位置。
+              如果你不想阻塞，我们就可以在调用socket时，给type指定SOCK_NONBLOCK宏。
+
+
+            疑问：在TCP/IP协议族中，只有TCP协议才有建立连接的要求，那么accept怎么知道你用的
+              就是TCP协议呢？
+
+              accept的第一个参数是socket返回的“套接字文件描述符”，它指向了socket所创建的套接字文件，
+            创建套接字文件时，我们会通过参数1和参数2指定你所使用的协议，
+              int socket(int domain, int type, int protocol);	
+
+              比如将其指定为TCP协议，所以只要你在调用socket创建套接字文件时有指定通信协议，
+            accept函数就可以通过“套接字文件描述符”知道套接字文件所使用的是不是TCP协议。
+
+
+            int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+          · addrlen：第二参数addr的大小，不过要求给的是地址。
+              如何给地址？
+              后面会代码演示。
+
+
+          · addr：用于记录发起连接请求的那个客户的IP和端口（port）
+
+              前面说过建立连接时，服务器这边的TCP协议会自动记录客户的ip和端口，如果是跨网通信的
+            话，记录的就是客户的公网IP。
+
+              如果服务器应用层需要用到客户ip和端口的话，可以给accept指定第二个参数addr，以获取
+            TCP在连接时所自动记录客户IP和端口，如果不需要的就写NULL。
+                int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+
+              addr为struct sockaddr类型，有关这个结构体，我们在前面介绍过。	
+
+              不过我们前面说过，虽然下层（内核）实际使用的是struct sockaddr结构体，但是由于这个
+            结构体用起来不方便，因此应用层会使用更加便于操作的结构体，比如使用TCP/IP协议族通信时，
+            应用层使用的就是struct sockaddr_in这个更加方便操作的结构体。
+
+              所以我们应该定义struct sockaddr_in类型的addr，传递给accept函数时，将其强制转为
+            struct sockaddr即可，与我们讲bind函数时的用法类似。
+
+
+              例子：
+              struct sockaddr_in clnaddr = {0};
+
+              int clnsize = sizeof(clnaddr)
+              cfd = accept(sockfd, (struct sockaddr *)&clnaddr, &clnsize);
+
+
+              将clnaddr传递给accept后，accept函数会自动的讲TCP记录的客户ip和端口设置到clnaddr中，
+            我们即可得到客户的ip和端口。
+
+              通过之前对struct sockaddr_in成员的了解可知，clnaddr第二个成员放的是客户的端口号，
+            第三个成员放的是客户的IP。
+
+              struct sockaddr_in 
+              {
+                  sa_family_t			sin_family;	//设置AF_***（地址族）
+                  __be16					sin_port;		//设置端口号
+                  struct in_addr	sin_addr;		//设置Ip
+
+                  /* 设置IP和端口时，这个成员用不到，这个成员的作用后面再解释， */
+                  unsigned char		__pad[__SOCK_SIZE__ - sizeof(short int) - 
+                    sizeof(unsigned short int) - sizeof(struct in_addr)];
+              };
+
+
+
+    2）代码演示
+
+
+
+
+
+
+
+    3）如何使用得到的客户ip和端口
+        比如我这里的使用方式是打印客户的ip和端口，此时必须调用ntohs和inet_ntoa函数进行端序转换。
+
+      为什么要进行端序转换？
+        客户的端口和ip是服务器这边的TCP协议，从客户端发送的网络数据包中提取出来的，网络数据包的
+      端序属于网络端序，主机接收到数据后，如果你想要使用的话，就必须从网络端序转为主机端序。
+
+      （a）ntohs：是htons的相反函数，将端口从网络端序转为主机端序
+      （b）inet_ntoa：功能与inet_addr刚好相反，该函数有两个功能
+
+          · 将IPV4的32位无符号整形数的ip，从网络端序转为主机端序
+
+          · 将实际所用的无符号整形数的ip，转成人能识别的字符串形式的ip
+
+      使用举例：
+        struct sockaddr_in clnaddr = {0};
+
+        int clnaddr_size = sizeof(clnaddr)
+        cfd = accept(sockfd, (struct sockaddr *)&clnaddr, &clnaddr_size);
+
+        printf("cln_port= %d, cln_addr=%s\n", ntohs(clnaddr.sin_port), inet_ntoa(clnaddr.sin_addr));
+
+
+      代码演示
+
+#### 第5步：服务器调用read（recv）和write（send），收发数据，实现与客户的通信
+
+      read和write的用法，我们在讲文件IO时已经介绍的非常清楚，我们这里着重介绍recv和send这两个函数，
+    recv和send其实和read和write差不多，它们的前三个参数都是一样的，只是recv和send多了第四个参数。
+
+      不管是使用read、write还是使用recv、send来实现TCP数据的收发，由于TCP建立连接时自动已经记录下
+    了对方的IP和端口，所以使用这些函数实现数据收发时，只需要指定通信描述符即可，不需要指定对方
+    的ip和端口。
+
+
+    1）send函数
+
+      （a）函数原型
+          #include <sys/types.h>
+          #include <sys/socket.h>
+
+          ssize_t send(int sockfd, const void *buf, size_t len, int flags);
+
+          · 功能：向对方发送数据
+            其实也可以使用sendto函数，相比send来说多了两个参数，当sendto的后两个参数写NULL和0时，
+          能完全等价于send。
+              ssize_t sendto(int sockfd, const void *buf, size_t len, int flags, NULL, 0);
+
+
+            类似TCP这种面向连接的通信，我们一般使用send而不是使用sendto，因为sendto用起来有点麻烦。
+            类似UDP这种不需要连接的通信，必须使用sendto，不能使用send，后面介绍到udp时再详细介绍。
+
+          · 返回值：成功返回发送的字节数，失败返回-1，ernno被设置
+
+
+
+          ssize_t send(int sockfd, const void *buf, size_t len, int flags);
+          · 参数：
+            - sockefd：用于通信的通信描述符
+
+                不要因为名字写的是sockfd，就认为一定是socket返回“套接字文件描述符”。
+              在服务器这边，accept返回的才是通信描述符，所以服务器调用send发送数据时，第一个参数
+              应该写accept所返回的通信描述符。
+
+
+            - buf：应用缓存，用于存放你要发送的数据
+                可以是任何你想发送的数据，比如结构体、int、float、字符、字符串等等。
+
+                正规操作的话，应该使用结构体来封装数据。
+
+
+            - len：buf缓存的大小
+
+            - flags：一般设置0，表示这个参数用不到，此时send是阻塞发送的。
+
+                阻塞发送的意思就是，如果数据发送不成功会一直阻塞，直到被某信号中断或者发送成功为止，
+              不过一般来说，发送数据是不会阻塞的。
+
+                当flags设置0时，send与write的功能完全一样，有关flags的其它设置，后面再介绍。
+
+
+
+
+      （b）代码演示
+          数据的发送和接收，
+
+          收发数据的数据需要在网路中传输，所以同样要进行端序的转换。
+
+          · 发送数据：将主机端序转为网络端序
+          · 接收数据：将网络端序转为主机端序
+
+          不过只有short、int、float等存储单元字节>1字节的数据，才有转换的需求。
+          如果是char这种存储单元为一个字节的数据，不需要对端序进行转换。
+
+          疑问：为什么存储单元为一个字节的数据，不需要进行端序的转换呢?
+          有关这个问题，我们在《C语言深度解析》中讲的非常清楚，所以这里不再赘述。
+
+
+          我们这里虽然介绍的是c程序的例子，但是实际上c++/java等调用相应的网络API实现通信时，应用
+        程序同样需要进行端序的转换，与我们这里介绍的c程序的情况是一样的。
+
+
+          前面介绍过，本机测试时其实是可以不进行端序转换的，但是对于正规网络通信来说，收发计算机
+        的大小端序不一定相同，为了避免因端序不同所带来的通信错误，我们应该严格操作，收发数据时必须
+        对端序进行转换。
+
+          代码演示：服务器发送数据
+
+
+
+
+
+        ssize_t send(int sockfd, const void *buf, size_t len, int flags);
+
+      （c）flags的常见设置
+          + 0：表示用不上flags，此时send是阻塞发送数据的
+
+
+          + MSG_NOSIGNAL：send数据时，如果对方将“连接”关闭掉了，调用send的进程会被发送SIGPIPE信号，
+            这个信号的默认处理方式是终止，所以收到这个信号的进程会被终止。
+
+            如果给flags指定MSG_NOSIGNAL，表示当连接被关闭时不会产生该信号。
+
+            从这里可看出，并不是只有写管道失败时才会产生SGIPIPE信号，网络通信时也会产生这个的信号。
+
+
+          + MSG_DONTWAIT：非阻塞发送
+
+
+          + MSG_OOB：表示发送的是带外数据
+            有关带外数据后面再详细介绍。
+
+
+          + ...
+
+
+          以上除了0以外，其它选项可以|操作，比如MSG_DONTWAIT | MSG_OOB。
+
+
+
+
+
+
+
+
+    2）recv函数
+
+      （a）函数原型
+           #include <sys/types.h>
+           #include <sys/socket.h>
+
+           ssize_t recv(int sockfd, void *buf, size_t len, int flags);
+
+          · 功能：接收对方发送的数据
+
+              我们也可以使用rcvfrom函数，当recvfrom函数的最后两个参数写NULL和0时，与recv的功能完全
+            一样。
+              ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags, NULL, 0);
+
+              同样的，讲到udp时再详细介绍recvfrom。
+
+
+          · 返回值：成功返回接收的字节数，失败返回-1，ernno被设置
+
+
+          · 参数
+            - sockfd：通信文件描述符
+
+            - buf：应用缓存，用于存放接收的数据
+
+            - len：buf的大小
+
+            - flags：
+              + 0：默认设置，此时recv是阻塞接收的，0是常设置的值。
+
+              + MSG_DONTWAIT：非阻塞接收
+
+              + MSG_OOB：接收的是带外数据
+
+              + ...：其它选项不做介绍
+
+
+
+
+      （b）代码演示
+
+#### 第6步：调用close或者shutdown关闭TCP的连接
+
+
+    1）回顾断开连接时的四次握手
+
+        图：
+
+
+        TCP断开连接时，可以由客户和服务器任何一方发起。
+
+
+        调用close或者sutdown函数断开连接时，四次握手的过程是由TCP自动完成的。
+
+
+
+
+    1）使用close断开连接
+
+      （a）服务器端调用close断开连接
+
+          · close(accept返回的描述符);
+
+            图：
+
+
+          · 代码演示
+
+
+
+
+
+
+      （b）客户端调用close断开连接
+          · close(socket返回的描述符)
+
+            图：
+
+          · 代码演示
+            写客户端代码时再介绍
+
+
+
+
+      （c）close断开连接的缺点
+
+          · 缺点1：会一次性将读写都关掉了
+              如果我只想关写，但是读打开着，或者只想关读、但是写打开着，close做不到。
+
+
+          · 缺点2：如果多个文件描述符指向了同一个连接时，如果只close关闭了其中某个文件描述符时，
+            只要其它的fd还打开着，那么连接不会被断开，直到所有的描述符都被close后才断开连接。
+
+            出现多个描述指向同一个连接的原因可能两个：
+            - 通过dup方式复制出其它描述符								
+              图：
+
+            - 子进程继承了这个描述符，所以子进程的描述符也指向了连接
+
+              图：
+
+
+
+    2）shutdown函数
+        有效的解决了close的缺点，所以以后断开连接时，建议使用更正规shutdown函数。
+
+      （a） shutdown函数原型
+            #include <sys/socket.h>
+
+            int shutdown(int sockfd, int how);
+
+          · 功能：可以按照要求关闭连接，而且不管有多少个描述符指向同一个连接，只要调用shutdown去
+              操作了其中某个描述符，连接就会被立即断开。
+
+          · 返回值：成功返回0，失败返回-1，ernno被设置
+
+          · 参数
+            - sokcfd：TCP服务器断开连接时，使用的是accept所返回的文件描述符
+
+              客户端调用shutdown断开连接的情况，讲到客户端时再介绍。
+
+
+            - how：如何断开连接
+              + SHUT_RD：只断开读连接
+              + SHUT_WR：只断开写连接
+              + SHUT_RDWR：读、写连接都断开
+
+
+      （c）代码演示
+          · 服务器shutdown
+
+
+          · 客户端调用shutdown
+            将客户端时在演示
+
+
+
+
+  （8）回顾TCP通信服务器程序的编程流程
+      图：
+
+### 4.6.2 实现TCP通信的客户端程序			
+
+#### （1）第1步：调用socket创建套接字文件，指定使用TCP协议
+
+```c
+int socket(int domain, int type, int protocol);
+```
+
+参数如何设置？
++ domain：指定为PF_INET，表示使用的IPV4是TCP/IP协议族
++ type：指定为SOCK_STREAM，表示使用的是面向连接的可靠传输协议. 在TCP/IP协议族中，只有TCP是面向连接的可靠传输协议，所以使用的是TCP协议
++ protocol：0，不指定协议号
+
+函数调用成功就“返回套接字文件描述符”，在客户端程序中，socket返回“套接字文件描述符”，直接用于通信。
+
+#### （2）第2步：调用connect主动向服务器发起三次握手，进行连接
+
+客户端调用connect主动发起连接请求，服务器调用accept被动接收请求，三次握手ok，连接就成功了。这三次握手是由TCP自动完成，我们只需要调用connect和accept这连个函数接口即可。
+
+连接成功后，服务器端的accept会返回专门与该客户通信的描述符，而客户端则直接使用socket返回套接字文件描述符来通信。图：
+
++ （a）为什么客户端没有bind和listen
+  + 为什么没有bind？  
+    我们之前说过，bind的目的是为了让套接字文件使用固定的ip和端口号来通信，但是只有TCP服务器有使用固定ip和端口的需求，但是于客户端来说，不需要固定的IP和端口，所以不需要调用bind函数来绑定，客户端只需使用自动分配的IP和端口即可  
+    我们前面介绍过，客户端使用自动分配的端口号时，端口号的分配范围为49152~65535  
+
+    疑问：如果客户程序非要bind绑定可以吗？  
+    答：当然可以，大家下去可以自己试试，尝试给客户端也绑定固定的ip和端口，不过对于客户端来说，没有什么意义 
+
+  + 客户端程序为什么没有listen？  
+    对客户端程序来说，客户端永远都是主动向服务器发起连接请求的，没有被动监听别人连接的需求，因此根本就不需要所谓的被动文件描述符，因此根本就用不到listen函数。
+
++ （b）connect函数	
+  + 函数原型
+
+   ```c
+   #include <sys/types.h>         
+   #include <sys/socket.h>
+   int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+   ```
+
+  + 功能：向服务器主动发起连接请求
+
+  + 返回值：成功返回0，失败返回-1，ernno被设置
+
+  + 参数
+    + sockfd：socket所返回的套接字文件描述符
+    + addrlen：参数2所指定的结构体变量的大小
+    + addr：用于设置你所要连接服务器的IP和端口
+
+    如果只是纯粹的局域网内部通信的话，ip就是局域网IP，但是如果是跨网通信的话，IP必须是服务器所在路由器的公网IP。
+
+    为了方便操作，在应用层我们还是使用struct sockaddr_in来设置，然后传递给connect时，再强制换为struct sockaddr。
+
+    ```c
+    struct sockaddr_in seraddr;
+
+    addr.sin_family = AF_INET;    
+    addr.sin_port		= htons(5006);//服务器程序的端口
+    addr.sin_addr.s_addr = inet_addr("192.168.1.105");//服务器的ip地址
+
+    cfd = connect(sockfd, (struct sockaddr *)&seraddr, sizeof(seraddr));										
+
+    struct sockaddr_in {
+      sa_family_t			sin_family;
+      __be16					sin_port;
+      struct in_addr	sin_addr;
+
+
+    /* 填补相比struct sockaddr所缺的字节数，保障强制转换不要出错 */
+      unsigned char		__pad[__SOCK_SIZE__ - sizeof(short int) - 
+        sizeof(unsigned short int) - sizeof(struct in_addr)];
+    };
+    ```
+
+#### （3）第3步：调用read（recv）和write（send）收发数据
+
+同样的，由于在建立TCP连接时，客户端的TCP协议会自动记录下服务器的ip和端口，调用这些函数收发数据时，我们不需要重新指定服务器的ip和端口，因为TCP有记录。代码演示：
+
+#### （4）第4步：调用close或者shutdown关闭连接 
+
+代码演示：      
