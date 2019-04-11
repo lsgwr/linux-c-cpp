@@ -36,11 +36,15 @@ typedef struct pthread_arg{
 
 /* 全局变量 */
 pth_arg pth_arg_arr[SUB_THREAD_NUM]; // 声明结构体数组,存放线程信息
+int exit_flag = 0; // 主线程退出标志
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;//互斥锁,初始化一下
 
 void process_exit_deal(void)
 {
+    int ret = 0;
     printf("main process exit~\n");
+    ret = pthread_mutex_destroy(&mutex);
+    if(ret != 0) print_error_thread("pthread_mutex_destroy",ret);
 }
 
 
@@ -86,6 +90,7 @@ void signal_func(int signo)
 	{
 		exit(0);
 	}
+    exit_flag = 1; // 表示次线程都退出了，父线程也可以退出了，在main里的while(1)里break
 }
 
 
@@ -116,21 +121,31 @@ int main()
     signal(SIGALRM, signal_func);
     alarm(1);
     
+    void *retval = NULL; // 用于存储pthread_join函数返回值
+    for(i = 0; i < SUB_THREAD_NUM; i++){
+        pthread_join(pth_arg_arr[i].tid, &retval);
+        printf("return val = %ld\n", (long)retval);
+    }
+    
     // 主线程也输出内容
     while(1){ // 主线程不能先死，要不子线程也得死; 子线程死，父线程还能接着存活
         pthread_mutex_lock(&mutex);
         write(fd, "hello ", 6);
         write(fd, "world ", 6);
         write(fd, "main\n", 5);
+        if(exit_flag){
+            break; // 次线程都退出了子线程再退出
+        }
         pthread_mutex_unlock(&mutex);
     }
     
     return 0;
 }
 
-/** 输出如下
-pthread start, No = 1, Id = 140134516991744
-pthread start, No = 0, Id = 140134525384448
-pthread exit, No = 1, Id = 140134516991744
+
+/**结果如下
+pthread start, No = 1, Id = 139701242963712
+pthread start, No = 0, Id = 139701251356416
+pthread exit, No = 1, Id = 139701242963712
 ^Cmain process exit~
 **/
