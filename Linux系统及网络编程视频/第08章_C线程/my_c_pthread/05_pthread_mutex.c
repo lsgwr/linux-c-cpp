@@ -36,6 +36,7 @@ typedef struct pthread_arg{
 /* 全局变量 */
 pth_arg pth_arg_arr[SUB_THREAD_NUM]; // 声明结构体数组,存放线程信息
 int exit_flag = 0; // 主线程退出标志
+pthread_mutex_t mutex; // 线程互锁
 
 void process_exit_deal(void)
 {
@@ -98,6 +99,10 @@ int main()
     // 注册进程退出处理函数，exit正常终止进程,atexit是c标准库函数
     atexit(process_exit_deal);
     
+    // 初始化线程互斥锁
+    ret = pthread_mutex_init(&mutex, NULL);
+    if(ret != 0) print_error("pthread_mutex_init fail");
+
     fd = open(PTHREAD_FILE, O_RDWR|O_CREAT|O_TRUNC, 0664);
     if(fd == -1) print_error("open fail");
     
