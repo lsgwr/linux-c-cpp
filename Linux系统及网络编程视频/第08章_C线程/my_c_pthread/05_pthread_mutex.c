@@ -66,8 +66,10 @@ void *pth_func(void *arg)
     
     int fd = pth_arg_obj->fd;
     while(1){
+        pthread_mutex_lock(&mutex);
         write(fd, "hello ", 6);
         write(fd, "world\n", 6);
+        pthread_mutex_unlock(&mutex);
     }
     
     pthread_cleanup_pop(!0); // 这个pop必须写上好和上面的push配对，否则会报奇怪的错
@@ -127,9 +129,11 @@ int main()
     
     // 主线程也输出内容
     while(1){ // 主线程不能先死，要不子线程也得死; 子线程死，父线程还能接着存活
+        pthread_mutex_lock(&mutex);
         write(fd, "hello ", 6);
         write(fd, "world ", 6);
         write(fd, "main\n", 5);
+        pthread_mutex_unlock(&mutex);
         if(exit_flag){
             break; // 次线程都退出了子线程再退出
         }
