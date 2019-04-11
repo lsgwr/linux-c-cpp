@@ -33,9 +33,9 @@ typedef struct pthread_arg{
     int fd; // 打开文件的文件描述符
 }pth_arg;
 
+/* 全局变量 */
 pth_arg pth_arg_arr[SUB_THREAD_NUM]; // 声明结构体数组,存放线程信息
-
-int exit_flag = 0;
+int exit_flag = 0; // 主线程退出标志
 
 void process_exit_deal(void)
 {
