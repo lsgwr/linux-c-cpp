@@ -1,3 +1,4 @@
+    
 #ifndef H_FILELOCK_H
 #define H_FILELOCK_H
 
@@ -10,6 +11,13 @@
 do{\
     fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
     perror(str);\
+    exit(-1);\
+}while(0);
+
+#define print_error_thread(str, errno) \
+do{\
+    fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+    printf("%s:%s", str, strerror(errno));\
     exit(-1);\
 }while(0);
 
@@ -49,5 +57,3 @@ static void set_filelock(int fd, int ifwait, int l_type, int l_whence, int l_off
 } 
 
 #endif // H_FILELOCK_H
-
-
