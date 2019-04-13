@@ -7,6 +7,7 @@
         "stdlib.h": "c",
         "string.h": "c",
         "pthread.h": "c",
-        "types.h": "c"
+        "types.h": "c",
+        "inet.h": "c"
     }
 }
