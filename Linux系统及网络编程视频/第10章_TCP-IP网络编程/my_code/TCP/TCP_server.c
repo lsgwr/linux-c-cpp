@@ -9,6 +9,9 @@
 #include <netinet/in.h>
 #include <pthread.h>
 
+#define SERVER_PORT 5006 // 服务器进行对外的端口
+#define SERVER_IP "127.0.0.1" // 服务器所在机器的IP
+
 #define print_error(str) \
 do{\
     fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
@@ -52,8 +55,8 @@ int main(int argc, char const *argv[])
     /* 第2步：调用bind绑定服务器的套接字、ip、端口 */
     struct sockaddr_in server_addr; 
     server_addr.sin_family = AF_INET; // 使用是IPV4 TCP/IP协议族的ip地址(32位)
-    server_addr.sin_port = htons(5006); // 指定端口
-    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // 服务器IP 
+    server_addr.sin_port = htons(SERVER_PORT); // 指定端口
+    server_addr.sin_addr.s_addr = inet_addr(SERVER_IP); // 服务器IP 
     ret = bind(skfd, (struct sockaddr *)&server_addr, sizeof(server_addr)); // 绑定信息，记住第二个参数需要进行强制转换
     if(ret == -1) print_error("bind fail");
 
