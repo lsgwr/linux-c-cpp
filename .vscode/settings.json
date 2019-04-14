@@ -8,6 +8,7 @@
         "string.h": "c",
         "pthread.h": "c",
         "types.h": "c",
-        "inet.h": "c"
+        "inet.h": "c",
+        "in.h": "c"
     }
 }

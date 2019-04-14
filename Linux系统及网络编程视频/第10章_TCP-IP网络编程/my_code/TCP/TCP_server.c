@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <netinet/in.h>
 
 #define print_error(str) \
 do{\
@@ -25,6 +26,9 @@ int main(int argc, char const *argv[])
     struct sockaddr_in server_addr; 
     server_addr.sin_family = AF_INET; // 使用是IPV4 TCP/IP协议族的ip地址(32位)
     server_addr.sin_port = htons(5006); // 指定端口
-    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // 服务器IP
+    
+    ret = bind(skfd, (struct sockaddr *)&server_addr, sizeof(server_addr)); // 绑定信息，记住第二个参数需要进行强制转换
+    if(ret == -1) print_error("bind fail");
     return 0;
 }
