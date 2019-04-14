@@ -184,4 +184,4 @@ addr.sin_addr.s_addr = inet_addr("192.168.1.105");
 
   **结构体内容并没有变，但是空间的解释方式变了**，当我们将`struct sockaddr_in`强制转为`struct sockaddr`时候，**struct sockaddr_in的后三个成员被强制解释为了struct sockaddr的sa_data成员**，如此一来就把ip和端口给设置到了struct sockaddr是sa_data成员中。
 
-  [sockaddr_in到sockaddr强制转换时的对应关系](sockaddr_in到sockaddr强制转换时的对应关系.png)
+  ![sockaddr_in到sockaddr强制转换时的对应关系](sockaddr_in到sockaddr强制转换时的对应关系.png)

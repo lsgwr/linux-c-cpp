@@ -34,5 +34,12 @@ int main(int argc, char const *argv[])
     ret = listen(skfd, 3);
     if(ret == -1) print_error("listen fail");
 
+    /* 第4步：调用accept 网络API，被动监听客户发起三次握手的连接请求，三次握手成功，即建立连接成功. 被动监听客户的连接也被称为监听客户上线的过程*/
+    int cfd = -1; // 客户端用于和服务器端通信的fd
+    struct sockaddr_in clnaddr = {}; // clnaddr : client address,用于存储客户端信息(ip和端口)的结构体
+    unsigned int clnaddr_size = sizeof(clnaddr);
+    cfd = accept(skfd, (struct sockaddr *)&clnaddr, &clnaddr_size); // 接收客户端相关的信息，成功返回客户端用于和服务器端通信的fd
+    if(cfd == -1) print_error("accept fail");
+    printf("cln_port= %d, cln_addr=%s\n", ntohs(clnaddr.sin_port), inet_ntoa(clnaddr.sin_addr)); // 打印客户端端口和IP，一定要先进行端序转换
     return 0;
 }
