@@ -89,11 +89,9 @@ int main(int argc, char const *argv[])
         printf("Please input student number:\n"); 
         scanf("%d", &tmp_num);
         stu_data.stu_num = htonl(tmp_num);
-        printf("学号 = %d\n", stu_data.stu_num);
         // 获取学生姓名，不需要进行端序转换,因为字符数组以一个字节为单位进行存储
         printf("Please input student name:\n"); // 获取学生姓名
         scanf("%s", stu_data.stu_name);
-        printf("姓名 = %s\n", stu_data.stu_name);
         // 根据cfd向指定的客户端发送数据
         ret = send(skfd, (void *)&stu_data, sizeof(stu_data), 0);
         if(ret == -1) print_error("send fail");
