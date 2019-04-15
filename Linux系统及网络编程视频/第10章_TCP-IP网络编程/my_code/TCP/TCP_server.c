@@ -36,10 +36,10 @@ void *pth_func(void *path_arg)
 
     while(1){
         bzero(&stu_data, sizeof(stu_data)); // 清空结构体中的数据
-        ret = recv(cfd, &stu_data, sizeof(stu_data), 0); 
+        ret = recv(cfd, (void *)&stu_data, sizeof(stu_data), 0); 
         if(ret == -1) print_error("recv fail");
     
-        printf("student number = %d\n", ntohs(stu_data.stu_num)); // 打印学号，记得把数据从网络端序转为主机断端序
+        printf("student number = %d\n", ntohl(stu_data.stu_num)); // 打印学号，记得把数据从网络端序转为主机断端序
         printf("student name = %s\n", stu_data.stu_name); // 1个字符存储的无需进行端序转换
     } 
 }
@@ -93,6 +93,7 @@ int main(int argc, char const *argv[])
     student stu_data = {0};
     unsigned int tmp_num; // 定义临时变量用于字节序转换
     while(1){
+        bzero(&stu_data, sizeof(stu_data)); // 清空结构体中的数据
         // 获取学生学号,但是需要从主机端序转换为网络端序
         printf("Please input student number:\n"); 
         scanf("%d", &tmp_num);
