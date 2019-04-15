@@ -28,7 +28,6 @@ typedef struct tcpdata{
     char stu_name[30]; // 学生姓名
 }student;
 
-int cfd = -1; // 服务器端用于和指定客户端通信的指定fd,用于第4步
 
 /* 线程处理函数，用于从读取客户端发送过来的消息,用于第6步 */
 void *pth_func(void *path_arg)
@@ -92,7 +91,7 @@ int main(int argc, char const *argv[])
         // 获取学生姓名，不需要进行端序转换,因为字符数组以一个字节为单位进行存储
         printf("Please input student name:\n"); // 获取学生姓名
         scanf("%s", stu_data.stu_name);
-        // 根据cfd向指定的客户端发送数据
+        // 根据skfd向指定的客户端发送数据
         ret = send(skfd, (void *)&stu_data, sizeof(stu_data), 0);
         if(ret == -1) print_error("send fail");
     }
