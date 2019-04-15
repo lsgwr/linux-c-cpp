@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <pthread.h>
+#include <signal.h>
 
 #define SERVER_PORT 5006 // 服务器进行对外的端口
 #define SERVER_IP "127.0.0.1" // 服务器所在机器的IP
@@ -43,9 +44,22 @@ void *pth_func(void *path_arg)
     } 
 }
 
+/* 信号处理函数，用于接收外部信号停止服务器线程 */
+void signal_func(int signo)
+{
+    if(signo == SIGINT){
+        // close(cfd); // 断开服务器端和客户端通信的fd
+        shutdown(cfd, SHUT_RDWR); // 读写都断开
+        exit(0); // 退出服务器进程
+    }
+}
+
 int main(int argc, char const *argv[])
 {
     int ret = -1;
+
+    /* 第7步：注册信号处理函数，用于关闭socket和退出线程 */
+    signal(SIGINT, signal_func);
 
     /* 第1步：创建使用TCP协议通信的套接字文件*/
     int skfd = -1;
