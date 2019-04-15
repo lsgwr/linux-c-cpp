@@ -36,7 +36,9 @@
 
 ## 5.3 UDP的编程模型
 
-图：
+![UDP的编程模型](https://i.loli.net/2019/04/15/5cb479366da91.jpg)
+
+见 https://edu.51cto.com/center/course/lesson/index?id=268331 的5:21
 
 学习TCP通信时我们说过，TCP协议要求必须要有一个服务器，这一点是由TCP协议本身的特性所决定的。
 
