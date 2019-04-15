@@ -33,7 +33,6 @@
 
 比如我们在开发与视频监控相关的网络程序时（主要时客户端），往往会使用RSTP或者RTP应用层协议来传输监控视频数据，RSTP和RTP底层实际上使用的就是UDP协议。
 
-
 ## 5.3 UDP的编程模型
 
 ![UDP的编程模型](UDP的编程模型.png)
@@ -92,7 +91,7 @@ ssize_t sendto(int sockfd, const void *buf, size_t len, int flags, const struct 
 ```
 
 + 功能
-  发送数据，当后两个参数为NULL和0时，功能等价于send，send专门用于TCP这种面向连接的通信，但对于像UDP这种非连接的通信，必须使用sendto，因为此时必须使用最后两个参数。
+  发送数据，当后两个参数为NULL和0时，功能等价于send，send专门用于TCP这种面向连接的通信，`但对于像UDP这种非连接的通信，必须使用sendto`，因为此时必须使用最后两个参数。
 
 + 返回值：成功返回发送的字节数，失败返回-1，errno被设置
 + 参数
@@ -107,7 +106,7 @@ ssize_t sendto(int sockfd, const void *buf, size_t len, int flags, const struct 
 
 #### （2）recvfrom
 
-+ 函数原型	
++ 函数原型
 
   ```c
   #include <sys/types.h>

@@ -10,8 +10,8 @@
 #include <pthread.h>
 #include <signal.h>
 
-#define SERVER_PORT 5006 // 服务器进行对外的端口
-#define SERVER_IP "127.0.0.1" // 服务器所在机器的IP
+#define SELF_PORT 5006 // 当前UDP进程端口
+#define SELF_IP "127.0.0.1" // 当前UDP进程所在机器的IP
 
 #define print_error(str) \
 do{\
@@ -20,7 +20,7 @@ do{\
     exit(-1);\
 }while(0);
 
-int skfd = -1; // 客户端用于和服务器端通信的fd
+int skfd = -1; // 两个UDP进程进行通信的fd
 
 /* tcp通信时发送的数据(send函数使用)，这里以一个学生信息为例，用于第3、4步 */
 typedef struct tcpdata{
@@ -56,6 +56,10 @@ void signal_func(int signo)
 
 int main(int argc, char const *argv[])
 {
+    
+    if(argc != 3){
+        printf("you must offer ip and port of peer!");
+    }
     int ret = -1;
 
     /* 第5步：注册信号处理函数，用于关闭socket和退出线程 */
@@ -65,25 +69,29 @@ int main(int argc, char const *argv[])
     skfd = socket(AF_INET, SOCK_STREAM, 0);
     if(skfd == -1) print_error("socket fail");
     
-    /* 第2步：调用connect主动向服务器发起三次握手，进行连接 */
-    struct sockaddr_in server_addr; 
-    server_addr.sin_family = AF_INET; // 使用是IPV4 TCP/IP协议族的ip地址(32位)
-    server_addr.sin_port = htons(SERVER_PORT); // 指定端口
-    server_addr.sin_addr.s_addr = inet_addr(SERVER_IP); // 服务器IP
-    ret = connect(skfd, (struct sockaddr *)&server_addr, sizeof(server_addr)); // 绑定信息，记住第二个参数需要进行强制转换
-    if(ret == -1) print_error("connect fail");
+    /* 第2步：bind绑定固定的ip和端口 */
+    struct sockaddr_in self_addr; 
+    self_addr.sin_family = AF_INET; // 使用是IPV4 TCP/IP协议族的ip地址(32位)
+    self_addr.sin_port = htons(SELF_PORT); // 指定端口
+    self_addr.sin_addr.s_addr = inet_addr(SELF_IP); // 指定IP
+    ret = bind(skfd, (struct sockaddr *)&self_addr, sizeof(self_addr)); // 绑定信息，记住第二个参数需要进行强制转换
+    if(ret == -1) print_error("bind fail");
     
     
-
-    /* 第4步：注册线程函数，用于接收客户端的消息 */
-    pthread_t recv_thread_id; // 接收客户端消息的线程id
+    /* 第4步：注册线程函数，用于对端的消息 */
+    pthread_t recv_thread_id; // 接收对端消息的线程id
     ret = pthread_create(&recv_thread_id, NULL, pth_func, NULL); // 注册消息接收线程
     if(ret != 0) print_error("pthread_create fail");
 
-    /* 第3步：服务器调用write(send)给指定客户端发送数据 */
+    /* 第3步：调用调用sendto给指定同伴发送数据 */
     student stu_data = {0};
     unsigned int tmp_num; // 定义临时变量用于字节序转换
+    struct sockaddr_in peer_addr = {0}; 
     while(1){
+        // 设置对端UDP进程的信息比如IP和端口等，需要命令行传参来指定
+        peer_addr.sin_family = AF_INET; // 使用是IPV4 TCP/IP协议族的ip地址(32位)
+        self_addr.sin_port = htons(atoi(argv[2])); // 对端UDP进程端口
+        self_addr.sin_addr.s_addr = inet_addr(argv[1]); // 对端UDP进程所在机器的IP
         bzero(&stu_data, sizeof(stu_data)); // 清空结构体中的数据
         // 获取学生学号,但是需要从主机端序转换为网络端序
         printf("Please input student number:\n"); 
@@ -92,9 +100,9 @@ int main(int argc, char const *argv[])
         // 获取学生姓名，不需要进行端序转换,因为字符数组以一个字节为单位进行存储
         printf("Please input student name:\n"); // 获取学生姓名
         scanf("%s", stu_data.stu_name);
-        // 根据skfd向指定的客户端发送数据
-        ret = send(skfd, (void *)&stu_data, sizeof(stu_data), 0);
-        if(ret == -1) print_error("send fail");
+        // 根据skfd向指定的UDP对端发送数据
+        ret = sendto(skfd, (void *)&stu_data, sizeof(stu_data), 0, (struct sockaddr *)&peer_addr, sizeof(peer_addr));
+        if(ret == -1) print_error("sendto fail");
     }
 
     return 0;

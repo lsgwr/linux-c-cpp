@@ -87,7 +87,8 @@ int main(int argc, char const *argv[])
 
     /* 第6步：注册线程函数，用于接收客户端的消息 */
     pthread_t recv_thread_id; // 接收客户端消息的线程id
-    pthread_create(&recv_thread_id, NULL, pth_func, NULL); // 注册消息接收线程
+    ret = pthread_create(&recv_thread_id, NULL, pth_func, NULL); // 注册消息接收线程
+    if(ret != 0) print_error("pthread_create fail");
 
     /* 第5步：服务器调用write(send)给指定客户端发送数据 */
     student stu_data = {0};
