@@ -36,7 +36,7 @@ typedef struct tcpdata{
 int cfd = -1; // 服务器端用于和指定客户端通信的指定fd,用于第4步
 
 /* 线程处理函数，用于从读取客户端发送过来的消息,用于第6步 */
-void *pth_func(void *path_arg)
+void *pth_func(void *pth_arg)
 {
     int ret = 0;
     student stu_data = {0};
