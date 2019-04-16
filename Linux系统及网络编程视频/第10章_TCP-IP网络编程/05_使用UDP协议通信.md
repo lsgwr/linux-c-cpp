@@ -45,7 +45,7 @@
 
 ## 5.4 UDP通信的例子程序
 
-> 写一个A程序，然后再写一个B程序，让这两个程序之间使用UDP通信。
+> 写一个A程序，然后再写一个B程序，让这两个程序之间使用UDP通信,完整代码见[peer1.c](my_code/UDP/peer1.c)和[peer2.c](my_code/UDP/peer2.c)
 
 ### 5.4.1 第1步：调用socket创建套接字文件
 
@@ -61,6 +61,12 @@
   + 3）protocol：0
 
 + （2）代码演示
+  
+  ```c
+  /* 第1步：创建使用TCP协议通信的套接字文件，客户端的套接字直接用于和服务器端通信*/
+  skfd = socket(AF_INET, SOCK_DGRAM, 0); // 一定注意第二个参数和TCP通信的不同
+  if(skfd == -1) print_error("socket fail");
+  ```
 
 ### 5.4.2 第2步：bind绑定固定的ip和端口
 
@@ -72,6 +78,16 @@
 所以如果要接收数据，就必须绑定固定的IP和端口。
 
 代码演示：
+
+```c
+/* 第2步：bind绑定固定的ip和端口 */
+struct sockaddr_in self_addr; 
+self_addr.sin_family = AF_INET; // 使用是IPV4 TCP/IP协议族的ip地址(32位)
+self_addr.sin_port = htons(SELF_PORT); // 指定端口
+self_addr.sin_addr.s_addr = inet_addr(SELF_IP); // 指定IP
+ret = bind(skfd, (struct sockaddr *)&self_addr, sizeof(self_addr)); // 绑定信息，记住第二个参数需要进行强制转换
+if(ret == -1) print_error("bind fail");
+```
 
 ### 5.4.3 第3步：调用sendto和recvfrom函数，发送和接收数据
 
@@ -103,6 +119,26 @@ ssize_t sendto(int sockfd, const void *buf, size_t len, int flags, const struct 
   + addelen：dest_addr的大小
 
 + 代码演示
+  
+  ```c
+  while(1){
+      // 设置对端UDP进程的信息比如IP和端口等，需要命令行传参来指定.UDP通信每次收发数据都需要指定IP和端口
+      peer_addr.sin_family = AF_INET; // 使用是IPV4 TCP/IP协议族的ip地址(32位)
+      peer_addr.sin_port = htons(atoi(argv[2])); // 对端UDP进程端口
+      peer_addr.sin_addr.s_addr = inet_addr(argv[1]); // 对端UDP进程所在机器的IP
+      bzero(&stu_data, sizeof(stu_data)); // 清空结构体中的数据
+      // 获取学生学号,但是需要从主机端序转换为网络端序
+      printf("Please input student number:\n"); 
+      scanf("%d", &tmp_num);
+      stu_data.stu_num = htonl(tmp_num);
+      // 获取学生姓名，不需要进行端序转换,因为字符数组以一个字节为单位进行存储
+      printf("Please input student name:\n"); // 获取学生姓名
+      scanf("%s", stu_data.stu_name);
+      // 根据skfd向指定的UDP对端发送数据
+      ret = sendto(skfd, (void *)&stu_data, sizeof(stu_data), 0, (struct sockaddr *)&peer_addr, sizeof(peer_addr));
+      if(ret == -1) print_error("sendto fail");
+  }
+  ```
 
 #### （2）recvfrom
 
@@ -126,21 +162,85 @@ ssize_t sendto(int sockfd, const void *buf, size_t len, int flags, const struct 
   + addrlen：src_addr的大小
 
 + 代码演示
+
+  ```c
+  ......
+  /* 第4步：注册线程函数，用于对端的消息 */
+  pthread_t recv_thread_id; // 接收对端消息的线程id
+  ret = pthread_create(&recv_thread_id, NULL, pth_func, NULL); // 注册消息接收线程
+  if(ret != 0) print_error("pthread_create fail");
+  ......
+  /* 线程处理函数，用于从读取客户端发送过来的消息,用于第6步 */
+  void *pth_func(void *path_arg)
+  {
+      int ret = -1;
+      student stu_data = {0};
+      unsigned int peer_addr_size = 0;
+
+      while(1){
+          bzero(&stu_data, sizeof(stu_data)); // 清空结构体中的数据
+          peer_addr_size = sizeof(peer_addr); // 设置信息题大小
+          ret = recvfrom(skfd, (void*)&stu_data, sizeof(stu_data), 0, (struct sockaddr *)&peer_addr, &peer_addr_size); 
+          if(ret == -1) print_error("recvfrom fail");
+          printf("peer_port= %d, peer_addr=%s\n", ntohs(peer_addr.sin_port), inet_ntoa(peer_addr.sin_addr)); // 打印客户端端口和IP，一定要先进行端序转换
+          printf("student number = %d\n", ntohl(stu_data.stu_num)); // 打印学号，记得把数据从网络端序转为主机断端序
+          printf("student name = %s\n", stu_data.stu_name); // 1个字符存储的无需进行端序转换
+      } 
+  }
+  ......
+  ```
+  
   UDP因为没有“连接和应答”这种确认机制，所以UDP是不可靠通信，不过我们自己可以在应用层加入确认机制，以弥补UDP的补足
 
   比如每次使用UDP通信发送数据给对方后，对方必须回答，如果对方没有回答或者回答数据有错，发送方就重发，以此保证UDP的通信的可靠性，这就是通过应用程序来弥补UDP的不可靠性
+  
+### 5.4.4 完整代码演示
 
-## 5.2 分析UDP的几种通信情况
+> 完整代码见[peer1.c](my_code/UDP/peer1.c)和[peer2.c](my_code/UDP/peer2.c)
+  
+执行结果如下：
 
-### 5.2.1 本机通信
+peer1.c
 
-### 5.2.2 局域网内跨机通信
+```shell
+root@6fb4b72f0c7c:/workspace/linuxc/chapter10socket/UDP# gcc peer1.c -pthread -o peer1
+root@6fb4b72f0c7c:/workspace/linuxc/chapter10socket/UDP# ./peer1 127.0.0.1 5001
+Please input student number:
+234
+Please input student name:
+lsg
+Please input student number:
+peer_port= 5001, peer_addr=127.0.0.1
+student number = 567
+student name = wangrui
+```
 
-### 5.2.3 过路由器，跨网通信
+peer2.c
+
+```shell
+root@6fb4b72f0c7c:/workspace/linuxc/chapter10socket/UDP# gcc peer2.c -pthread -o peer2
+root@6fb4b72f0c7c:/workspace/linuxc/chapter10socket/UDP# ./peer2 127.0.0.1 5006
+Please input student number:
+peer_port= 5006, peer_addr=127.0.0.1
+student number = 234
+student name = lsg
+567
+Please input student name:
+wangrui
+Please input student number:
+```
+
+## 5.5 分析UDP的几种通信情况
+
+### 5.5.1 本机通信
+
+### 5.5.2 局域网内跨机通信
+
+### 5.5.3 过路由器，跨网通信
 
 UDP跨网通信的前提是，必须要知道对方的公网ip，暂时先假设发送者本来就知道。
 
-## 5.3 使用UDP通信搭建出服务器
+## 5.6 使用UDP通信搭建出服务器
 
 有同学可能会有疑问说，不对啊，不是说UDP是“对等通信”，没有服务器吗，怎么还可以使用UDP搭建服务器呢？
 
@@ -154,21 +254,21 @@ UDP跨网通信的前提是，必须要知道对方的公网ip，暂时先假设
 + （2）多进程
 + （3）多路IO
 
-## 5.3 如何实现两台普通计算机之间的跨网通信
+## 5.7 如何实现两台普通计算机之间的跨网通信
 
 比如我的PC和我同事的PC之间想要进行跨网通信，方法有两种，
 
 + 第一种：通过服务器中转
 + 第二种：直接通信
 
-### 5.3.1 通过服务器中转
+### 5.7.1 通过服务器中转
 
 + （1）TCP
 + （2）UDP
 
 我们举例子时，直接举跨网通信的例子。
 
-### 5.3.2 直接通信
+### 5.7.2 直接通信
 
 PC之间如果要直接通信的话，只能使用UDP通信。
 
