@@ -71,7 +71,7 @@ int main(int argc, char **argv)
 	addr.sin_family = AF_INET;
 	addr.sin_port   = htons(5009);
 	//addr.sin_addr.s_addr = inet_addr("192.168.1.106"); 
-	addr.sin_addr.s_addr = inet_addr("192.168.1.106"); 
+	addr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
 
 	ret = bind(sockfd, (struct sockaddr *)&addr, sizeof(addr));
 	if(ret == -1) print_err("bind fial", __LINE__, errno);	
