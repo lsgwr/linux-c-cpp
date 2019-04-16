@@ -89,11 +89,13 @@ int main(int argc, char const *argv[])
 
     long cfd; // 存储服务器端和制定客户端通信的fd，一个客户端就需要服务器端分配一个cfd
     pthread_t recv_thread_id; // 接收客户端消息的线程id
-
+    struct sockaddr_in clnaddr = {}; // clnaddr : client address,用于存储客户端信息(ip和端口)的结构体
+    unsigned int clnaddr_size = sizeof(clnaddr);
     while(1){
         // 第4步：监听客户端连接
-        cfd = accept(skfd, NULL, NULL);
+        cfd = accept(skfd, (struct sockaddr *)&clnaddr, &clnaddr_size);
         if(cfd == -1) print_error("accept fail");
+        printf("cln_port= %d, cln_addr=%s\n", ntohs(clnaddr.sin_port), inet_ntoa(clnaddr.sin_addr)); // 打印客户端端口和IP，一定要先进行端序转换
         
         // 第5步：注册消息接收线程,把专用的fd传给线程，方便服务器给指定线程回消息
         ret = pthread_create(&recv_thread_id, NULL, pth_func, (void *)cfd); 
