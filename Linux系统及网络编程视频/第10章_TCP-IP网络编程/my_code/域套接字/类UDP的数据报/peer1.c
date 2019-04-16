@@ -9,9 +9,9 @@
 #include <netinet/in.h>
 #include <pthread.h>
 #include <signal.h>
+#include <sys/un.h>
 
-#define SELF_PORT 5006 // 当前UDP进程端口
-#define SELF_IP "127.0.0.1" // 当前UDP进程所在机器的IP
+#define SOCK_FILE "./sock_peer1"
 
 #define print_error(str) \
 do{\
@@ -21,7 +21,7 @@ do{\
 }while(0);
 
 int skfd = -1; // 两个UDP进程进行通信的fd
-struct sockaddr_in peer_addr = {0};  // 存放UDP对端的信息比如IP和端口
+struct sockaddr_un peer_addr = {0};  // 存放UDP对端的信息比如协议和套接字文件地址
 
 /* tcp通信时发送的数据(send函数使用)，这里以一个学生信息为例，用于第3、4步 */
 typedef struct tcpdata{
@@ -42,7 +42,6 @@ void *pth_func(void *path_arg)
         peer_addr_size = sizeof(peer_addr); // 设置信息题大小
         ret = recvfrom(skfd, (void*)&stu_data, sizeof(stu_data), 0, (struct sockaddr *)&peer_addr, &peer_addr_size); 
         if(ret == -1) print_error("recvfrom fail");
-        printf("peer_port= %d, peer_addr=%s\n", ntohs(peer_addr.sin_port), inet_ntoa(peer_addr.sin_addr)); // 打印客户端端口和IP，一定要先进行端序转换
         printf("student number = %d\n", ntohl(stu_data.stu_num)); // 打印学号，记得把数据从网络端序转为主机断端序
         printf("student name = %s\n", stu_data.stu_name); // 1个字符存储的无需进行端序转换
     } 
@@ -52,7 +51,7 @@ void *pth_func(void *path_arg)
 void signal_func(int signo)
 {
     if(signo == SIGINT){
-        shutdown(skfd, SHUT_RDWR); // 读写都断开
+        remove(SOCK_FILE);
         exit(0); // 退出服务器进程
     }
 }
@@ -60,7 +59,7 @@ void signal_func(int signo)
 int main(int argc, char const *argv[])
 {
     
-    if(argc != 3){
+    if(argc != 2){
         printf("you must offer ip and port of peer!\n");
         exit(-1);
     }
@@ -70,14 +69,13 @@ int main(int argc, char const *argv[])
     signal(SIGINT, signal_func);
 
     /* 第1步：创建使用TCP协议通信的套接字文件，客户端的套接字直接用于和服务器端通信*/
-    skfd = socket(AF_INET, SOCK_DGRAM, 0); // 一定注意第二个参数和TCP通信的不同
+    skfd = socket(AF_UNIX, SOCK_DGRAM, 0); // 一定注意第二个参数和TCP通信的不同
     if(skfd == -1) print_error("socket fail");
     
     /* 第2步：bind绑定固定的ip和端口 */
-    struct sockaddr_in self_addr; 
-    self_addr.sin_family = AF_INET; // 使用是IPV4 TCP/IP协议族的ip地址(32位)
-    self_addr.sin_port = htons(SELF_PORT); // 指定端口
-    self_addr.sin_addr.s_addr = inet_addr(SELF_IP); // 指定IP
+    struct sockaddr_un self_addr; 
+    self_addr.sun_family = AF_UNIX; // 使用是IPV4 TCP/IP协议族的ip地址(32位)
+    strcpy(self_addr.sun_path, SOCK_FILE);
     ret = bind(skfd, (struct sockaddr *)&self_addr, sizeof(self_addr)); // 绑定信息，记住第二个参数需要进行强制转换
     if(ret == -1) print_error("bind fail");
     
@@ -91,10 +89,9 @@ int main(int argc, char const *argv[])
     student stu_data = {0};
     unsigned int tmp_num; // 定义临时变量用于字节序转换
     while(1){
-        // 设置对端UDP进程的信息比如IP和端口等，需要命令行传参来指定.UDP通信每次收发数据都需要指定IP和端口
-        peer_addr.sin_family = AF_INET; // 使用是IPV4 TCP/IP协议族的ip地址(32位)
-        peer_addr.sin_port = htons(atoi(argv[2])); // 对端UDP进程端口
-        peer_addr.sin_addr.s_addr = inet_addr(argv[1]); // 对端UDP进程所在机器的IP
+        // 设置对端UDP套接字的信息
+        peer_addr.sun_family = AF_UNIX; // 使用是IPV4 TCP/IP协议族的ip地址(32位)
+        strcpy(peer_addr.sun_path, argv[1]); // 命令行传参得到对方UDP套接字文件路径
         bzero(&stu_data, sizeof(stu_data)); // 清空结构体中的数据
         // 获取学生学号,但是需要从主机端序转换为网络端序
         printf("Please input student number:\n"); 
