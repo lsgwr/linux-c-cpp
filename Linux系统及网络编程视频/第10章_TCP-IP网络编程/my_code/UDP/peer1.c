@@ -38,7 +38,7 @@ typedef struct tcpdata{
 
 
 /* 线程处理函数，用于从读取客户端发送过来的消息,用于第6步 */
-void *pth_func(void *path_arg)
+void *pth_func(void *pth_arg)
 {
     int ret = -1;
     student stu_data = {0};
