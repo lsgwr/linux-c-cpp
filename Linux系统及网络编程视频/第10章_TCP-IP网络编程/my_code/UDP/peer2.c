@@ -20,6 +20,13 @@ do{\
     exit(-1);\
 }while(0);
 
+#define print_error_thread(str, errno) \
+do{\
+    fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+    printf("%s:%s", str, strerror(errno));\
+    exit(-1);\
+}while(0);
+
 int skfd = -1; // 两个UDP进程进行通信的fd
 struct sockaddr_in peer_addr = {0};  // 存放UDP对端的信息比如IP和端口
 
@@ -85,7 +92,7 @@ int main(int argc, char const *argv[])
     /* 第4步：注册线程函数，用于对端的消息 */
     pthread_t recv_thread_id; // 接收对端消息的线程id
     ret = pthread_create(&recv_thread_id, NULL, pth_func, NULL); // 注册消息接收线程
-    if(ret != 0) print_error("pthread_create fail");
+    if(ret == -1) print_error_thread("pthread_create fail", ret); // 注意函数返回值用来设置perror
 
     /* 第3步：调用调用sendto给指定同伴发送数据 */
     student stu_data = {0};
