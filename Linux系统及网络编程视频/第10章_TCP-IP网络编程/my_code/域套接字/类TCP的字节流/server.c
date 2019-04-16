@@ -20,6 +20,13 @@ do{\
     exit(-1);\
 }while(0);
 
+#define print_error_thread(str, errno) \
+do{\
+    fprintf(stderr, "File %s, Line %d, Function %s error\n",__FILE__, __LINE__, __func__);\
+    printf("%s:%s", str, strerror(errno));\
+    exit(-1);\
+}while(0);
+
 /* tcp通信时发送的数据(send函数使用)，这里以一个学生信息为例，用于第5步 */
 typedef struct tcpdata{
     unsigned int stu_num; // 学号,无符号整型
@@ -29,7 +36,7 @@ typedef struct tcpdata{
 int cfd = -1; // 服务器端用于和指定客户端通信的指定fd,用于第4步
 
 /* 线程处理函数，用于从读取客户端发送过来的消息,用于第6步 */
-void *pth_func(void *path_arg)
+void *pth_func(void *pth_arg)
 {
     int ret = 0;
     student stu_data = {0};
@@ -84,7 +91,8 @@ int main(int argc, char const *argv[])
 
     /* 第6步：注册线程函数，用于接收客户端的消息 */
     pthread_t recv_thread_id; // 接收客户端消息的线程id
-    pthread_create(&recv_thread_id, NULL, pth_func, NULL); // 注册消息接收线程
+    ret = pthread_create(&recv_thread_id, NULL, pth_func, NULL); // 注册消息接收线程
+    if(ret == -1) print_error_thread("pthread_create fail", ret); // 注意函数返回值用来设置perror
 
     /* 第5步：服务器调用write(send)给指定客户端发送数据 */
     student stu_data = {0};
