@@ -10,7 +10,7 @@
 #include <pthread.h>
 #include <signal.h>
 
-#define SELF_PORT 5006 // 当前UDP进程端口
+#define SELF_PORT 5001 // 当前UDP进程端口
 #define SELF_IP "127.0.0.1" // 当前UDP进程所在机器的IP
 
 #define print_error(str) \
