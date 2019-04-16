@@ -70,7 +70,7 @@ int main(int argc, char const *argv[])
     signal(SIGINT, signal_func);
 
     /* 第1步：创建使用TCP协议通信的套接字文件，客户端的套接字直接用于和服务器端通信*/
-    skfd = socket(AF_INET, SOCK_STREAM, 0);
+    skfd = socket(AF_INET, SOCK_DGRAM, 0); // 一定注意第二个参数和TCP通信的不同
     if(skfd == -1) print_error("socket fail");
     
     /* 第2步：bind绑定固定的ip和端口 */
