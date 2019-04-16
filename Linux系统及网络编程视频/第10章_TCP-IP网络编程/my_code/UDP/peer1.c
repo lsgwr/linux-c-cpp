@@ -33,12 +33,13 @@ typedef struct tcpdata{
 /* 线程处理函数，用于从读取客户端发送过来的消息,用于第6步 */
 void *pth_func(void *path_arg)
 {
-    int ret = 0;
+    int ret = -1;
     student stu_data = {0};
-    unsigned int peer_addr_size = sizeof(peer_addr);
+    unsigned int peer_addr_size = 0;
 
     while(1){
         bzero(&stu_data, sizeof(stu_data)); // 清空结构体中的数据
+        peer_addr_size = sizeof(peer_addr); // 设置信息题大小
         ret = recvfrom(skfd, (void*)&stu_data, sizeof(stu_data), 0, (struct sockaddr *)&peer_addr, &peer_addr_size); 
         if(ret == -1) print_error("recvfrom fail");
         printf("peer_port= %d, peer_addr=%s\n", ntohs(peer_addr.sin_port), inet_ntoa(peer_addr.sin_addr)); // 打印客户端端口和IP，一定要先进行端序转换
@@ -60,10 +61,10 @@ int main(int argc, char const *argv[])
 {
     
     if(argc != 3){
-        printf("you must offer ip and port of peer!");
+        printf("you must offer ip and port of peer!\n");
         exit(-1);
     }
-    int ret = -1;
+    int ret = 0;
 
     /* 第5步：注册信号处理函数，用于关闭socket和退出线程 */
     signal(SIGINT, signal_func);
