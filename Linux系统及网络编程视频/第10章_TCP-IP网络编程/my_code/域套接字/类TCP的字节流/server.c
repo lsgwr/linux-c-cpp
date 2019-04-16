@@ -11,8 +11,6 @@
 #include <signal.h>
 #include <sys/un.h>
 
-#define SERVER_PORT 5006 // 服务器进行对外的端口
-#define SERVER_IP "100.106.115.113" // 服务器所在机器的IP
 #define SOCK_FILE "./sock"
 
 #define print_error(str) \
