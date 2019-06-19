@@ -6,3 +6,5 @@
 + [视频系列2：C++高性能服务器框架](https://www.bilibili.com/video/av53602631)
 + [上面视频的代码github仓库](https://github.com/sylar-yin/sylar)
 + [上面视频的老师个人网站](http://www.sylar.top/blog/)
++ [Linux C++ 开发环境搭建文字教程1](http://www.sylar.top/blog/?p=135)
++ [Linux C++ 开发环境搭建文字教程2](http://www.sylar.top/blog/?p=147)
