@@ -27,3 +27,7 @@
 + [第08章_C线程](https://edu.51cto.com/course/13512.html):C线程会被经常使用，因此本章很重要，本章重点是学会如何实现C线程，以及掌握C线程常用的资源保护机制
 + [第09章_高级IO](https://edu.51cto.com/course/13558.html):有关文件IO操作的一些高级用法，本章在后续Linux的学习中会经常使用到，因此本章很重要
 + [第10章_TCP-IP网络编程](https://edu.51cto.com/course/13655.html):理解什么是网络编程，加深对网络通信、以及TCP/IP协议族的理解，掌握Linux系统的常用的网络API，为学习C++/JAVA库所提供的网络API打基础
+
+## [从零开始开发服务器框架](https://www.bilibili.com/video/av53602631)
+
+> 本人从事互联网linux c++服务器开发10年，精通高性能，高并发，分布式系统的开发。有5年的时间，从事游戏后台服务器开发，5年电商服务器后台开发经验（推荐系统，abtest，搜索系统，监控，效果分析等）本系列视频教程是本人，总结从业以来10年的经验。从零开始开源出一套C++高性能服务器框架联系方式：QQ 564628276，微信：sylar-yin，个人主页：http://www.sylar.top, github: https://github.com/sylar-yin/sylar
