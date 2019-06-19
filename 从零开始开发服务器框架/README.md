@@ -1,1 +1,7 @@
 # 从零开始开发服务器框
+
+## 参考资料
+
++ [视频系列1：Linux C++ 开发环境搭建](https://www.bilibili.com/video/av56106619)
++ [视频系列2：C++高性能服务器框架](https://www.bilibili.com/video/av53602631)
++ [上面视频的代码github仓库]()
