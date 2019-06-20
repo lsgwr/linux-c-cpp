@@ -39,3 +39,10 @@
   " Quickly save your file.
   map <leader>w :w!<cr>
   ```
+
+## 2.2 Vim的四种模式
+
++ 普通模式：打开默认就是
++ 可视：v进入，可以对一整块区域进行操作
++ 插入：insert或i,添加文本
++ 命令：esc进入，和普通模式类似
