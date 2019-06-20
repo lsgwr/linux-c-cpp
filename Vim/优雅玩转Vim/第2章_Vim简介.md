@@ -30,6 +30,24 @@
 + `set showcmd`:输入命令时自动提示
 + `set autoindent`:自动缩进
 + `set smartindent`:智能缩进
++ `colorscheme slate`:主题设置，可选的主题有
+  + blue
+  + darkblue
+  + default
+  + delek
+  + desert
+  + elflord
+  + evening
+  + koehler
+  + morning
+  + murphy
+  + pablo
+  + peachpuff
+  + ron
+  + shine
+  + slate
+  + torte
+  + zellner
 + 设置快速保存
   ```vim
   " change the mapleader from \ to ,
@@ -51,10 +69,12 @@
 "                                                                              "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" Save 1,000 items in history
+" Save 1,000 items in history 
+" vim的命令历史，可以用上下箭头切换
 set history=1000
 
 " Show the line and column number of the cursor position
+# 最下方先当前的行列和命令信息
 set ruler
 
 " Display the incomplete commands in the bottom right-hand side of your screen.  
@@ -67,18 +87,22 @@ set wildmenu
 set scrolloff=5
 
 " Highlight search matches
+" 高亮显示搜索关键字
 set hlsearch
 
 " Enable incremental searching
+" 实时高亮显示搜索关键字
 set incsearch
 
 " Ignore case when searching
+" 忽略大小写
 set ignorecase
 
 " Override the 'ignorecase' option if the search pattern contains upper case characters.
 set smartcase
 
 " Turn on line numbering
+" 显示行号
 set number
 
 " Turn on file backups
@@ -88,6 +112,7 @@ set backup
 set lbr
 
 " Copy the indentation from the current line.
+" 自动缩进
 set autoindent
 
 " Enable smart autoindenting.
@@ -105,6 +130,7 @@ set tabstop=4
 
 
 " Specifiy a color scheme.
+" 主题设置
 colorscheme slate
 
 " Tell vim what background you are using
