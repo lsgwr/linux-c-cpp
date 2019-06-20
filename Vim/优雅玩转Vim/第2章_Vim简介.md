@@ -48,7 +48,7 @@
   + slate
   + torte
   + zellner
-+ 设置快速保存
++ 设置快速保存(ESC模式下先后按下`, w`实现不退出保存)
   ```vim
   " change the mapleader from \ to ,
   " NOTE: This has to be set before <leader> is used.
@@ -153,6 +153,7 @@ let mapleader=","
 
 " Quickly save your file.
 map <leader>w :w!<cr>
+" 设置快速保存(ESC模式下先后按下`, w`实现不退出保存)
 
 " For more options see ":help option-list" and ":options".
 ```
