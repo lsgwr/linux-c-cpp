@@ -1,6 +1,6 @@
-# linux-c-51cto
+# linux-c-cpp
 
-> 51CTO上的C语言基础和Linux编程视频教程
+> C、C++和其在Linux下的编程学习，主要是51CTO、传智播客、一些经典书籍的学习等
 
 ## [C语言深度解析](https://edu.51cto.com/topic/1756.html)
 
