@@ -1,0 +1,5 @@
+result= $(firstword hello world china)		# 调用取第一个单词的函数
+all :
+	echo -n "the result is :"
+	echo $(result) 								# 输出结果
+.PHONY: all

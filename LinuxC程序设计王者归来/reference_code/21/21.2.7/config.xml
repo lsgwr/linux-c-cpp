@@ -1,0 +1,14 @@
+<!-- #config of network 			有关网络的配置信息 -->
+<network>
+	<ip>ip</ip>
+	<port>port</port>
+	<home-path>home-path</home-path>
+</network>
+
+<!-- #config of database				有关数据库的配置信息 -->
+<database>
+	<server>server</server>
+	<user>user</user>
+	<password>password</password>
+</database>
+

@@ -1,0 +1,5 @@
+result= $(sort hello world hello china)	#字符串中的单词排序，去掉相同的词
+all :
+	echo -n "the result is :"
+	echo $(result) 							#输出结果
+.PHONY: all

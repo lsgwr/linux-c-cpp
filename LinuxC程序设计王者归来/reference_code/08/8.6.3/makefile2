@@ -1,0 +1,5 @@
+result= $(notdir test.c /home/admin/test.c)	# 调用取文件的函数
+all :
+	echo -n "the result is :"
+	echo $(result)										# 输出结果
+.PHONY: all

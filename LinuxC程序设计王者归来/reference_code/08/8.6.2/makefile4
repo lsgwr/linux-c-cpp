@@ -1,0 +1,5 @@
+result=$(findstring h,hello)			# 查找字符串
+all : 
+	echo -n "the result is : "
+	echo $(result) 						# 输出结果
+.PHONY: all

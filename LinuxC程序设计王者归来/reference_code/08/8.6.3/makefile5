@@ -1,0 +1,5 @@
+result= $(addsuffix .c,a b c)			# 调用添加后缀的函数
+all : 
+	echo -n "the result is :"
+	echo $(result)						# 输出结果
+.PHONY: all

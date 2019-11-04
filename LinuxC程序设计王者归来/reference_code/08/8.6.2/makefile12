@@ -1,0 +1,6 @@
+#取字符串中的最后一个单词
+result= $(word $(words hello world china)，hello world china)
+all :
+	echo -n "the result is :"
+	echo $(result) 								#输出结果
+.PHONY: all

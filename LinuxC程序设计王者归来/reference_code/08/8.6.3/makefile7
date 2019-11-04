@@ -1,0 +1,10 @@
+#第一次调用连接函数
+result1=$(join /home/ /home/, test1.c test2.c test3.c)
+#第二次调用连接函数，缺少一个文件名
+result2=$(join /home/ /home/ /home/, test1.c test2.c) 
+all : 
+	echo -n "the result1 is : "
+	echo $(result1)						# 输出结果
+	echo -n "the result2 is :"
+	echo $(result2)						# 输出结果
+.PHONY: all

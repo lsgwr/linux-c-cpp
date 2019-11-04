@@ -1,0 +1,11 @@
+result1= $(wordlist 1, 2, hello world china)	# 取单词串
+result2= $(wordlist 3, 2, hello world china)	# 取单词串
+result3= $(wordlist 2, 5, hello world china)	# 取单词串
+all :
+	echo -n "the result1 is :"
+	echo $(result1) 							# 输出结果
+	echo -n "the result2 is : "
+	echo $(result2)								# 输出结果
+	echo -n "the result3 is : "
+	echo $(result3)								# 输出结果
+.PHONY: all

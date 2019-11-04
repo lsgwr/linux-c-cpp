@@ -1,0 +1,5 @@
+foo = $(bar)
+bar = $(ugh)
+ugh = Huh?
+all:
+	@echo $(foo) # 输出变量foo

@@ -1,0 +1,6 @@
+y := $(x) bar 
+x := foo 
+all: 
+	echo $(y) # 输出变量y
+.PHONY:all
+

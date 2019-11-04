@@ -1,0 +1,5 @@
+result= $(sort hello world china)			# 字符串中的单词排序
+all : 
+	echo -n "the result is : "
+	echo $(result) 							# 输出结果
+.PHONY: all

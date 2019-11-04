@@ -1,0 +1,1 @@
+#include <stdlib.h>int main(void){	exit(3); /* 退出的状态码，可以在shell中被检测到 */}

@@ -1,0 +1,14 @@
+var1=
+var2=hello
+all:
+ifdef var1
+	echo "var1 is defined"
+else
+	echo "var1 is undefined"
+endif
+ifeq ($(var1),$(var2))
+	echo "they are equal"
+else
+	echo "they are not equal" $(var2) $(var1)
+endif
+.PHONY:all

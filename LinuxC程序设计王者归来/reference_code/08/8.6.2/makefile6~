@@ -1,0 +1,7 @@
+sources := a.c b.c c.c d.h e f
+result= $(filter -out %.c %.h,$(sources))			#使用反过滤函数
+all :
+	echo -n "the result is :"
+	echo $(result) 									#输出结果
+.PHONY: all
+

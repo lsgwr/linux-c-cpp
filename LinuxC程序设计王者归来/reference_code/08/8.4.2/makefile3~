@@ -1,0 +1,8 @@
+a := hello
+b ?= world
+a ?= HELLO
+all:
+	echo $(a) # 输出变量a
+	echo $(b) # 输出变量b
+.PHONY: all
+

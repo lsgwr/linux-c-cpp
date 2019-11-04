@@ -1,0 +1,5 @@
+result =$(strip    hello world    )	#”hello world”头尾各包含4个空格
+all :
+	echo -n "the result is : "
+	echo $(result) 					#输出结果
+.PHONY: all

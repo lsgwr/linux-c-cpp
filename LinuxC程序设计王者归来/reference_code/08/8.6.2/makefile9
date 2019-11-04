@@ -1,0 +1,8 @@
+result1= $(word 2, hello world china)	# 取单词world
+result2= $(word 5, hello world china)	# 取一个不存在的单词
+all :
+	echo -n "the result1 is : "
+	echo $(result1) 					# 输出结果
+	echo -n "the result2 is : "
+	echo $(result2)						# 输出结果
+.PHONY: all

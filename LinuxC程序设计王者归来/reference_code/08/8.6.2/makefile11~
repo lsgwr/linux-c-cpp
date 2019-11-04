@@ -1,0 +1,6 @@
+result=$(words hello world china)			# 统计单词的个数
+all : 
+	echo -n "the result is : "
+	echo $(result) 							# 输出结果
+.PHONY: all
+

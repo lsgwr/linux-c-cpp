@@ -1,0 +1,6 @@
+add = $(1) + $(2)				#定义一个函数，求两个参数的和
+result := $(call add, 1, 2)	# 调用这个函数
+all : 
+	echo -n "the result is : "
+	echo $(result) # 输出结果
+.PHONY: all

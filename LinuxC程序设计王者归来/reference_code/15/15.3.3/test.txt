@@ -1,0 +1,2 @@
+new thread heap:3 stack :4
+main thread: heap:4 stack :5

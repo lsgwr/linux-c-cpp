@@ -1,0 +1,6 @@
+# 调用取后缀的函数
+result=$(suffix test.txt /home/admin/test.c file)
+all : 
+	echo -n "the result is :"
+	echo $(result)											# 输出结果
+.PHONY: all

@@ -1,0 +1,29 @@
+CC = gcc 											# 使用gcc编译器
+FLAGS = -c  										# 使用-c编译选项
+objects = main.o kbd.o command.o display.o \ 		# 使用变量代替模块
+          insert.o search.o files.o utils.o
+
+edit : $(objects) 
+	$(CC) -o edit $(objects)
+
+main.o : main.c defs.h
+	$(CC) $(FLAGS) main.c
+kbd.o : kbd.c defs.h command.h
+	$(CC) $(FLAGS) kbd.c
+command.o : command.c defs.h command.h
+	$(CC) $(FLAGS) command.c
+display.o : display.c defs.h buffer.h
+	$(CC) $(FLAGS) display.c
+insert.o : insert.c defs.h buffer.h
+	$(CC) $(FLAGS) insert.c
+search.o : search.c defs.h buffer.h
+	$(CC) $(FLAGS) search.c
+files.o : files.c defs.h buffer.h command.h
+	$(CC) $(FLAGS) files.c
+utils.o : utils.c defs.h
+	$(CC) $(FLAGS) utils.c
+
+clean :
+	rm edit $(objects)
+
+.PHONY: clean

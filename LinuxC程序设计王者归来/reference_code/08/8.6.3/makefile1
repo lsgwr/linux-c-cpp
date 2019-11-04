@@ -1,0 +1,5 @@
+result= $(dir test.c /home/admin/test.c)		#调用取目录的函数
+all :
+	echo -n "the result is :"
+	echo $(result)								# 输出结果
+.PHONY: all
