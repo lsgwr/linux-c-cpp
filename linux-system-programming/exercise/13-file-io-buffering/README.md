@@ -1,0 +1,120 @@
+Chapter 13: File I/O Buffering
+==============================
+
+Exercise 13-1
+-------------
+
+**Question**
+
+Using the time built-in command of the shell, try timing the operation
+of the program in Listing 4-1 (copy.c) on your system.
+
+**Answer**
+
+(a) Experiment with different file and buffer sizes.  You can set the
+buffer size using the -DBUF_SIZE=nbytes option when compiling the
+program.
+
+With different buffer sizes:
+
+ - 10 bytes: 0.206 secs
+ - 512 bytes: 0.013 secs
+ - 512000 bytes: 0.007 secs
+
+(b) Modify the open() system call to include the O_SYNC flag.  How
+much difference does this make to the speed for various buffer sizes?
+
+ - 10 bytes: 778.368 secs
+ - 512 bytes: 14.408 secs
+ - 512000 bytes: 0.042 secs 
+
+(c) Try performing these timing tests on a range of file systems
+(e.g. ext3, XFS, btrfs, and JFS).  Are the results similar?  Are the
+trendsw the same when going from small to large buffer sizes?
+
+  - Didn't try, in general the trend seems to hold for this kind of
+    workload.  Readahead can be terrible in some cases (EEPROM).  Even
+    broken sometimes.
+
+Exercise 13-2
+-------------
+
+**Question**
+
+Time the operation of the filebuff/write_bytes.c program (provided in
+the source code distribution for this book) for various buffer sizes
+and file systems.
+
+**Answer**
+
+Here's the output from the tests in ./run_write_test.sh as generated
+by the build with a few different params.
+
+     == write_bytes tests ==
+     ./prog_write_bytes testfile3.txt 10000000 10
+     time: 0.457s
+     ./prog_write_bytes testfile3.txt 10000000 512
+     time: 0.013s
+     ./prog_write_bytes testfile3.txt 10000000 1024
+     time: 0.008s
+     ./prog_write_bytes testfile3.txt 10000000 10000
+     time: 0.005s
+
+Exercise 13-3
+-------------
+
+**Question**
+
+What is the effect of the following statements?
+
+     fflush(fp);
+     fsync(fileno(fp));
+
+**Answer**
+
+`fflush(fp)` flushes all data in the user space buffer associated with the stream `fp` to the kernel 
+space buffer using system call `write`.
+
+`fd = fileno(fp)` gets the corresponding file descriptor associated with the stream `fp`, then `fsync(fd)`
+flushes the kernel space buffer data associated with the file descriptor to disk (or disk caches).
+
+Thus the two calls ensures that the data in the user space buffer is written into disk (or disk caches).
+
+__These commands will ensure that all bytes that have been written to a
+stream will be flushed into kernel buffers and subsequently written to
+disk before program execution continues.  Basically, it ensure that
+all writes have been written (for this open file).__
+
+Exercise 13-4
+-------------
+
+**Question**
+
+Explain why the output of the following code differs depending on
+whether standard output is redirected to a terminal or to a disk file.
+
+    printf("If I had more time, \n");
+    write(STDOUT_FILENO, "I would have written you a shorter letter.\n", 43);
+
+**Answer**
+
+Different file types handle buffered IO in different ways.  Calls to
+write() are not bufferd (by libc printf) but calls to printf may be
+depending on where stdout is directed.  In particular, when flushed to
+file, IO is done in terms of blocks and stdio is not flushed until the
+process exits.  Write calls are written immediately.
+
+Exercise 13-5
+-------------
+
+**Question**
+
+The command `tail [ -n num ] file` prints the last `num` lines (ten by
+default) of the named file.  Implement this command using I/O system
+calls (lseek() , read(), write(), and so on).  Keep in mind the
+buffering issues described in this chapter, in order to make the
+implementation efficient.
+
+**Answer**
+
+See `tail.c`

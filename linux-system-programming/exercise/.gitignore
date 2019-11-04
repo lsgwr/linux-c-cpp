@@ -1,0 +1,26 @@
+# Editor files
+*~
+\#*\#
+
+# C Object Files
+a.out
+*.o
+*.a
+build_*
+
+# Python Files
+*.pyc
+*.pyo
+
+# Scons trash
+.sconsign*
+
+# Our binary executables (pattern for scons scripts)
+prog_*
+
+# eclipse trash
+*.*project*
+
+# test files
+testfile*.txt
+tfile
