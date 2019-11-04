@@ -1,0 +1,192 @@
+.gz ---- gzip   不保留源文件   不能对目录进行打包压缩
+
+.bz2 --- bzip2  -k 来保留源文件  不能对目录进行打包压缩
+
+tar： 压缩：tar zcvf 新起的压缩包名字.tar.gz   原材料
+	
+      解压：tar zxvf 已有的压缩包
+
+前台：能够跟用户完成交互。
+
+后台：不能直接跟用户交互。
+
+
+sudo adduser lisi 添加李四用户  他默认属于李四用户组
+
+sudo adduser liwu 添加李五用户  他默认属于李五用户组
+
+sudo adduser liwu lisi   将 李五用户加入到李四用户组
+
+sudo deluser lisi  删除用户lisi
+
+sudo delgroup  liwu  删除用户组李五
+
+----------------------------------
+
+服务器：
+
+1. 安装	sudo apt-get install vsftpd
+
+2. 配置	sudo vi /etc/vsftpd.conf
+
+	尽量不要手写内容到文件中。通过打开、关闭注释的方式调整该文件。
+
+3. 启动 （重启——如果修改过配置必须重启）
+
+   	sudo service vsftpd restart
+
+4. 客户端发起链接
+
+	ftp 127.0.0.1（自己充当服务器、自己充当客户端）
+
+	ftp 192.168.36.xxx（对方IP）
+
+5. 数据传递(上传、下载)
+
+	下载：get	非目录
+
+	上传：put	非目录
+
+6. 关闭连接
+	quit/exit/bye
+
+
+匿名用户：
+
+1. 创建匿名用户登录位置。
+
+	cat /etc/passwd | grep ftp  查找本机默认指定 匿名用户登录位置。——/srv/ftp
+
+2. sudo mkdir /srv/ftp/incoming
+
+3. sudo chown ftp:nogroup /srv/ftp/incoming ——所有者：ftp  所属组：nogroup
+
+4. 修改配置文件，给匿名用户开放各种权限。/etc/vasftpd.conf
+
+5. sudo service vsftpd restart
+
+6. ps aux | grep ftp   ——查询结果应为2+ 才表示启动成功
+
+7. ftp 127.0.0.1  ——用户名：anonymous   密码：回车
+
+8. 默认匿名用户登录上以后在/srv/ftp(默认)
+
+9. cd  incoming (注意目录权限)
+
+10  put 上传  get 下载。
+
+---------------------------
+
+lftp使用：
+
+1. sudo apt-get install lftp  安装lftp客户端
+
+2. 配置vsftpd.conf(与ftp共享同一个配置文件)
+
+3. restart
+
+4. 登录lftp 127.1
+
+5. login itcat/anonymous	(匿名用户可省略该步)
+
+6. mirror -R 上传目录
+
+7. mirror  目录下载
+
+8. bye
+
+
+上传位置：ftp或lftp登录后，cd到哪个目录执行put/mirror -R 就上传至哪个目录。
+
+
+下载位置：默认情况从哪个目录执行了ftp 127.0.0.1 就get到哪个目录，
+	
+	  可以使用lcd 改变本地机的工作目录位置。lcd ..可以修改至上级目录
+
+	  !ls 列出本地机列表项。
+
+	  !pwd 查看本地机工作目录位置
+
+-----------------------------
+
+nfs使用流程：
+
+1.安装：sudo apt-get install nfs-kernel-server
+
+2.创建一个欲共享出去的目录 如：/home/itcast/itcast
+
+3.打开配置文件：sudo vi /etc/exports 
+
+4.写入共享目录的绝对路径，及对应权限。如：
+	
+	/home/itcast/itcast *（ro,sync,no_root_squash）
+5.重启nfs  
+	
+	sudo /etc/init.d/nfs-kernel-server restart
+
+	-------------------------
+
+6.客户端访问共享目录：
+
+	sudo mount 192.168.43.75:/home/itcast/itcast/ /mnt
+
+7. cd 到本机的/mnt 目录中就可以使用cp命令得到目录中的所有文件。
+
+
+【常见错误】：1. 虚拟机下出现“不能mount实体”错误时，需在mount之前使用
+
+		 install nfs-common 即可解决。
+	  
+	      2. 出现“超级坏块儿”错误无法挂载，多是因为没有安装nfs-kernel-server导致。
+
+
+
+
+对比语法格式：
+
+nfs：sudo mount　192.168.43.75:/home/itcast/itcast/ /mnt
+
+ssh: ssh itcast@192.168.43.75   ——>yes   密码
+
+scp -r itcast@192.168.43.75:/home/itcast/aa ../
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

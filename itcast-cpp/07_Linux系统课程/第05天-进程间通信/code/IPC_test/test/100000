@@ -1,0 +1,6 @@
+root      1198  0.0  0.1  15000  2160 ?        Ss    1月12   0:00 /usr/sbin/xinetd -dontfork -pidfile /var/run/xinetd.pid -stayalive -inetd_compat -inetd_ipv6
+nobody    1206  0.0  0.0  14972  1952 ?        Ss    1月12   0:00 /usr/bin/gdomap -I /var/run/gdomap.pid -p
+root      1259  0.0  0.0   4372  1660 ?        Ss    1月12   0:06 acpid -c /etc/acpi/events -s /var/run/acpid.socket
+nobody    2528  0.0  0.1  35232  2884 ?        S     1月12   0:00 /usr/sbin/dnsmasq --no-resolv --keep-in-foreground --no-hosts --bind-interfaces --pid-file=/run/sendsigs.omit.d/network-manager.dnsmasq.pid --listen-address=127.0.1.1 --conf-file=/var/run/NetworkManager/dnsmasq.conf --cache-size=0 --proxy-dnssec --enable-dbus=org.freedesktop.NetworkManager.dnsmasq --conf-dir=/etc/NetworkManager/dnsmasq.d
+root     12827  0.0  0.2  10236  5244 ?        S    09:00   0:00 /sbin/dhclient -d -sf /usr/lib/NetworkManager/nm-dhcp-client.action -pf /run/sendsigs.omit.d/network-manager.dhclient-eth0.pid -lf /var/lib/NetworkManager/dhclient-17695118-c4ee-4532-9f9b-e248e5c00080-eth0.lease -cf /var/lib/NetworkManager/dhclient-eth0.conf eth0
+itcast   13877  0.0  0.1  15964  2236 pts/0    S+   11:39   0:00 grep --color=auto pid

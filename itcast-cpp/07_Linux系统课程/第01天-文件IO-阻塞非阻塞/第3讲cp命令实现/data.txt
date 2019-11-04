@@ -1,0 +1,9 @@
+read/write函数	
+ssize_t read(int fd, void *buf, size_t count); 
+ssize_t write(int fd, const void *buf, size_t count); 
+
+read与write函数原型类似。使用时需注意：read/write函数的第三个参数。
+
+练习：编写程序实现简单的cp功能。
+
+程序比较：如果一个只读一个字节实现文件拷贝，使用read、write效率高，还是使用对应的标库函数效率高呢？
