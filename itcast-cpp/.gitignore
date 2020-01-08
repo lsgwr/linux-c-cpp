@@ -1,37 +1,4 @@
-# Prerequisites
-*.d
+cmake-build-debug/
+.idea/
+*.iml
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-07_Linux系统课程/第01天-文件IO-阻塞非阻塞）/~$nux系统编程--文件IO.docx
-07_Linux系统课程/第01天-文件IO-阻塞非阻塞/code/O_CREATE
-07_Linux系统课程/第01天-文件IO-阻塞非阻塞/code/O_RDONLY
-07_Linux系统课程/第01天-文件IO-阻塞非阻塞/code/O_RDWR_wrrno
-07_Linux系统课程/第02天-文件系统-目录操作-dup2/~$nux系统编程--文件系统.docx

@@ -1,9 +1,0 @@
-{
-    "editor.fontFamily": "consolas",
-    "editor.fontSize": 11,
-    "files.associations": {
-        "unistd.h": "c",
-        "stdlib.h": "c",
-        "ioctl.h": "c"
-    }
-}
