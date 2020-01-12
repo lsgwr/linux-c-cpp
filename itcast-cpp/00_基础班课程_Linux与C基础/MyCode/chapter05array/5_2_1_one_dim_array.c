@@ -12,7 +12,7 @@ int main() {
         a[i] = i;
     }
     for (int i = 0; i < 10; ++i) {
-        printf("%d\t", a[i]);
+        printf("%d\ta", a[i]);
     }
     printf("\n");
     return 0;
