@@ -37,4 +37,21 @@ add_executable(5_5_6_15 chapter05array/5_5_6_15_strstr.c)
 add_executable(5_5_6_16 chapter05array/5_5_6_16_strtok.c)
 add_executable(5_5_6_17 chapter05array/5_5_6_17_atox.c)
 
+# 第6章 函数
 add_executable(6 chapter6function/main.c chapter6function/func.h chapter6function/func.c)
+
+# 第7章 指针
+add_executable(7_2_1 chapter7pointer/7_2_1_def_init.c)
+add_executable(7_2_2 chapter7pointer/7_2_2_modify_pointer.c)
+add_executable(7_2_3 chapter7pointer/7_2_3_size_of_pointer.c)
+add_executable(7_2_4 chapter7pointer/7_2_4_wild_pointer.c)
+add_executable(7_2_5 chapter7pointer/7_2_5_void_pointer.c)
+add_executable(7_2_6 chapter7pointer/7_2_6_const_pointer.c)
+add_executable(7_3_1 chapter7pointer/7_3_1_array_name_pointer.c)
+add_executable(7_3_2_1 chapter7pointer/7_3_3_pointer_add.c)
+add_executable(7_3_2_2 chapter7pointer/7_3_3_pointer_sub.c)
+add_executable(7_3_4 chapter7pointer/7_3_4_pointer_array.c)
+add_executable(7_4 chapter7pointer/7_4_multi_level_pointer.c)
+add_executable(7_5_1 chapter7pointer/7_5_1_func_pointer_params.c)
+add_executable(7_5_2 chapter7pointer/7_5_2_array_as_params.c)
+add_executable(7_5_3 chapter7pointer/7_5_3_pointer_as_return.c)
