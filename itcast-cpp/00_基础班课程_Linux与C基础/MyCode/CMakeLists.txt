@@ -3,7 +3,6 @@ project(MyCode C)
 
 set(CMAKE_C_STANDARD 99)
 
-add_executable(MyCode main.c)
 # 第5章 数组和字符串
 add_executable(5_2_1 chapter05array/5_2_1_one_dim_array.c)
 add_executable(5_2_2 chapter05array/5_2_2_one_dim_array_init.c)
@@ -37,3 +36,5 @@ add_executable(5_5_6_14 chapter05array/5_5_6_14_strchr.c)
 add_executable(5_5_6_15 chapter05array/5_5_6_15_strstr.c)
 add_executable(5_5_6_16 chapter05array/5_5_6_16_strtok.c)
 add_executable(5_5_6_17 chapter05array/5_5_6_17_atox.c)
+
+add_executable(6 chapter6function/main.c chapter6function/func.h chapter6function/func.c)
