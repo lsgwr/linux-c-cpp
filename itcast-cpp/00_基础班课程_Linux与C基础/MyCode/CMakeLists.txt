@@ -62,3 +62,10 @@ add_executable(7_6_4 chapter07pointer/7_6_4_main_pointer_argv.c)
 add_executable(7_6_5_1 chapter07pointer/7_6_5_1_str_while.c)
 add_executable(7_6_5_2 chapter07pointer/7_6_5_2_both_direction_iteration.c)
 add_executable(7_6_5_3 chapter07pointer/7_6_5_3_str_inverse.c)
+
+# 第8章 内存管理
+add_executable(8_1_1 chapter08memory/8_1_1_auto.c)
+add_executable(8_1_2 chapter08memory/8_1_2_static.c)
+add_executable(8_2_2 chapter08memory/8_2_2_memory_type.c)
+add_executable(8_2_3_1 chapter08memory/8_2_3_1_memset.c)
+add_executable(8_2_3_2 chapter08memory/8_2_3_2_memcpy.c)
