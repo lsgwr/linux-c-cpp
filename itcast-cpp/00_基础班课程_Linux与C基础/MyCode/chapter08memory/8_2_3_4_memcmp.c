@@ -1,8 +1,8 @@
 /***********************************************************
- * @Description : 内存操作函数之memcpy(dst, src, n)
- * 拷贝src所指的内存内容的前n个字节到dst所指的内存地址上
+ * @Description : 内存操作函数之memcmp(s1, s2, n)
+ * 比较s1和s2所指向内存区域的前n个字节
  * @author      : 梁山广(Liang Shan Guang)
- * @date        : 2020/1/13 08：06
+ * @date        : 2020/1/13 23:52
  * @email       : liangshanguang2@gmail.com
  ***********************************************************/
 #include <stdio.h>
@@ -10,14 +10,12 @@
 
 int main(void) {
     int a[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int b[10];
+    int b[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-    memcpy(b, a, sizeof(a));
-    for (int i = 0; i < 10; ++i) {
-        printf("%d\t", b[i]);
-    }
+    int flag = memcmp(a, b, sizeof(a));
+    printf("flag = %d\n", flag);
     return 0;
 }
 /**
- * 1	2	3	4	5	6	7	8	9	10
+ * 0
  */
