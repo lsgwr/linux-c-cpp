@@ -76,3 +76,8 @@ add_executable(8_3_2 chapter08memory/8_3_2_data.c)
 add_executable(8_3_3 chapter08memory/8_3_3_val_pass.c)
 add_executable(8_3_4 chapter08memory/8_3_4_val_pass.c)
 add_executable(8_3_5 chapter08memory/8_3_5_heap.c)
+
+# 第9章 复合类型(就结构体、共用体、枚举和typedef)
+add_executable(9_1_3 chapter09struct/9_1_3_basic_use.c)
+add_executable(9_1_4 chapter09struct/9_1_4_struct_arr.c)
+add_executable(9_1_5 chapter09struct/9_1_5_struct_in_struct.c)
