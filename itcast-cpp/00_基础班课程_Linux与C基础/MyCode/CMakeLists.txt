@@ -90,3 +90,11 @@ add_executable(9_1_8_2 chapter09struct/9_1_8_2_struct_pointer_as_func_params.c)
 add_executable(9_1_8_3 chapter09struct/9_1_8_3_struct_arr_pointer_as_func_params.c)
 add_executable(9_3 chapter09struct/9_3_enum.c)
 add_executable(9_4 chapter09struct/9_4_typedef.c)
+
+# 第10章 文件操作
+add_executable(10_2_2 chapter10file/10_2_2_fopen.c)
+add_executable(10_2_3 chapter10file/10_2_3_fclose.c)
+add_executable(10_3_1_1 chapter10file/10_3_1_1_fputc.c)
+add_executable(10_3_1_3 chapter10file/10_3_1_3_fgetc.c)
+add_executable(10_3_2_1 chapter10file/10_3_2_1_fputs.c)
+add_executable(10_3_2_2 chapter10file/10_3_2_2_fgets.c)
