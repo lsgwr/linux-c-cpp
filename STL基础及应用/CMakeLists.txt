@@ -18,3 +18,9 @@ add_executable(02_05 第02章_模板/P12_模板与运算符重载.cpp)
 add_executable(03_01 第03章_迭代器/P17_为数组和链表编制共同的显示函数.cpp)
 add_executable(03_02 第03章_迭代器/P26_STL输入迭代器.cpp)
 add_executable(03_03 第03章_迭代器/P28_STL输出迭代器.cpp)
+
+# 第4章 输入输出流
+add_executable(04_01 第04章_输入输出流/P31_标准输入输出流给不同变量赋值.cpp)
+add_executable(04_02 第04章_输入输出流/P32_标准输入给不同类型变量赋值的不足示例.cpp)
+add_executable(04_03 第04章_输入输出流/P33_get和getline函数示例.cpp)
+add_executable(04_04 第04章_输入输出流/P34_判断是否是输入地整数.cpp)
