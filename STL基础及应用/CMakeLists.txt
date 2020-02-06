@@ -24,3 +24,8 @@ add_executable(04_01 第04章_输入输出流/P31_标准输入输出流给不同
 add_executable(04_02 第04章_输入输出流/P32_标准输入给不同类型变量赋值的不足示例.cpp)
 add_executable(04_03 第04章_输入输出流/P33_get和getline函数示例.cpp)
 add_executable(04_04 第04章_输入输出流/P34_判断是否是输入地整数.cpp)
+add_executable(04_05 第04章_输入输出流/P35_确保输入一个整型数给变量a.cpp)
+add_executable(04_06 第04章_输入输出流/P37_读文本文件并显示在屏幕上.cpp)
+add_executable(04_07 第04章_输入输出流/P37_把学生信息保存到文件中.cpp)
+add_executable(04_08 第04章_输入输出流/P38_write写二进制文件.cpp)
+add_executable(04_09 第04章_输入输出流/P38_读取二进制文件.cpp)
