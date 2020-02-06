@@ -19,16 +19,16 @@ char *getMem1(int num) {
 }
 
 // 栈区：局部变量
-char *getMem2(){
+char *getMem2() {
     char buf[64]; // 局部变量，栈区存放
     strcpy(buf, "123456789");
     return buf;
 }
 
-int main(void){
+int main(void) {
     char *tmp = NULL;
     tmp = getMem1(10);
-    if (tmp == NULL){
+    if (tmp == NULL) {
         return -1;
     }
     strcpy(tmp, "2222111"); // 向堆中的tmp指向的内存空间copy数据
@@ -37,3 +37,7 @@ int main(void){
     printf("%s\n", tmp); // 打印为空，因为栈中的变量出了函数就被释放了
     return 0;
 }
+/*
+2222111
+123456789
+ */

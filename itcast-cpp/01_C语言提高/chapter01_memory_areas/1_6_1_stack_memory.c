@@ -6,7 +6,7 @@
  ***********************************************************/
 #include <stdio.h>
 
-int main(void){
+int main(void) {
     int a;
     int b;
     char buf[4];
@@ -17,3 +17,9 @@ int main(void){
     printf("buf+1的地址：%p\n", &buf[1]);
     return 0;
 }
+/*
+&a:0x7ffeefae18c8
+&b:0x7ffeefae18c4
+buf的地址：0x7ffeefae18c0
+buf+1的地址：0x7ffeefae18c1
+ */

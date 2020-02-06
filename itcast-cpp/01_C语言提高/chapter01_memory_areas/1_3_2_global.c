@@ -28,3 +28,7 @@ int main(void){
     printf("p1:%p, p2:%p \n", p1, p2);
     return 0;
 }
+/*
+p1:abcdefg1, p2:abcdefg2
+p1:0x109718f7e, p2:0x109718f87
+ */
