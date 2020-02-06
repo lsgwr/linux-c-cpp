@@ -13,3 +13,8 @@ add_executable(02_02 第02章_模板/P7_数组求和的函数模板.cpp)
 add_executable(02_03 第02章_模板/P8_traits技术举例.cpp)
 add_executable(02_04 第02章_模板/P10_traits技术进阶.cpp)
 add_executable(02_05 第02章_模板/P12_模板与运算符重载.cpp)
+
+# 第3章 迭代器
+add_executable(03_01 第03章_迭代器/P17_为数组和链表编制共同的显示函数.cpp)
+add_executable(03_02 第03章_迭代器/P26_STL输入迭代器.cpp)
+add_executable(03_03 第03章_迭代器/P28_STL输出迭代器.cpp)
