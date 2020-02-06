@@ -29,3 +29,5 @@ add_executable(04_06 第04章_输入输出流/P37_读文本文件并显示在屏
 add_executable(04_07 第04章_输入输出流/P37_把学生信息保存到文件中.cpp)
 add_executable(04_08 第04章_输入输出流/P38_write写二进制文件.cpp)
 add_executable(04_09 第04章_输入输出流/P38_读取二进制文件.cpp)
+add_executable(04_10 第04章_输入输出流/P39_读取文件所有内容.cpp)
+add_executable(04_11 第04章_输入输出流/P40_定位输入输出流.cpp)
