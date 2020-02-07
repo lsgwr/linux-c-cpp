@@ -9,7 +9,21 @@
 
 using namespace std;
 
-int main(){
-
+int main() {
+    string s = "what's your name?my name is TOM. How do you do?Fine, thanks";
+    int n = s.find("your");
+    cout << "the first your pos:" << n << endl;
+    n = s.find("you", 15);
+    cout << "the first your pos begin from 15:" << n << endl;
+    n = s.find_first_of("abcde");
+    cout << "find pos when char within abcde:" << n << endl;
+    n = s.find_first_of("abcde", 3);
+    cout << "find pos begin from 2 when char within abcde:" << n << endl;
     return 0;
 }
+/**
+the first your pos:7
+the first your pos begin from 15:40
+find pos when char within abcde:2
+find pos begin from 2 when char within abcde:13
+ */
