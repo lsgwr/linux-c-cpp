@@ -36,3 +36,10 @@ add_executable(04_13 第04章_输入输出流/P42_合并不同类型的数据到
 add_executable(04_14 第04章_输入输出流/P42_从键盘中读取学生对象并显示.cpp)
 add_executable(04_15 第04章_输入输出流/P44_从文本中读取每个学生的各科成绩_方法1.cpp)
 add_executable(04_16 第04章_输入输出流/P45_从文本中读取每个学生的各科成绩_方法2.cpp)
+
+# 第5章 字符串
+add_executable(05_01 第05章_字符串/P47_字符串的基本创建方式.cpp)
+add_executable(05_02 第05章_字符串/P48_迭代器创建方式.cpp)
+add_executable(05_03 第05章_字符串/P48_字符串插入.cpp)
+add_executable(05_04 第05章_字符串/P49_替换操作.cpp)
+add_executable(05_05 第05章_字符串/P51_字符串查询函数基本用法.cpp)
