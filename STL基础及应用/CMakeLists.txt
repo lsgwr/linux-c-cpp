@@ -3,7 +3,6 @@ project(STL)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(STL main.cpp)
 # 第1章 STL概述
 add_executable(01_01 第01章_STL概述/P3_命名空间.cpp)
 
@@ -50,3 +49,19 @@ add_executable(05_09_1 第05章_字符串/P54_利用STL拆分字符串1.cpp)
 add_executable(05_09_2 第05章_字符串/P55_利用STL拆分字符串2.cpp)
 add_executable(05_10 第05章_字符串/P56_STL实现trim功能.cpp)
 add_executable(05_11 第05章_字符串/P57_字符串工具类.cpp)
+
+# 第6章 函数对象
+add_executable(06_01 第06章_函数对象/P61_求整型向量各元素之和.cpp)
+add_executable(06_02_01 第06章_函数对象/P62_1_利用一元函数求向量各元素之和.cpp)
+add_executable(06_02_02 第06章_函数对象/P62_2_利用一元函数求向量各元素之和.cpp)
+add_executable(06_03 第06章_函数对象/P64_二元函数.cpp)
+add_executable(06_04 第06章_函数对象/P67_算术类基本函数使用.cpp)
+add_executable(06_05 第06章_函数对象/P68_非常规数据类型基本函数的使用.cpp)
+add_executable(06_06 第06章_函数对象/P70_关系运算符基本函数使用.cpp)
+add_executable(06_07 第06章_函数对象/P71_利用二元函数比较两个复数是否相等.cpp)
+add_executable(06_08 第06章_函数对象/P72_逻辑运算符函数对象使用.cpp)
+add_executable(06_09 第06章_函数对象/P73_绑定和取反适配器基本用法.cpp)
+add_executable(06_10 第06章_函数对象/P74_成员函数适配器基本方法.cpp)
+add_executable(06_11 第06章_函数对象/P76_普通函数适配器使用.cpp)
+add_executable(06_12 第06章_函数对象/P77_综合案例_求圆和长方形的面积.cpp)
+add_executable(06_13 第06章_函数对象/P78_学生成绩输出.cpp)
