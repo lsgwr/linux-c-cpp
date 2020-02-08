@@ -65,3 +65,42 @@ add_executable(06_10 第06章_函数对象/P74_成员函数适配器基本方法
 add_executable(06_11 第06章_函数对象/P76_普通函数适配器使用.cpp)
 add_executable(06_12 第06章_函数对象/P77_综合案例_求圆和长方形的面积.cpp)
 add_executable(06_13 第06章_函数对象/P78_学生成绩输出.cpp)
+
+# 第7章 通用容器
+## vector
+add_executable(07_01 第07章_通用容器/vector/P84_向量初始化方法举例.cpp)
+add_executable(07_02 第07章_通用容器/vector/P86_基本变量增加及获得元素.cpp)
+add_executable(07_03 第07章_通用容器/vector/P87_类对象的添加及获得元素.cpp)
+add_executable(07_04 第07章_通用容器/vector/P90_修改元素示例.cpp)
+add_executable(07_05 第07章_通用容器/vector/P91_删除元素.cpp)
+add_executable(07_06 第07章_通用容器/vector/P93_vector综合示例对象查询.cpp)
+add_executable(07_07 第07章_通用容器/vector/P95_vector综合案例之书籍出版.cpp)
+## deque
+add_executable(07_08 第07章_通用容器/deque/P98_基础操作.cpp)
+add_executable(07_09 第07章_通用容器/deque/P99_deque和vector内存分配比较示例.cpp)
+add_executable(07_10 第07章_通用容器/deque/P100_用deque实现一个先进先出的队列.cpp)
+## list
+add_executable(07_11 第07章_通用容器/list/P104_基本操作.cpp)
+add_executable(07_12 第07章_通用容器/list/P105_list遍历示例.cpp)
+add_executable(07_13_1 第07章_通用容器/list/P105_splice.cpp)
+add_executable(07_13_2 第07章_通用容器/list/P106_merge.cpp)
+## stack和queue
+add_executable(07_16 第07章_通用容器/stack_queue/P115_stack的基本操作.cpp)
+add_executable(07_17 第07章_通用容器/stack_queue/P117_queue的基本操作.cpp)
+add_executable(07_18 第07章_通用容器/stack_queue/P118_实现一个大小固定的堆栈类.cpp)
+## priority queue
+add_executable(07_20_1 第07章_通用容器/priority_queue/P122_1_整型序列进出优先队列_降序.cpp)
+add_executable(07_20_2 第07章_通用容器/priority_queue/P122_2_整型序列进出优先队列_升序.cpp)
+add_executable(07_21 第07章_通用容器/priority_queue/P123_优先队列给学生成绩排序.cpp)
+add_executable(07_22 第07章_通用容器/priority_queue/P124_固定大小的优先队列.cpp)
+## bitset
+add_executable(07_23 第07章_通用容器/biset/P127_定义位变量.cpp)
+add_executable(07_24 第07章_通用容器/biset/P128_位操作函数示例.cpp)
+add_executable(07_25 第07章_通用容器/biset/P129_8位二进制数高4位不变低4位取反.cpp)
+## set and multiset
+add_executable(07_28 第07章_通用容器/set/P134_3种形成集合的方法.cpp)
+add_executable(07_29 第07章_通用容器/set/P135_集合的常用方法.cpp)
+add_executable(07_30 第07章_通用容器/set/P137_求集合的交并差.cpp)
+## map
+add_executable(07_31 第07章_通用容器/map/P141_两种常用地形成映射的方法.cpp)
+add_executable(07_32 第07章_通用容器/map/P143_单映射map中的operator中括号用法.cpp)
