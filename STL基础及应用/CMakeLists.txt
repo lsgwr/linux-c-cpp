@@ -120,3 +120,36 @@ add_executable(08_08 第08章_非变异算法/03_计数/P171_查询多少学生�
 add_executable(08_09 第08章_非变异算法/04_比较/P173_比较两个整形数组是否相等.cpp)
 add_executable(08_10 第08章_非变异算法/04_比较/P174_寻找两个整型数组不相等时的元素值.cpp)
 add_executable(08_11 第08章_非变异算法/04_比较/P174_查询第一对成绩不相等学生的信息.cpp)
+
+# 第9章 变异算法
+## 复制
+add_executable(09_01 第09章_变异算法/01_复制/P179_copy示例.cpp)
+## 交换
+add_executable(09_02 第09章_变异算法/02_交换/P181_swap举例.cpp)
+## 变换
+add_executable(09_03 第09章_变异算法/03_变换/P183_transform示例.cpp)
+add_executable(09_04 第09章_变异算法/03_变换/P185_字符串加密后输出.cpp)
+## 替换
+add_executable(09_05 第09章_变异算法/04_替换/P188_4个replace函数示例.cpp)
+add_executable(09_06 第09章_变异算法/04_替换/P189_replace的易错案例.cpp)
+add_executable(09_07 第09章_变异算法/05_填充/P191_fill函数简单示例.cpp)
+## 生成
+add_executable(09_09 第09章_变异算法/06_生成/P194_生成随机数.cpp)
+## 删除
+add_executable(09_11 第09章_变异算法/07_删除/P199_remove简单示例.cpp)
+add_executable(09_12 第09章_变异算法/07_删除/P201_remove_copy示例.cpp)
+add_executable(09_13 第09章_变异算法/07_删除/P202_学生信息筛选.cpp)
+## 唯一
+add_executable(09_14 第09章_变异算法/08_唯一/P205_unique示例.cpp)
+add_executable(09_15 第09章_变异算法/08_唯一/P206_单词统计.cpp)
+## 反转
+add_executable(09_16 第09章_变异算法/09_反转/P208_reverse.cpp)
+## 移位
+add_executable(09_17 第09章_变异算法/10_环移/P210_循环显示.cpp)
+add_executable(09_18 第09章_变异算法/10_环移/P211_list中环移函数用法.cpp)
+## 随机
+add_executable(09_19 第09章_变异算法/11_随机/P212_随机函数示例.cpp)
+add_executable(09_20 第09章_变异算法/11_随机/P213_自定义随机函数生成器.cpp)
+## 划分
+add_executable(09_21 第09章_变异算法/12_划分/P216_划分函数示例.cpp)
+add_executable(09_23 第09章_变异算法/12_划分/P218_list中按照小于4进行划分.cpp)
