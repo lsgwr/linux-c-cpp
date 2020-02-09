@@ -104,3 +104,19 @@ add_executable(07_30 第07章_通用容器/set/P137_求集合的交并差.cpp)
 ## map
 add_executable(07_31 第07章_通用容器/map/P141_两种常用地形成映射的方法.cpp)
 add_executable(07_32 第07章_通用容器/map/P143_单映射map中的operator中括号用法.cpp)
+
+# 第8章 非变异算法(不改变原始数据结构)
+## 循环
+add_executable(08_01 第08章_非变异算法/01_循环/P154_for_each.cpp)
+add_executable(08_02 第08章_非变异算法/01_循环/P155_求vector的最大最小以及和.cpp)
+## 查询
+add_executable(08_03 第08章_非变异算法/02_查询/P161_7个查询函数的简单应用.cpp)
+add_executable(08_04 第08章_非变异算法/02_查询/P162_根据学号查询学生信息.cpp)
+## 计数
+add_executable(08_06 第08章_非变异算法/03_计数/P170_求数组中有多少个0.cpp)
+add_executable(08_07 第08章_非变异算法/03_计数/P170_查询多少学生成绩为80分.cpp)
+add_executable(08_08 第08章_非变异算法/03_计数/P171_查询多少学生成绩高于80分.cpp)
+## 比较
+add_executable(08_09 第08章_非变异算法/04_比较/P173_比较两个整形数组是否相等.cpp)
+add_executable(08_10 第08章_非变异算法/04_比较/P174_寻找两个整型数组不相等时的元素值.cpp)
+add_executable(08_11 第08章_非变异算法/04_比较/P174_查询第一对成绩不相等学生的信息.cpp)
