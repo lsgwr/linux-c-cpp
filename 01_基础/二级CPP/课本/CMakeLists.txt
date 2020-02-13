@@ -13,6 +13,14 @@ add_executable(05_11 第05章_函數/P108_形参默认值.cpp)
 # 第06章 类和对象
 add_executable(06_01 第06章_类和对象/P129_对象的成员.cpp)
 add_executable(06_02 第06章_类和对象/P134_构造函数与析构函数.cpp)
+add_executable(06_03 第06章_类和对象/P137_自由存储对象.cpp)
+add_executable(06_05 第06章_类和对象/P142_引用静态数据成员.cpp)
+add_executable(06_06 第06章_类和对象/P143_成员函数.cpp)
+add_executable(06_07 第06章_类和对象/P146_常成员函数.cpp)
+add_executable(06_08 第06章_类和对象/P147_常数据成员.cpp)
+add_executable(06_09 第06章_类和对象/P149_将普通函数声明为友元函数.cpp)
+add_executable(06_10 第06章_类和对象/P150_友元成员函数.cpp)
+add_executable(06_11 第06章_类和对象/P151_友元类.cpp)
 
 # 第07章 继承和派生
 add_executable(07_01 第07章_继承和派生/P167_派生类的定义和组成.cpp)
