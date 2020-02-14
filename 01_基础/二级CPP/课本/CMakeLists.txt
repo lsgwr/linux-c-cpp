@@ -39,3 +39,13 @@ add_executable(07_13 第07章_继承和派生/P194_派生类对象赋给基类�
 add_executable(07_13_2 第07章_继承和派生/P194_派生类对象赋给基类病调用析构函数2.cpp)
 add_executable(07_14 第07章_继承和派生/P196_纯虚函数示意.cpp)
 add_executable(07_15 第07章_继承和派生/P197_抽象类中虚函数的重写.cpp)
+
+# 第08章 运算符重载
+add_executable(08_01 第08章_运算符重载/P210_复数运算.cpp)
+
+# 第09章 模板函数实例化
+add_executable(09_01 第09章_模板/P230_模板函数实例化.cpp)
+add_executable(09_02 第09章_模板/P234_类模板的定义和实例化.cpp)
+
+# 第10章 流
+add_executable(10_01 第10章_流/P247_输入输出控制.cpp)
