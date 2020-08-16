@@ -1,0 +1,16 @@
+---- Listen( Matches (15 in 6 files) ----
+Lib.html (doc):<DT><FONT COLOR="#cc0000">void</FONT> Listen(
+Lib.html (doc):Assumes the socket is setup with Listen() first.
+Lib.html (doc):listen() calls. SetSocketOptions is called in the Listen() and
+Listener.cpp (src):    Listen( inSettings->mLocalhost, mSettings->mDomain ); 
+Listener.cpp (src):                Listen( mSettings->mLocalhost, mSettings->mDomain );
+PerfSocket.cpp (src): * Set socket options before the listen() or connect() calls.
+Socket.cpp (lib): * For TCP, this calls bind() and listen().
+Socket.cpp (lib):void Socket::Listen( const char *inLocalhost, bool isIPv6 ) {
+Socket.cpp (lib):        rc = listen( mSock, 5 );
+Socket.cpp (lib): * After Listen() has setup mSock, this will block
+Socket.hpp (lib):    void Listen( const char *inLocalhost = NULL, bool isIPv6 = false );
+Socket.hpp (lib):    // to put setsockopt calls before the listen() and connect() calls
+Tcp_window_size.c (lib): * This must be called prior to calling listen() or connect() on
+Tcp_window_size.c (lib):             * note: results are verified after connect() or listen(),
+Tcp_window_size.c (lib):             * note: results are verified after connect() or listen(),
