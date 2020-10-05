@@ -1,37 +1,75 @@
+#include <string>
 #include <iostream>
 #include <memory>
 
 using namespace std;
 
-int main() {
-    //// shared_ptr
-    {
-        //shared_ptr 代表的是共享所有权，即多个 shared_ptr 可以共享同一块内存。
-        auto wA = shared_ptr<int>(new int(20));
-        {
-            auto wA2 = wA;
-            cout << ((wA2.get() != nullptr) ? (*wA2.get()) : -1) << endl;   // 20
-            cout << ((wA.get() != nullptr) ? (*wA.get()) : -1) << endl;     // 20
-            cout << wA2.use_count() << endl;                                // 2
-            cout << wA.use_count() << endl;                                 // 2
-        }
-        //cout << wA2.use_count() << endl;
-        cout << wA.use_count() << endl;                                     // 1
-        cout << ((wA.get() != nullptr) ? (*wA.get()) : -1) << endl;         // 20
-        //shared_ptr 内部是利用引用计数来实现内存的自动管理，每当复制一个 shared_ptr，
-        //	引用计数会 + 1。当一个 shared_ptr 离开作用域时，引用计数会 - 1。
-        //	当引用计数为 0 的时候，则 delete 内存。
-    }
+struct B;
 
-    // move 语法
-    auto wAA = std::make_shared<int>(30);
-    auto wAA2 = std::move(wAA); // 此时 wAA 等于 nullptr，wAA2.use_count() 等于 1
-    cout << ((wAA.get() != nullptr) ? (*wAA.get()) : -1) << endl;          // -1
-    cout << ((wAA2.get() != nullptr) ? (*wAA2.get()) : -1) << endl;      // 30
-    cout << wAA.use_count() << endl;                                                  // 0
-    cout << wAA2.use_count() << endl;                                                // 1
-    //将 wAA 对象 move 给 wAA2，意味着 wAA 放弃了对内存的所有权和管理，此时 wAA对象等于 nullptr。
-    //而 wAA2 获得了对象所有权，但因为此时 wAA 已不再持有对象，因此 wAA2 的引用计数为 1。
+struct A {
+    shared_ptr<B> pb;
+
+    ~A() {
+        cout << "~A()" << endl;
+    }
+};
+
+struct B {
+    shared_ptr<A> pa; // A和B都是shared_ptr，互相引用造成了循环引用，导致A和B的对象都无法释放，从而产生了内存泄露
+
+    ~B() {
+        cout << "~B()" << endl;
+    }
+};
+
+// pa 和 pb 存在着循环引用，根据 shared_ptr 引用计数的原理，pa 和 pb 都无法被正常的释放。
+// weak_ptr 是为了解决 shared_ptr 双向引用的问题。
+struct BW;
+
+struct AW {
+    shared_ptr<BW> pb;
+
+    ~AW() {
+        cout << "~AW()" << endl;
+    }
+};
+
+struct BW {
+    weak_ptr<AW> pa; // 和B相比，这里把shared_ptr改成了weak_ptr，这是防止循环引用的关键
+
+    ~BW() {
+        cout << "~BW()" << endl;
+    }
+};
+
+void Test() {
+    cout << "Test shared_ptr and shared_ptr:  " << endl;
+    shared_ptr<A> tA(new A());                                             // 1
+    shared_ptr<B> tB(new B());                                             // 1
+    cout << tA.use_count() << endl;
+    cout << tB.use_count() << endl;
+    tA->pb = tB;
+    tB->pa = tA;
+    cout << tA.use_count() << endl;                                        // 2
+    cout << tB.use_count() << endl;                                        // 2
+}
+
+void Test2() {
+    cout << "Test weak_ptr and shared_ptr:  " << endl;
+    shared_ptr<AW> tA(new AW());
+    shared_ptr<BW> tB(new BW());
+    cout << tA.use_count() << endl;                                        // 1
+    cout << tB.use_count() << endl;                                        // 1
+    tA->pb = tB;
+    tB->pa = tA;
+    cout << tA.use_count() << endl;                                        // 1
+    cout << tB.use_count() << endl;                                        // 2
+}
+
+int main() {
+    Test();
+    Test2();
+
 
     return 0;
 }
