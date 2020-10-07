@@ -12,7 +12,7 @@
 #define _CPP_STRING_H
 
 #include <iostream>
-#include <string.h>
+#include <cstring>
 
 using namespace std;
 

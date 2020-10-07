@@ -228,7 +228,7 @@ istream &operator>>(istream &is, Complex &x) {
 ### 基本概念
 + **浅拷贝**：只拷贝指针地址，C++默认拷贝构造函数与赋值运算符重载都是浅拷贝；节省空间，但是容易引起多次释放
 + **深拷贝**：重新分配堆内存，拷贝指针重新指向内容；缺点是浪费空间。但是不会导致多次释放
-
+![深拷贝与浅拷贝](images/深拷贝与浅拷贝.png)
 ### 举例
 > String.h
 ```cpp
@@ -349,4 +349,29 @@ ostream &operator<<(ostream &os, const String &c) {
     os << c.m_data;
     return os;
 }
+```
+
+> 测试main.cpp
+```cpp
+#include "String.h"
+
+int main() {
+    String s1("Hello");        // 构造函数
+    cout << s1 << endl;
+    //String s2 = s1;          // 调用拷贝构造函数
+    String s2(s1);             // 调用拷贝构造函数
+    cout << s2 << endl;
+    String s2A(std::move(s1)); // 移动构造函数，这个move在stl中用地也很多，比如list和vector
+    cout << s2A << endl;
+    String s3;                 // 无参构造函数
+    cout << s3 << endl;
+    s3 = s2;                   // 调用赋值函数
+    cout << s3 << endl;
+    String s3A;                // 无参构造函数
+    s3A = std::move(s2A);      // 移动赋值运算符
+    cout << s3A << endl;
+
+    return 0;
+}
+
 ```
