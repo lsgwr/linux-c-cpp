@@ -273,6 +273,7 @@ for (iter = dataMap.begin(); iter != dataMap.end(); )
 注意：经过erase(iter)之后的迭代器完全失效，该迭代器iter不能参与任何运算，包括iter++,*ite
 
 ## 9-5 函数指针到仿函数模板
+> https://blog.csdn.net/u010710458/article/details/79734558
 ### 1、何为仿函数
 > 仿函数的主要功能是为了搭配STL算法使用，单独使用仿函数的情况比较少。
 
