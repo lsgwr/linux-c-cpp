@@ -1,80 +1,59 @@
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
-int Test() {
-    return 0;
+//测试错误的Map删除元素
+void mapTest()
+{
+    map<int, string> dataMap;
+
+
+    for (int i = 0; i < 100; i++)
+    {
+        string strValue = "Hello, World";
+
+        stringstream ss;
+        ss<<i;
+        string tmpStrCount;
+        ss>>tmpStrCount;
+        strValue += tmpStrCount;
+        dataMap.insert(make_pair(i, strValue));
+    }
+
+    cout<<"MAP元素内容为："<<endl;
+    map<int, string>::iterator iter;
+    for (iter = dataMap.begin(); iter != dataMap.end(); iter++)
+    {
+        int nKey = iter->first;
+        string strValue = iter->second;
+        cout<<strValue<<endl;
+    }
+
+    cout<<"内容开始删除："<<endl;
+    //删除操作引发迭代器失效
+    for (iter = dataMap.begin(); iter != dataMap.end();iter++)
+    {
+        int nKey = iter->first;
+        string strValue = iter->second;
+
+        if (nKey % 2 == 0)
+        {
+            dataMap.erase(iter);    //错误
+
+        }
+        /* cout<<iter->second<<endl;*/
+    }
 }
 
-class Base {
-public:
-    Base() : _i(0) { ; }
-
-    virtual void T() { cout << "Base:T" << _i << endl; }
-
-private:
-    int _i;
-};
-
-class Derived : public Base {
-public:
-    Derived() : _j(1) { ; }
-
-    virtual void T() { cout << "Derived:T" << _j << endl; }
-
-private:
-    int _j;
-};
-
 int main() {
-    // C++ const_cast
-    const int a = 10;
-    //int* pA = &a;
-    int *pA = const_cast<int *>(&a);
-    *pA = 100;
-
-    // C++ reinterpret_cast
-    typedef void(*FuncPtr)();
-    FuncPtr funcPtr;
-    //funcPtr = &Test;
-    funcPtr = reinterpret_cast<FuncPtr>(&Test);
-
-    // static_cast
-    int i = 6;
-    double d = static_cast<double>(i);    //基本类型转换  int -> double
-    double d2 = 5.6;
-    int i2 = static_cast<int>(d2);        //基本类型转换  double -> int
-
-    // static_cast与dynamic_cast
-    int ii = 5;
-    double dd = static_cast<double>(ii);
-    double dd2 = 5.6;
-    int ii2 = static_cast<int>(dd2);
-
-    Base cb;
-    Derived cd;
-    Base *pcb;
-    Derived *pcd;
-
-    // 子类--》 父类，static_cast和dynamic_cast均可
-    pcb = static_cast<Base *>(&cd);
-    if (pcb == NULL) {
-        cout << "unsafe dynamic_cast from Derived to Base" << endl;
+    for (iter = cont.begin(); it != cont.end();)
+    {
+        (*iter)->doSomething();
+        if (shouldDelete(*iter))
+            cont.erase(iter++);
+        else
+            ++iter;
     }
-    pcb = dynamic_cast<Base *>(&cd);
-    if (pcb == NULL) {
-        cout << "unsafe dynamic_cast from Derived to Base" << endl;
-    }
-
-    // 父类--》 子类，只能用dynamic_cast
-    pcd = static_cast<Derived *>(&cb);
-    if (pcd == NULL) {
-        cout << "unsafe dynamic_cast from Derived to Base" << endl;
-    }
-    pcd = dynamic_cast<Derived *>(&cb);
-    if (pcd == NULL) {
-        cout << "unsafe dynamic_cast from Derived to Base" << endl;
-    }
-
     return 0;
 }
