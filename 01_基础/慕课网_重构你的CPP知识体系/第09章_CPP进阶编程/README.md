@@ -279,4 +279,56 @@ for (iter = dataMap.begin(); iter != dataMap.end(); )
 
 仿函数（functors）在C++标准中采用的名称是函数对象（function objects）。仿函数主要用于STL中的算法中，虽然函数指针虽然也可以作为算法的参数，但是函数指针不能满足STL对抽象性的要求，也不能满足软件积木的要求–函数指针无法和STL其他组件搭配，产生更灵活变化。仿函数本质就是类重载了一个operator()，创建一个行为类似函数的对象。
 
-对于重载了()操作符的类，可以实现类似函数调用的过程，所以叫做仿函数，实际上仿函数对象仅仅占用1字节，因为内部没有数据成员，仅仅是一个重载的方法而已。实际上可以通过传递函数指针实现类似的功能，但是为了和STL内部配合使用，他提供了仿函数的特性。
+对于重载了`()`操作符的类，可以实现类似函数调用的过程，所以叫做仿函数，实际上仿函数对象仅仅占用1字节，因为内部没有数据成员，仅仅是一个重载的方法而已。实际上可以通过传递函数指针实现类似的功能，但是为了和STL内部配合使用，他提供了仿函数的特性。
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+// 仿函数
+struct MyPlus {
+    int operator()(const int &a, const int &b) const {
+        return a + b;
+    }
+};
+
+int main() {
+    MyPlus myPlus;
+    cout << MyPlus()(1, 2) << endl; // 1.通过产生临时对象调用重载运算符
+    cout << myPlus.operator()(1, 2) << endl; // 2.通过对象显示调用重载运算符
+    cout << myPlus(1, 2) << endl; // 3.通过对象类似函数调用，隐式地调用重载运算符
+    return 0;
+}
+```
+
+输出
+```cpp
+3
+3
+3
+```
+
+### 2、STL中基础仿函数
+#### 2.1 仿函数定义自己型别
+算法内部可能需要使用仿函数返回值或者输出值的类型参数，因此定义两个类
+```cpp
+// 一元函数的参数和返回值类型，通常被继承
+template<class Arg, class Result>
+struct unary_function {
+    typedef Arg argument_type;
+    typedef Result result_type;
+};
+
+// 二元函数的参数和返回值类型，通常被继承
+template<class Arg1, class Arg2, class Result>
+struct binary_function {
+    typedef Arg1 first_argument_type;
+    typedef Arg2 second_argument_type;
+    typedef Result result_type;
+};
+```
+上述两个类分别定义了一个一元和二元函数参数和返回值类型，对应的仿函数类仅仅需要继承此类即可
+
+#### 2.2 算术类仿函数
+STL标准库给我们定义了一些通用的仿函数，可以直接调用，生成对象，面向用户
