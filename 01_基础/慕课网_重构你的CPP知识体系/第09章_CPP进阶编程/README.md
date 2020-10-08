@@ -998,3 +998,211 @@ int main() {
     return 0;
 }
 ```
+
+## 9-9 迭代器
+### 迭代器分类
+![迭代器分类(images/迭代器分类.png)
+
+### 迭代器访问方式
+![迭代器访问方式](images/迭代器访问方式.png)
+
+### 迭代器使用举例
+```cpp
+#include <list>
+#include <iostream>
+
+using namespace std;
+
+int main() {
+    list<int> v;
+    v.push_back(3);
+    v.push_back(4);
+    v.push_front(2);
+    v.push_front(1);  // 1, 2, 3, 4
+
+    list<int>::const_iterator it;
+    for (it = v.begin(); it != v.end(); it++) {
+        //*it += 1;
+        cout << *it << " ";
+    }
+    cout << endl;
+
+    // 注意：迭代器不支持<
+    //for (it = v.begin(); it < v.end(); it++)
+    //{
+    //	cout << *it << " ";
+    //}
+    cout << v.front() << endl;
+    v.pop_front();  // 从顶部去除
+
+    list<int>::reverse_iterator it2;
+    for (it2 = v.rbegin(); it2 != v.rend(); it2++) {
+        *it2 += 1; // 逆序并+1
+        cout << *it2 << " ";  // 5 4 3
+    }
+    cout << endl;
+
+    return 0;
+}
+```
+输出：
+```text
+1 2 3 4 
+1
+5 4 3 
+```
+
+## 优先队列
+```cpp
+#include <functional>
+#include <stack>
+#include <queue>
+#include <iostream>
+
+using namespace std;
+
+
+int main() {
+    //stack<int> s;
+    //queue<int> q;
+
+    priority_queue<int> pq;  // 默认是最大值优先
+    priority_queue<int, vector<int>, less<int> > pq2; //   最大值优先
+    priority_queue<int, vector<int>, greater<int> > pq3; // 最小值优先
+
+    pq.push(2);
+    pq.push(1);
+    pq.push(3);
+    pq.push(0);
+    while (!pq.empty()) {
+        int top = pq.top();
+        cout << " top is: " << top << endl;
+        pq.pop();
+    }
+    cout << endl;
+
+
+    pq2.push(2);
+    pq2.push(1);
+    pq2.push(3);
+    pq2.push(0);
+    while (!pq2.empty()) {
+        int top = pq2.top();
+        cout << " top is: " << top << endl;
+        pq2.pop();
+    }
+    cout << endl;
+
+
+    pq3.push(2);
+    pq3.push(1);
+    pq3.push(3);
+    pq3.push(0);
+    while (!pq3.empty()) {
+        int top = pq3.top();
+        cout << " top is: " << top << endl;
+        pq3.pop();
+    }
+    cout << endl;
+
+    return 0;
+}
+```
+
+输出：
+```text
+ top is: 3
+ top is: 2
+ top is: 1
+ top is: 0
+
+ top is: 3
+ top is: 2
+ top is: 1
+ top is: 0
+
+ top is: 0
+ top is: 1
+ top is: 2
+ top is: 3
+```
+
+## 9-17 C++多线程基础
++ [C++11多线程并发基础入门教程](https://zhuanlan.zhihu.com/p/194198073)
++ [thread中join和detach的区别](https://blog.csdn.net/xibeichengf/article/details/71173543)
+
+## 9-18 线程交换地例子
+```cpp
+#include <iostream>
+#include <thread>
+#include <mutex>
+using namespace std;
+
+
+// 存钱
+void Deposit(mutex& m, int& money)
+{
+    // 锁的粒度尽可能的最小化
+    for(int index = 0; index < 100; index++)
+    {
+        m.lock();
+        money += 1;
+        m.unlock();
+    }
+}
+// 取钱
+void Withdraw(mutex& m, int& money)
+{
+    // 锁的粒度尽可能的最小化
+    for (int index = 0; index < 100; index++)
+    {
+        m.lock();
+        money -= 2;
+        m.unlock();
+    }
+}
+
+int main()
+{
+    // 银行存取款
+    int money = 2000;
+    mutex m;
+    cout << "Current money is: " << money << endl;
+    thread t1(Deposit, ref(m), ref(money));
+    thread t2(Withdraw, ref(m), ref(money));
+    t1.join();
+    t2.join();
+    cout << "Finally money is: " << money << endl;
+
+    //线程交换 
+    thread tW1([]()
+    {
+    	cout << "ThreadSwap1 " << endl;
+    });
+    thread tW2([]()
+    {
+    	cout << "ThreadSwap2 " << endl;
+    });
+    cout << "ThreadSwap1' id is " << tW1.get_id() << endl;
+    cout << "ThreadSwap2' id is " << tW2.get_id() << endl;
+
+    cout << "Swap after:" << endl;
+    swap(tW1, tW2); 
+    cout << "ThreadSwap1' id is " << tW1.get_id() << endl;
+    cout << "ThreadSwap2' id is " << tW2.get_id() << endl;
+    tW1.join();
+    tW2.join();
+
+    //// 线程移动
+    thread tM1( []() { ; } );
+    //tM1.join();
+    cout << "ThreadMove1' id is " << tM1.get_id() << endl;
+    cout << "Move after:" << endl;
+    thread tM2 = move(tM1);
+    cout << "ThreadMove2' id is " << tM2.get_id() << endl;
+    cout << "ThreadMove1' id is " << tM1.get_id() << endl;
+    tM2.join();
+
+    return 0;
+}
+```
