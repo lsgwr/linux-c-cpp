@@ -108,3 +108,91 @@ int main() {
 int *k[10][30]; //声明了int型的指针数组 即数组里放的是int型的指针，8*10*30=2400  
 int (*k)[10][30]; // 这样声明的结果就是 8，这个是声明了 数组指针
 ```
+
+### 7.以下能对二维数组a进行正确初始化的语句是（B）
++ `int a[2][ ]=({1,0,1},{5,2,3});`
++ `int a[ ][3]={{1,2,3},{4,5,6}};`
++ `int a[2][4]=({1,2,3},{4,5},{6});`
++ `int a[ ][3]={(1,0,1)(),(1,1)};`
+
+> 解析：二维数组的第二维一定要指定
+
++ A选项：最后一个维度没有指明，小括号套花括号；
++ B相当于int a[][3]={3,6}；其余元素为0；    正确
++ C维度超过2
++ D空括号编译过不了
+
+
+### 8.请问运行Test 函数会有什么样的结果？（`A`）
+```cpp
+void GetMemory(char ** p, int num) {
+    * p = (char * ) malloc(num);
+}
+void Test(void) {
+    char * str = NULL;
+    GetMemory( & str, 100);
+    strcpy(str, "hello");
+    printf(str);
+}
+```
+
++ hello
++ 空
++ 出错
+
+> 解析：
+
+先把题目改成如下:
+1.把函数参数从二级指针改成一级指针之后的代码
+```cpp
+voidGetMemory(char*p,intnum)
+{
+   p = (char*)malloc(num);
+}
+voidTest(void)
+{
+   char*str = NULL;
+   GetMemory(str,100);
+   strcpy(str,"hello");
+   printf(str);
+}
+```
+结果就是str为空，也就是函数的操作并没有影响str。
+
+很明显，指针就是传个地址给函数参数，那么p也是指向空。而操纵的是p而对str没有影响。
+
+2.而源代码是二级指针
+
+```cpp
+*p = (char*)malloc(num);
+```
+*p就是str的地址，操作的也就是str，即给*p分配内存。
+
+总结如下:
+**对于函数传字符串或者通过malloc分配内存，都需要使用二级指针**
+
+### 9.以下代码是哪一句可能导致的编译错误?(D)
+```cpp
+#include <iostream>
+using namespace std;
+class Test
+{
+public:
+	Test() { cout << "i like zk"; }
+	Test(int) { cout << "i like wangyi"; }
+	void exe() { cout << "this is my choice"; }
+};
+int main()
+{
+	Test a(1);//1
+	a.exe();  //2
+	Test b(); //3
+	b.exe();  //4
+	Test c;   //5
+	c.exe();  //6
+    return 0;
+}
+```
+
+> 3出的问题(声明成函数了)，但是到4才会体现出来
+
