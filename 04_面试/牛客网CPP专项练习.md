@@ -273,3 +273,66 @@ i=2时，以上四个进程分别创建新的进程，此时共有8个进程
 ....
 依次类推, 当i=n时，共创建2^(n+1)个进程
 ```
+
+### 12.已知: int m=10；下列表示引用的方法中，正确的是:(C)
++ `int&Z;`
++ `int &t=10;`
++ `int&X=m;`
++ `float&f=&m;`
+
+> 解析：
+
+```txt
+A、引用必须被初始化
+B、引用类型的初始值必须是一个对象
+C、正确
+D、错误，1、非常量引用的初始值必须是左值 2、不能用int类型的值初始化double类型的引用
+```
+
+### 13.以下关于C++的描述中哪一个是正确的：(`C`)
++ 任何指针都必须指向一个实例
++ 子类指针不可以指向父类实例
++ 任何引用都必须指向一个实例
++ 引用所指向的实例不可能无效
+
+### 14.有以下一段代码,编译时会产生错误的语句有：(C)
+```cpp
+#include <iostream>
+
+using namespace std;
+
+class A {
+public :
+    void run(void) {
+        cout << "run()" << endl;
+    }
+
+    void run(int a) {
+        cout << "run(A)" << endl;
+    }
+};
+
+class B : public A {
+public :
+    void run(int a) {
+        cout << "run(B)" << endl;
+    }
+
+};
+
+int main(void) {
+    B b;
+    b.run(0); //语句1
+    b.A::run(1); //语句2
+    b.run(); //语句3
+    b.A::run(); //语句4
+    return 0;
+}
+```
+
++ 语句1
++ 语句2
++ 语句3
++ 语句4
+
+### 15.
