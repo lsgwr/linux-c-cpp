@@ -335,4 +335,35 @@ int main(void) {
 + 语句3
 + 语句4
 
-### 15.
+> 解析：派生类和基类函数同名了，基类函数会被隐藏。
+
+### 15.有以下类定义，若有语句定义rectangle r; r.setLength(3,5); 则编译时无语法错误的语句是（AB）
+```cpp
+#include <iostream>
+
+using namespace std;
+
+class shape {
+public:
+    virtual int area() = 0;
+};
+
+class rectangle : public shape {
+public:
+    int a, b;
+
+    void setLength(int x, int y) {
+        a = x;
+        b = y;
+    }
+
+    int area() { return a * b; }
+};
+```
+
++ `shape *s1=&r;`
++ `shape &s2=r;`
++ `shape s3=r;`
++ `shape s4[3];`
+
+> 解析：有纯虚函数的不允许实例化。C，D都是要创建shape的对象，所以不可以
