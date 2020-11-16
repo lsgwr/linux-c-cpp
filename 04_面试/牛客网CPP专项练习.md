@@ -236,3 +236,40 @@ int main() {
 + 24
 + 25
 + 26
+
+> 解析：注意while一旦不满足条件是直接退出地哦
+
+### 11.请问下面的程序最后会产生多少个进程：（D）
+```c
+#include <stdio.h>
+#include <unistd.h>
+
+int main(void) {
+    int i;
+    for (i = 0; i < 5; i++) {
+        int pid = fork();
+        if (pid == 0) {
+            //do something 
+        } else {
+            //do something 
+        }
+    }
+    // do somthing,sleep
+    return 0;
+}
+```
+
++ 5
++ 10
++ 15
++ 32
+
+> 解析：
+
+```txt
+i=0时，共有两个进程: 主进程和主进程创建的第一个进程
+i=1时，以上两个进程分别创建新的进程，此时共有四个进程
+i=2时，以上四个进程分别创建新的进程，此时共有8个进程
+....
+依次类推, 当i=n时，共创建2^(n+1)个进程
+```
