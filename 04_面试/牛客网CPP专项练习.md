@@ -463,3 +463,183 @@ D选项 : *p代表p指向内存的内容, 这里要使用p="china"才正确
 + 引用和指针都可以被重新赋值
 + 引用不能用const修饰，而指针可以
 + 引用创建时必须初始化，而指针则可以在任何时候被初始化
+
+### 21.下面代码的输出是：(D)
+```cpp
+sizeof("hello")
+strlen("world")
+```
+
++ 5,5
++ 5,6
++ 6,6
++ 6,5
+
+> 解析：
+
+```txt
+strlen 是函数，sizeof 是运算符。
+strlen 测量的是字符的实际长度，以'\0' 结束，也就是说不算最后的'\0';
+而sizeof 测量的是字符的分配大小,包括最后的'\0';
+帮助记忆的话，可以理解成运算符更加底层一下，会输出真实的内存占用情况，而函数有封装，会处理成用户想要看到的内容
+```
+
+### 22.下面代码中，p和"hello,world"存储在内存哪个区域？（D）
++ 栈，堆
++ 栈，栈
++ 堆，只读存储区
++ 栈，只读存储区
+
+> 解析：
+
+```txt
+（1）从静态存储区域分配：
+内存在程序编译时就已经分配好，这块内存在程序的整个运行期间都存在。速度快、不容易出错，因为有系统会善后。例如全局变量，static变量等。
+（2）在栈上分配：
+在执行函数时，函数内局部变量的存储单元都在栈上创建，函数执行结束时这些存储单元自动被释放。栈内存分配运算内置于处理器的指令集中，效率很高，但是分配的内存容量有限。
+（3）从堆上分配：
+即动态内存分配。程序在运行的时候用malloc或new申请任意大小的内存，程序员自己负责在何时用free或delete释放内存。动态内存的生存期由程序员决定，使用非常灵活。
+如果在堆上分配了空间，就有责任回收它，否则运行的程序会出现内存泄漏，另外频繁地分配和释放不同大小的堆空间将会产生堆内碎块。
+一个C、C++程序编译时内存分为5大存储区：堆区、栈区、全局区、文字常量区、程序代码区。
+```
+
+### 23.下面函数的执行结果是输出(B)
+```cpp
+char str[]=”xunlei”;
+char *p=str;
+int n=10;
+printf(“%d,%d,%d\n”,sizeof(str),sizeof(p),sizeof(n));
+```
+
++ 4，4，4
++ 7，4，4
++ 6，4，4
++ 6，6，4
+
+解析：
+
+```txt
+sizeof(str),str是字符数组，所以第一个是7个字节
+sizeof(p), str的首元素地址赋给指针p，指针总占4个字节
+sizeof(n), int型整数，所以4个字节
+```
+
+### 24.下面程序的输出结果是（A）
+```cpp
+#include <iostream>
+using namespace std;
+
+int main() 
+{
+    char str1[] = "hello world";  
+    char str2[] = "hello world";  
+
+    const char str3[] = "hello world";  
+    const char str4[] = "hello world";  
+
+    const char* pstring1 = "hello world";  
+    const char* pstring2 = "hello world";  
+
+    cout << boolalpha << ( str1==str2 ) <<  ',' ; 
+    cout << boolalpha << ( str3==str4 ) << ',' ;  
+    cout << boolalpha << ( pstring1==pstring2 ) <<endl;
+
+    return 0;
+}
+```
+
++ false,false,true
++ false,false,false
++ true,true,true
++ false,true,true
+
+> 解析：
+
+这个题主要是考察，变量在内存的存放的地点。感觉还可以加强一下变得难一些，比如比较地址的大小等等。
+str1、str2、str3以及str4都是栈中定义的局部变量数组，并且进行了初始化，地址肯定会不一样。
+而pstring1、pstring2则是指针，虽然本身在栈中，但是所指向的是一个字串常量。题中比较的就是所指向的地址，所以为true。
+
+```cpp
+#include<iostream>
+using namespace std;
+int main(void)
+{
+    char str1[] = "hello world";   //存放在栈中的数组
+    char str2[] = "hello world";   //存放在栈中的数组
+
+    const char str3[] = "hello world";  //存放在栈中的字符串常量
+    const char str4[] = "hello world";  //存放在栈中的字符串常量
+
+    const char* pstring1 = "hello world";   //本身在栈中，指向常量的指针
+    const char* pstring2 = "hello world";   //本身在栈中，指向常量的指针     //显然二者所指向的地址一致
+
+    int x = (int)pstring1;
+    int y = (int)pstring2;                  //为了方便打印出指针所指向的地址
+
+    cout << boolalpha << ( str1==str2 ) << endl;               //比较字串首地址      flase
+    cout << boolalpha << ( str3==str4 ) << endl;               //比较字串首地址      flase
+    cout << boolalpha << ( pstring1==pstring2 ) <<endl;        //比较指针所指地址    true
+
+    cout << "str1=" << &str1 << ",";
+    cout << "str2=" << &str2 << endl;
+
+    cout << "str3=" << &str3 << ",";
+    cout << "str4=" << &str4 << endl;
+
+    cout << "pstring1=" << &pstring1 << ",";
+    cout << "pstring2=" << &pstring2 << endl;                   //输出指针本身地址
+
+    cout<<hex;
+    cout << "pstring1=" << x << ",";
+    cout<<hex;
+    cout << "pstring2=" << y << endl;      //16进制输出指针所指地址
+
+    return 0;
+}
+
+```
+
+### 25.对C++中重载（overload）和重写（override）描述正确的有（ABD）
++ 重载是指在同一个类或名字空间中存在多个函数，它们的函数名相同，而函数签名不同
++ 重写是指在子类中实现一个虚函数，该虚函数与其父类中的一个虚函数拥有同样的函数签名
++ 虚函数不可以重载
++ 构造函数可以重载，析构函数可以重写
+
+```txt
+函数重载（overload）
+函数重载是指在一个类中声明多个名称相同但参数列表不同的函数，这些的参数可能个数或顺序，类型不同，但是不能靠返回类型来判断。特征是：
+（1）相同的范围（在同一个作用域中）；
+（2）函数名字相同；
+（3）参数不同；
+（4）virtual 关键字可有可无（注：函数重载与有无virtual修饰无关）；
+（5）返回值可以不同；
+
+函数重写（也称为覆盖 override）
+函数重写是指子类重新定义基类的虚函数。特征是：
+（1）不在同一个作用域（分别位于派生类与基类）；
+（2）函数名字相同；
+（3）参数相同；
+（4）基类函数必须有 virtual 关键字，不能有 static 。
+（5）返回值相同，否则报错；
+（6）重写函数的访问修饰符可以不同；
+
+重定义（也称隐藏）
+（1）不在同一个作用域（分别位于派生类与基类） ；
+（2）函数名字相同；
+（3）返回值可以不同；
+（4）参数不同。此时，不论有无 virtual 关键字，基类的函数将被隐藏（注意别与重载以及覆盖混淆）；
+（5）参数相同，但是基类函数没有 virtual关键字。此时，基类的函数被隐藏（注意别与覆盖混淆）；
+```
+
+### 26.下面哪些函数不能被声明为虚函数（ABCD）
++ 构造函数
++ 静态成员函数
++ 内联函数
++ 友元函数
+
+> 解析：以上几类函数都不可声明为虚函数：
+
++ 构造函数：虚函数是运行时绑定，需要对象，所以要先调用构造函数
++ 静态成员函数：只有一份大家共享
++ 内联函数：编译时就展开，而虚函数是运行时绑定
++ 友元函数：友元函数不能被继承，所以不存在虚函数
