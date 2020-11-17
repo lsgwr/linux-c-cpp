@@ -680,3 +680,132 @@ unordered_multiset：哈希组织的set；关键字可以重复出现。
 三、其他项：
 stack、queue、valarray、bitset
 ```
+
+### 28.下面的函数作用：将整型数组p中n个数据增大，代码的实现有错误，下面哪句话的表述是正确的？（A）
+```cpp
+void increment_ints (int p [ ], int n) 
+{ 
+  assert(p != NULL);  /* 确保p不为空指针 */ 
+  assert(n >= 0);  /* 确保n不为负数 */ 
+  while (n)  /* 循环n次. */ 
+  { 
+    *p++;          /* 增大p*/ 
+    p++, n--;      /* p指向下一位，n减1 */ 
+  } 
+}
+```
+
++ `*p++`使得p在解引用之前增大，应该改为`(*p)++`
++ 数组的值是一个不能改变的值，所以p不能直接被修改。应该使用一个和p相关联的指针来完成这个操作。
++ while循环的条件必须是一个布尔类型的表达式，表达式应该为n!=0.
++ p不应该定义为变长的数组，参数中不应该包含参数n。
+
+> 解析：
+
+```txt
+A：同级运算符，自右向左，*p++相当于*(p++),正确的应该是(*p)++
+B：数组名作为参数传递的时候将作为指针处理，可以通过指针名对值进行修改。
+C：while循环的条件可以是表达式，也可以是值。非0为真，0为假
+D：参数中传递数组中的长度是无效的，所以要把数组长度单独传送。
+```
+
+### 29.下列代码的运行结果是（B）
+```cpp
+void main()
+{
+    Stack S;
+    Char x,y;
+    InitStack(S);
+    x='n';y='g';
+    Push(S,x);Push(S,'i');Push(S,y);
+    Pop(S,x);Push(S,'r');Push(S,'t');Push(S,x);
+    Pop(S,x);Push(S,' s');
+    while(!StackEmpty(S)){Pop(S,y);printf(y);};
+        printf(x);
+}
+```
+
+### 30.下面的代码输出是：（D）
+```cpp
+int main() {
+    union Data {
+        struct {
+            int x;
+            int y;
+        } s;
+        int x, y;
+    } d;
+
+    d.x = 1;
+    d.y = 1;
+    d.s.x = d.x * d.x;
+    d.s.y = d.y + d.y;
+    printf("%d %d\n", d.s.x, d.s.y);
+}
+```
+
++ 1 4
++ 4 4
++ 1 2
++ 4 8
+
+> 解析：
+
+```txt
+union中的所有成员相对于基地址的偏移量都为零。d.x,d.y和d.s.x的起始地址都相同,共享内存空间，给任意一个变量赋值，其他两个变量也会赋相同的值。
+d.x，d.y以及d.s.x都是前四个字节，所以他们的值永远相等，
+d.x=1；///d.x=d.y=d.s.x=1;
+d.y=2;///d.x=d.y=d.s.x=2;
+d.s.x=d.x*d.x;///d.x=d.y=d.s.x=2*2=4;
+d.s.y=d.y*d.y;///d.x=d.y=d.s.x=4+4=8;
+
+更详细的解析：https://www.nowcoder.com/test/question/done?tid=39458166&qid=112253#summary
+```
+
+### 31.以下程序输出结果是(B)
+```cpp
+#include<iostream>
+#include <cstring>
+
+using namespace std;
+
+class A {
+public:
+    virtual void func(int val = 1) { std::cout << "A->" << val << std::endl; }
+
+    virtual void test() { func(); }
+};
+
+class B : public A {
+public:
+    void func(int val = 0) { std::cout << "B->" << val << std::endl; }
+};
+
+int main(int argc, char *argv[]) {
+    B *p = new B;
+    p->test();
+    return 0;
+}
+```
+
++ A->0
++ B->1
++ A->1
++ B->0
++ 编译出错
++ 以上都不对
+
+### 32.下面中哪两个可以在Demo的子类中使用：（AC）
+```cpp
+class Demo {
+protected:
+    int m1(int a, int b) {
+        return 0;
+    }
+}
+```
+
++ `public int m1 (int a, int b) { return 0; }`
++ `private int m1 (int a, int b) { return 0; }`
++ `private int m1 (int a, long b) { return 0; }`
++ `public short m1 (int a, int b) { return 0; }`
