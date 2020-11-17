@@ -809,3 +809,71 @@ protected:
 + `private int m1 (int a, int b) { return 0; }`
 + `private int m1 (int a, long b) { return 0; }`
 + `public short m1 (int a, int b) { return 0; }`
+
+### 33.循环语句`while(int i=0 )i--;`的循环次数是（A）
++ 0
++ 1
++ 5
++ 无限次
+
+> while ()里面是一个声明变量的语句，根本不会进入循环，而且在C语言中，定义变量都是放在最前面，总体来说，这个代码有错误
+
+### 34.如下程序的执行结果(A)
+```cpp
+#include "stdio.h"
+
+class A {
+public:
+    virtual void Test() {
+        printf("A test\n");
+    }
+};
+
+class B : public A {
+public:
+    void func() {
+        Test();
+    }
+
+    virtual void Test() {
+        printf("B test\n");
+    }
+};
+
+class C : public B {
+public:
+    virtual void Test() {
+        printf("C test\n");
+    }
+};
+
+int main() {
+    C c;
+    ((B *) (&c))->func();
+    ((B) c).func();
+}
+```
+
++ A
+```txt
+C test				
+B test
+```
+
++ B
+```txt
+B test
+B test
+```
+
++ C.
+```txt
+B test			
+C test
+```
+
++ D.
+```txt
+A test
+C test
+```
