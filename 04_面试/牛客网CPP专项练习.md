@@ -1132,3 +1132,228 @@ fork(); // i=1
     printf("-");    // +1
 printf("-")
 ```
+
+### 48.下列代码之后的结果为（D）
+```cpp
+#include <iostream>
+
+using namespace std;
+
+struct Base {
+    int i;
+    virtual int f() {
+        cout << "a";
+        return 1;
+    }
+
+    virtual const Base & f() const {
+        cout << "b";
+        return *this;
+    }
+
+    int g() {
+        cout << "c";
+        return 3;
+    }
+};
+
+struct Derive: Base {
+    int i;
+    int f() {
+        cout << "d";
+        return 4;
+    }
+
+    const Base &f() const {
+        cout << "e";
+        return *this;
+    }
+
+    int f(int =0) {
+        cout << "f";
+        return 6;
+    }
+
+    virtual int g() {
+        cout << "g";
+        return 7;
+    }
+};
+
+int main() {
+
+    Derive d;
+    const Derive d_const;
+    Base b, *p = &d;
+    const Base *p_const = &d_const;
+    b.f();
+    p->f();
+    p->g();
+    p_const->f();
+    d_const.f();
+    return 0;
+}
+```
+
++ abccf
++ acdff
++ abcde
++ adcee
+
+> 解析：
+
+```txt
+链接：https://www.nowcoder.com/questionTerminal/c27d972a46514d45986496e864d24621
+来源：牛客网
+
+1.b.f(); 基类对象直接调用基类的f()函数，输出a
+2.p->f(); 派生类对象赋给基类的指针，由于f()在基类中是虚函数，根据基类指针指向的对象进行调用，因此调用派生类的int f()输出d
+3.p->g();基类中g()不是虚函数，调用基类的g()
+4.p_const->f();常对象，又由于基类中声明为虚，同理用派生类中的函数
+5.同理
+```
+
+### 49.下面的程序中， int32_t 表示一个有符号的 32 位整数，程序的入口是 main 函数，问最终 res 的结果是多少？(D)
+> 链接：https://www.nowcoder.com/questionTerminal/b905e60905ce42e3a64a9f9007a5d1d1
+
+```cpp
+#include <iostream>
+
+using namespace std;
+
+int32_t  f(int32_t a, int32_t b) {
+    while (a + b > 0) {
+        a = a +1;
+        b = b-1;
+    }
+    return a+b;
+}
+
+int32_t main() {
+    int32_t res = f(1, 0);
+    return 0;
+}
+```
+
++ –(2^31+2^30+…+2^2+2^1+2^0)
++ 0
++ -1
++ 程序会死循环
+
+> 解析：char+char的结果会自动转化成int，所以(char)-128+(char)-127 = (int)-255。此时停止循环。但是int32+int32结果仍为int32，所以不会停止循环
+
+### 50. 在32位机器上用gcc编译如下代码，求sizeof(A),sizeof(B)分别是多少。(C)
+```cpp
+class A {
+    int a;
+    short b;
+    int c;
+    char d;
+};
+
+class B {
+    double a;
+    short b;
+    int c;
+    char d;
+};
+```
++ 12 16
++ 12 12
++ 16 24
++ 16 20
+
+> 解析：
+
+```txt
+链接：https://www.nowcoder.com/questionTerminal/ec319607d5c842e88f31d1aaf0582561
+来源：牛客网
+
+A  ----->     △△△△||△△==||△△△△||△===
+B ----->    △△△△△△△△||△△==(short)△△△△(int)||△=======
+其中△为数据存储，=为填充
+
+链接：https://www.nowcoder.com/questionTerminal/ec319607d5c842e88f31d1aaf0582561
+来源：牛客网
+
+链接：https://www.nowcoder.com/questionTerminal/4bcbe5bbcb564d238d2f3d6e7dbb83ea?orderByHotValue=0&mutiTagIds=641_134&page=8&onlyReference=false
+来源：牛客网
+按照下面3个条件来计算：
+1) 结构体变量的首地址能够被其最宽基本类型成员的大小所整除；
+备注：编译器在给结构体开辟空间时，首先找到结构体中最宽的基本数据类型，然后寻找内存地址能被该基本数据类型所整除的位置，作为结构体的首地址。将这个最宽的基本数据类型的大小作为上面介绍的对齐模数。
+2) 结构体每个成员相对于结构体首地址的偏移量（offset）都是成员大小的整数倍，如有需要编译器会在成员之间加上填充字节（internal adding）；
+备注:为结构体的一个成员开辟空间之前，编译器首先检查预开辟空间的首地址相对于结构体首地址的偏移是否是本成员的整数倍，若是，则存放本成员，
+反之，则在本成员和上一个成员之间填充一定的字节，以达到整数倍的要求，也就是将预开辟空间的首地址后移几个字节。
+3) 结构体的总大小为结构体最宽基本类型成员大小的整数倍，如有需要，编译器会在最末一个成员之后加上填充字节（trailing padding）。
+```
+
+### 51.声明一个数组`int a[10];`问下面哪些不可以表示a[1]的地址？（B）
++ `&a[0] + 1`
++ `a+sizeof(int)`
++ `(int*)&a+1`
++ `(int*)((char*)&a+sizeof(int))`
+
+> 解析：有图有真相，a+sizeof(int)，等价于a[4]的地址，因为数组a为int型，步长为4，+1就相当于向前进了4字节，等于a[1]地址，+4相当于进了16字节，等于a[4]地址
+
+### 52.对于protected成员，下面说法错误的是:（A）
++ 基类可以访问从所有派生类造型（cast）成基类对象的protected成员
++ 从公有和保护继承的派生类继承的子类里可以访问基类的protected成员
++ 派生类可以定义一个同名的非protected成员
++ 派生类可以访问基类对象的公有protected成员
+
+> 公有：所有成员皆可访问 保护：只有派生类可以访问 私有：只能类本身能访问 证明友元：不受限制。代码验证如下：
+
+```cpp
+class Base
+{
+protected:
+    int ip=666;
+    void ptshow()
+    {
+        cout<<"protected "<<ip<<endl;
+    }
+public:
+    void show()
+    {
+        cout<<"public "<<ip<<endl;
+    }
+};
+class Derive:public Base
+{
+public:
+    void show()
+    {
+        cout<<"derive public "<<ip<<endl;
+    }
+    void ptshow()
+    {
+        cout<<"same name as Base::ptshow() "<<ip<<endl;
+    }
+    void myshow()
+    {
+        cout<<"my public show "<<ip<<endl;
+    }
+};
+int main()
+{
+    //1. base
+    Base b;
+    //cout<<b.ip<<endl;//error: 不能访问自己的protected变量
+    //b.ptshow();//error: Base::ptshow() is protected
+    //b.show();//public 666  //可以访问protected变量。
+
+    //2. derive
+    Derive d;
+    //cout<<d.ip<<endl;//error: Base::ip is protected
+    //d.show();//derive public 666 //从派生类可访问protected变量
+    //d.ptshow();//和Base的protected成员重名，ok
+
+    //3. base pointer point to derive obj
+    Base* x=new Derive();//没有虚函数的情况下，x的行为就是普通Base实例
+    //x->ptshow();//error: 无法访问protected成员
+    //x->myshow();//error: Base has no member named 'myshow'
+    x->show();//public 666
+    return 0;
+}
+
+```
