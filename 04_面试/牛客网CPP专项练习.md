@@ -1388,3 +1388,648 @@ int main()
 
 局部变量 > 成员变量 > 全局变量
 ```
+
+### 55.下输出正确的是（B）
+```cpp
+class Base
+{
+    public:
+    void virtual Func()
+    {
+        cout<<"Base"<<endl;
+    }
+};
+ 
+class Derived : public Base
+{
+    public:
+    void virtual Func()
+    {
+        cout<<"Derived "<<endl;
+    }
+};
+ 
+int main ()
+{
+    Base* pBase = new Base();
+    pBase ->Func();
+    Derived * pDerived = (Derived*)pBase;
+    pDerived->Func();
+    delete pBase;
+ 
+    pDerived  =  new Derived();
+    pBase = pDerived;
+    pBase->Func();
+ 
+    delete pDerived
+    return 0;
+}
+```
++ Base  Derived  Base
++ Base  Base  Derived
++ Base  Derived  Derived
++ Derived Base  Derived
+
+> 解析：
+
+```txt
+链接：https://www.nowcoder.com/questionTerminal/814ce13c95ff439bab17f73ca5f0410a
+来源：牛客网
+
+选B，13好理解，对于2，强制类型转换时会将Base类型的数据所在的内存按照Derived类型格式解析和转换。pDerived解析得到的是pBase的虚函数表，相当于pDerived的vtbl虚函数表指针指向了pBase的虚函数表，故得到Base;
+但这种强制转换比较危险，当访问某虚函数时子类存在而父类不存在时，就可能导致运行时出现访问错误，程序崩溃，而此时编译是正常的，因为指针的虚函数表是动态链接的。
+```
+
+### 56.下列代码运行出错，可能会是哪一行引起的?(B)
+```cpp
+void getMemory(char *p)  
+{ 
+ p = (char *)malloc(100);   // 1 
+} 
+  
+int main(int argc, char const *argv[]) 
+{ 
+ char *str = NULL; 
+ getMemory(str); 
+ strcpy(str,"hello wrold");   //2 
+ printf("%s\n", str);   //3 
+ free(str);   //4 
+} 
+```
++ 1
++ 2
++ 3
++ 4
+
+> 入getMemory的是str的拷贝，所以getMemory函数运行返回后，str仍为NULL，这样调用str自然会运行出错。要想使得传入的就是str指针本身，可以使用传引用的方式。
+
+### 57.给定声明 const char * const * pp; 下列操作或说明正确的是?(A)
++ `pp++`
++ `(*pp)++`
++ `(**pp) = \\c\\;`
++ `以上都不对`
+
+> 解析：
+
+```txt
+相当于
+(char const) (* const) *pp
+所以
+**p是char型常量
+*p是char const *型常量
+p是char const *const型变量
+```
+
+### 58.以下代码共调用多少次拷贝构造函数：(D)
+```cpp
+Widget f(Widget u)
+{  
+   Widget v(u);
+   Widget w=v;
+   return w;
+}
+main(){
+    Widget x;
+    Widget y=f(f(x));
+}
+```
++ 1
++ 3
++ 5
++ 7
+
+> 详细解释参考：https://www.nowcoder.com/questionTerminal/a0f69e79a60d45f2b441c7e92f8f6ad3
+
+```txt
+这道题目咋一看，觉得是调用了9次，而不是7次。可是实际运行发现确实只调用了7次。为什么呢？
+
+我理解9次的原因在这里：形参u，局部变量v和w，return返回w这里还是有一次拷贝构造函数的调用的。你想，函数返回之后局部变量要被销毁，所以在返回之前必定有会新建一个临时对象出来，这时必然会再调用一次拷贝构造函数，这样分析，这个一个f（）函数就调用了4次拷贝构造函数，2次调用再加上主函数中给y的实例化，一共是9次才对！
+
+从结果可以看出。我的分析肯定是错误的，错误发生在什么地方呢，我把主函数的调用注释掉，换一个写法，看结果再分析，再看这个运行图。
+
+结果是一样的，都调用了7次。按上面的分析应该少 1 次（给 y实例化的那一次调用），这个问题的关键
+
+就是出在这个return返回局部对象这里。通过单步调试，我发现是这么一回事：return之后一定会调用拷贝构造函数，这个返回的局部变量估计是编辑器直接优化给y了，和下一次的调用形参u。所以这里少了两次。（单步调试可以看得很清楚。）
+
+拷贝构造函数调用的时机：
+1、当用类的一个对象初始化该类的另一个对象时
+2、 如果函数的形参是类的对象,调用函数时,进行形参和实参结合时. 
+3、如果函数的返回值是类的对象,函数执行完成返回调用者时. 
+4、需要产生一个临时类对象时
+```
+
+### 59.对于下面的说法，正确的是(F)。
+> 链接：https://www.nowcoder.com/questionTerminal/1277288d00a64c1ca58736345fecbdab
+
++ 对于 struct X { short s; int i; char c; }，sizeof(X) 的值等于 sizeof(s) + sizeof(i) + sizeof(c)
++ 对于某个double变量 a，可以使用 a == 0.0 来判断其是否为零
++ 初始化方式 char a[14] = "Hello, world!"; 和初始化方式 char a[14]; a = "Hello, world!"; 的效果相同
++ 在gcc编译器下，对于 int i = 3; printf("%d %d", ++i, ++i)，运行输出为：4 5
++ 选项A、B、C、D中至少有两个是正确的
++ 以上选项均不正确
+
+> 解答：链接：https://www.nowcoder.com/questionTerminal/1277288d00a64c1ca58736345fecbdab
+
+```txt
+A结构体要按高位对齐，int占四个字节，short占两个，char占一个 字节，所以4+4+4=12；
+B要判断一个双精度浮点数：if( abs(f) <= 1e-15 )
+C数组初始化两种方式：一种逐个赋值 char a[14] ={‘H’，‘e’,'l','l','o'}；另一种 char a[14] = "Hello, world!"
+D选项，函数的参数是从右向左压栈的，输出时从栈顶开始，相当于: int i = 3;  ++i; ++i; printf("%d,%d",i,i);所以是 5，5；
+再举一个例子，int i = 1; printf("%d,%d", i += 2, i *= 3); 在输出i之前先进行了i *= 3和 i += 2；最终i = 5；所以结果是5，5；
+```
+
+### 60.下面说法正确的是：(C)
+> https://www.nowcoder.com/questionTerminal/3327439779e146dc9035b0977d9469eb
+```cpp
+signed char a=0xe0;
+unsigned int b=a;
+unsigned char c=a;
+```
++ (a>0 )&&(b>0)为真
++ c==a 为真
++ b的16进制为0xffffffe0
++ 都不对
+
+> 解析：
+
+```txt
+a的值为-32，所以a<0.
+相反，c的值为224，大于0.
+b的16进制表示为ffffffe0
+
+有符号数最高位为1，所以a为负数；
+负数原码转补码是符号位不变，其他各位取反，然后加1；
+无符号数的原，反，补码一样
+补码转原码：a = 0xe0的补码是1110 0000，所以a的原码是1010 0000 = -32
+c是无符号数1110 0000就是它的原码，所以c = 224
+signed char转signed int: 将a的原码拓展为32位编码1000 0000 0000 0000 0010 0000
+有符号负数原码转补码为，之后signed int转unsigned int同理：1111 1111 1111 1111 1110 0000 = 0xffffffe0 = b。
+```
+
+### 61.为避免运算过程中出现整型溢出可以考虑的办法有（BC）
++ 将运算结果和可以表示的最大整数进行比较
++ 检测符号位的变化
++ 将计算结果减去加数看是否与另一加数相等
++ 比较参数的长度
+
+```txt
+链接：https://www.nowcoder.com/questionTerminal/7d7844f2443c46b98a7f10cab1174e0c
+来源：牛客网
+
+选项1 ： 运算结果进行比较的话，已经溢出导致结果变化，去比较也为时已晚。 所以不正确
+选项2 ： 检测符号为变化可以防止符号溢出，正确。
+选项3 ： a+b = c   c - a != b 则c溢出 正确
+选项4 ： 参数长度    0000000000000000000000000 这个长度算溢出么 不正确
+```
+
+### 62.下列代码段的打印结果为（A）（注：└┘代表空格）
+```cpp
+#include <stdio.h>
+
+void main(void) {
+    char ac[] = "Hello World! C Program", * p;
+
+    for (p = ac + 6; p < ac + 9; p++) {
+        printf("%c", * p);
+    }
+}
+```
+
++ Wor
++ o W
++ └┘Wo
++ o Wor
+
+> 解析：
+
+```txt
+链接：https://www.nowcoder.com/questionTerminal/dedf7f3c0e09454e9c951fb8307289a4
+来源：牛客网
+
+p=ac+6表示把ac[6]的地址赋给指针p，p<ac+9表示p只能访问到ac[9]之前的地址，p++表示指针迭代，*p调用该指针指向的数即地址对应的数
+代码的意思就是输出从ac[6]到ac[8]的一段字符串
+```
+
+### 63.以下代码是否完全正确，执行可能得到的结果是(C)。
+```cpp
+class A{
+   int i;
+};
+class B{
+   A *p;
+public:
+   B(){p=new A;}
+   ~B(){delete p;}
+};
+void sayHello(B b){
+}
+int main(){
+   B b;
+   sayHello(b);
+}
+```
++ 程序正常运行
++ 程序编译错误
++ 程序崩溃
++ 程序死循环
+
+> 为了清晰可见，我们从新把题目代码码一遍：
+
+```cpp
+class A{
+   int i;
+};
+class B{
+   A *p;
+public:
+   B(){p=new A;}
+   ~B(){delete p;}
+   /*
+   B(const B& ths){
+	   p = ths.p;
+   }*/
+};
+void sayHello(B x){
+}
+int main(){
+   B b;
+   sayHello(b);
+}
+```
+
+这里的错误原因是编译器在生成default copy construction的时候使用的bitwise copy语义，也就是只是简单的浅拷贝。 上面被注释掉的程序就是编译器自动添加的部分。 从而导致在sayHello中向参数x传递值时，调用了bitwise copy的拷贝构造函数，使得x对象和b对象中的值完全一致，包括p指针的值，在x离开作用域（也就是sayHello函数结束），x发生析构，调用delete 销毁了指针p，同时在main函数结束的时候，析构b时又会调用一次delete删除指针p。
+也就是本程序会delete一直已经被delete 的指针。可以做如下改进，来修复程序：
+
+```cpp
+class A{
+   int i;
+};
+class B{
+   A *p;
+public:
+   B(){p=new A;}
+   ~B(){delete p;}
+   B(const B& other){
+	   p = new A;		//构建新的指针
+	   *p = *(other.p);	//将指向的内容复制，依然指向不同的位置
+   }
+};
+void sayHello(B b){
+}
+int main(){
+   B b;
+   sayHello(b);
+}
+```
+
+如上，在B中添加copy 构造函数,实现深拷贝即可
+
+### 64.下面程序的功能是输出数组的全排列,选择正确的选项,完成其功能。(B)
+```cpp
+void perm(int list[], int k, int m)
+{
+    if (    )
+    {
+        copy(list,list+m,ostream_iterator<int>(cout," "));
+        cout<<endl;
+        return;
+    }
+    for (int i=k; i<=m; i++)
+    {
+        swap(&list[k],&list[i]);
+        (    );
+        swap(&list[k],&list[i]);
+    }
+}
+```
++ `k!=m 和 perm（list，k+1，m）`
++ `k==m 和 perm（list，k+1，m）`
++ `k!=m 和 perm（list，k，m）`
++ `k==m 和 perm（list，k，m）`
+
+### 65.执行下列程序后,其输出结果是（C）
+```cpp
+main() {
+    int a = 9;
+    a += a -= a + a;
+    printf("%d\n", a);
+}
+```
++ 18
++ 9
++ -18
++ -9
+
+> 解析：
+
+```txt
+链接：https://www.nowcoder.com/questionTerminal/1e5530882df140d3a152c6420e9cbfba
+来源：牛客网
+
+根据运算优先级可将上面式子分解成如下：
+1、a -= (a+a);
+2、a += （第一个式子的结果）;
+第一个式子的结果 a = -9;
+故  2中 a = a + (-9) = -9 + (-9) =  -18;
+```
+
+### 66.已知int x=5;，执行语句`x+=x-=x*x;`后，x的值为（C）
++ 25
++ 40
++ –40
++ 20
+
+> 先算x-＝x*x，得出x=5-5*5,x=-20;再算x+=x;得出x=-20-20,x=-40
+
+### 67.关于这段代码，下列说法正确的是(B)
+```cpp
+#define SIZE_20M (20*1024*1024)
+void func_a()
+{
+    char *temp = malloc(SIZE_20M)
+    return;
+}
+void func_b()
+{
+    char temp[SIZE_20M];
+    //...do something using temp
+    return;
+}
+```
+
++ func_a 获得临时内存的方式效率通常更高。
++ func_b 使用了太多的栈，程序可能会在运行时候崩溃。
++ func_b 存在内存泄露
++ func_a 和func_b 分配的内存会自动初始化0
+
+> 解析：
+
+```txt
+链接：https://www.nowcoder.com/questionTerminal/11a1f270d36846b49c6dbe49f172fc3f
+来源：牛客网
+
+A   func_a()动态分配的数据位于堆区，func_b()的temp位于栈区，栈区的执行效率高于堆区，故func_b()效率高
+C  func_b()中没有动态分配的内存，不存在泄露问题
+D  都不会自动初始化为0，只有全局变量或者static变量会初始化为0
+B  栈的空间一般为2M，分配太多栈空间程序肯定会崩溃
+```
+
+### 68.如下代码段，哪种描述是正确的（B）
+```cpp
+#include <iostream>
+
+using namespace std;
+
+class A {};
+void f(const A ** p) {}
+void g(const A * const * p) {}
+void k(const A*& p){}
+
+int main() {
+    const A * ca = new A();
+    A *a = new A();
+    A** p = &a;
+    k(ca); // 1
+    f(p); // 2
+    g(p); // 3
+}
+```
++ 全部正确
++ 2错，1,3正确
++ 1,2错，3正确
++ 1正确，2,3,错
+
+> 解析：
+
+```txt
+链接：https://www.nowcoder.com/questionTerminal/918f550b51df44e8b88e66ef87882b58
+来源：牛客网
+
+1：const A*&p形参限定的是A*的内容，ca刚好限定了A*指向的内容。
+2错误点：首先，p是一个二级指针，且指向是A*，根据题目给的信息，A* 指向的内容是可修改的，
+但是f()函数中的形参 const A** p 的意思就是 p的指向可以改，A*的指向也可以改，但是A*指向的内容不可更改，参数转换出错，所以编译是不通过的。
+3：g(const A* const* p) 其实左边的const是没有实际意义的，const限定的是*A的指向，并没有限定*A指向的内容，和参数p是刚好匹配的
+```
+
+### 69.下列关于new delete 与malloc free 的联系与区别描述正确的有?(BC)
++ 都是在栈上进行动态的内存操作
++ 用malloc函数需要指定内存分配的字节数并且不能初始化对象，new 会自动调用对象的构造函数
++ delete 会调用对象的destructor，而free 不会调用对象的destructor
++ 以上说法都不正确
+
+> 解析：
+
+```txt
+A:都是在堆上取得内存。
+BC的详细解释可以参考一下这篇博文，作者写的很详细。http://blog.csdn.net/hazir/article/details/21413833
+```
+
+### 70.以下程序运行后的输出结果是（A）
+```cpp
+int main() {
+    int a = 1, b = 2, m = 0, n = 0, k;
+
+    k = (n = b < a) && (m = a);
+    printf("%d,%d\n", k, m);
+
+    return 0;
+}
+```
++ 0,0
++ 0,1
++ 1,0
++ 1,1
+
+### 71.下面程序的输出结果是（B）
+```cpp
+#include <iostream>
+
+using namespace std;
+class MD {
+    protected:
+        float miles;
+    public:
+        void setDist(float d) {
+            miles = d;
+        }
+    virtual float getDist() {
+        return miles;
+    }
+    float square() {
+        return getDist() * getDist();
+    }
+};
+
+class FeetDist: public MD {
+    protected: float feet;
+    public: void setDist(float);
+    float getDist() {
+        return feet;
+    }
+    float getMiles() {
+        return miles;
+    }
+};
+
+void FeetDist::setDist(float ft) {
+    feet = ft;
+    MD::setDist(feet / 2);
+}
+
+int main() {
+    FeetDist feet;
+
+    feet.setDist(8);
+    cout << feet.getDist() << "," << feet.getMiles() << "," << feet.square() << endl;
+
+    return 0;
+}
+```
+
++ 8,4,16
++ 8,4,64
++ 8,8,64
++ 其他几项都不对
+
+> 解析
+
+```txt
+链接：https://www.nowcoder.com/questionTerminal/c72c1799bca34a09a6de0a3f5581c396
+来源：牛客网
+
+注意一点MD::setDist()函数调用。此时是没有父类的对象的，调用函数后设置的变量值当然也不属于父类对象。那他属于谁呢，没错他是子类继承自父类的变量，属于子类对象。
+本题其实漏掉了一个考点，如果同时创建一个父类对象并给父类对象的成员变量miles赋值。此时同时输出父类对象的getDist(),和子类的getMiles()函数，通过对比能更直观的理解继承中子类继承全部的父类内容。
+```
+
+### 72.下面程序的执行结果：(E)
+```cpp
+class A{ 
+    public: 
+        long a; 
+}; 
+class B : public A { 
+    public: 
+        long b; 
+}; 
+void seta(A* data, int idx) { 
+    data[idx].a = 2; 
+} 
+int main(int argc, char *argv[]) { 
+    B data[4]; 
+    for(int i=0; i<4; ++i){ 
+        data[i].a = 1; 
+        data[i].b = 1; 
+        seta(data, i); 
+    } 
+    for(int i=0; i<4; ++i){ 
+         std::cout << data[i].a << data[i].b; 
+    } 
+    return 0; 
+}
+```
+
++ 11111111
++ 12121212
++ 11112222
++ 21212121
++ 22221111
+
+```txt
+链接：https://www.nowcoder.com/questionTerminal/c85f9e15e6a4410a930581ae12b9a341
+来源：牛客网
+
+这道题应该注意 指针类型加减 时步长的问题。
+A 大小为 4
+B 大小为 8
+那么：
+void seta(A* data, int idx) {
+    data[idx].a = 2;
+}
+由于传入的实参为B类型，大小为8，而形参为A类型，大小为4
+data[idx] 取 data + idx 处的元素，这时指针 data加1 的长度不是一个B长度，而是一个A长度，或者说是1/2个B长度。这时该函数中 data[0~3] 指向的是原 data[0].a,data[0].b,data[1].a,data[1].b, 
+由于隐式类型转换的缘故，data[0].a, data[0].b,data[1].a,data[1].b 处的值全部由于 data[idx].a = 2; 操作变为 2。
+这道题如果改为void seta(B* data, int idx)，那么形参中data指针加1步长为8，结果就是21212121。但是由于步长为4，所以结果就是 22221111。
+```
+
+### 73.有以下程序程序运行后的输出结果是？(B)
+```cpp
+#include < stdio. h > 
+main ( )
+{ 
+    int a [ 3 ] [ 4 ] = { 1,3,5,7,9,11,13,15,17,19,21,23 } , (*p) [4] = a , i , j , k = 0 ;
+    for ( i =0 ; i < 3 ; i + + )
+    for ( j =0 ; j < 2 ; j + + ) 
+        k = k + * ( * ( p+i )+j );
+    printf ( "%d" , k );
+}
+```
+
++ 40
++ 60
++ 80
++ 100
+
+```txt
+链接：https://www.nowcoder.com/questionTerminal/e913f4aaf41840c68c97cec70741c8e8
+来源：牛客网
+
+本题答案应为 60
+
+int (*p)[4]= a；说明 p是一个指针数组，长度为4，存储的是二维数组每行的地址。
+p指向a的首地址 &a[0][0].
+*(p+i) 相当于p[i]，p[i]存储的是二维数组a的i行的数据地址。即p[i]=&a[i][0]；
+*(p+i)+j 存储的是a[i][j]的地址。*(*(p+i)+j)即是a[i][j]的值。
+根据i j循环。i<3,j<2，即是取二维数组三行的前两列的值的总和。
+1+3+9+11+17+19=60
+```
+
+### 74.已知ii，j都是整型变量，下列表达式中，与下标引用X[ii][j]不等效的是（BC）。
++ `*（X[ii]+j）`
++ `*(X+ii)[j]`
++ `*(X+ii+j)`
++ `*(*(X+ii)+j)`
+
+```txt
+B应该也是错误的，
+由于[]的优先级高于*,因此，相当于对地址（X+ii）[j]取值，
+如果B改为（*（X+ii））[j]就对了
+```
+
+### 74.32位系统下下面程序的输出结果为多少？(B)
+```cpp
+void Func(char str_arg[100])
+{
+       printf("%d\n",sizeof(str_arg));
+}
+int main(void)
+{
+     char str[]="Hello";
+     printf("%d\n",sizeof(str));
+    printf("%d\n",strlen(str));
+    char*p=str;
+    printf("%d\n",sizeof(p));
+    Func(str);
+}
+```
++ 5 5 4 4
++ 6 5 4 4
++ 6 5 6 4
++ 5 5 5 100
+
+```txt
+链接：https://www.nowcoder.com/questionTerminal/edc7169f19274d4a9d486959cba68f3e
+来源：牛客网
+
+输出结果为：6 5 4 4
+对字符串进行sizeof操作的时候，会把字符串的结束符"\0"计算进去的，进行strlen操作求字符串的长度的时候，不计算\0的。
+数组作为函数参数传递的时候，已经退化为指针了，Func函数的参数str_arg只是表示一个指针，那个100不起任何作用的。
+
+链接：https://www.nowcoder.com/questionTerminal/edc7169f19274d4a9d486959cba68f3e
+来源：牛客网
+
+都是什么栏解析
+第一个长度，是实际数组的长度5个字符，一个隐式的‘\0’编译会分配6个字节
+第二个长度，标准的C库函数，返回字符串实际长度，那么是5个字符
+第三个长度，是一个指针的长度，就是计算机系统的地址长度，32位机器 4字节
+第四个和第三个同理，形参传递数组，传递的是数组首地址
+```
