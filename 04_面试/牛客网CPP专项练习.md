@@ -2153,3 +2153,50 @@ union内的类型共享一段内存，大小按照最大的类型算
 + 虚函数个数
 + 静态变量个数
 + 对齐方式
+
+### 82.以下代码段执行后的输出结果为(D)
+```cpp
+public class Test {
+    public static void main(String args[]) {
+        int x = -5;
+        int y = -12;
+        System.out.println(y % x);
+    }
+}
+```
++ -1
++ 2
++ 1
++ -2
+
+> 解析：
+
+```txt
+C++整数取余，符号只与前面的数字有关。
+
+|小| % |大| = |小| 符号同前面数字    |大| % |小| = |余| 符号同前面数字
+
+3%4 = 3 ； -3%4 = -3 ； -3%-4 = -3 ； 3%-4 = 3；
+
+5%3 = 2 ； 5%-3 = 2  ；-5%-3 = -2 ； -5%3 = -2；
+```
+
+### 83.若有以下类W说明，则函数fConst的正确定义是（A）
+```cpp
+class W {
+    int a;
+    public:
+        void fConst(int & ) const;
+};
+```
++ `void W::fConst( int &k )const  { k = a; }`
++ `void W::fConst( int &k )const  { k = a++; }`
++ `void W::fConst( int &k )const  { cin >> a; }`
++ `void W::fConst( int &k )const  { a = k; }`
+
+> 解析
+
+```txt
+这道题目考的是const关键字，类的方法后面加了const后，该方法的实现中不能修改类的成员。即不能修改类成员a选项中，只有选项A，没有修改类成员a的值
+```
+
