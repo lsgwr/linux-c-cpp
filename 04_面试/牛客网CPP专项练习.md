@@ -2049,3 +2049,26 @@ p 是个数组，所以 sizeof(p) 返回数组的占用大小，64 位情况下
 【char *(*p)[4] 】 表示 【指向 char* 数组的指针】 返回 8
 【char (**p)[4] 】 表示 【指向 char 数组的指针的指针】 返回 8
 ```
+
+### 76.假定CSomething是一个类，执行下面这些语句之后，内存里创建了__6__个CSomething对象。
+```cpp
+CSomething a();
+CSomething b(2);
+CSomething c[3];
+CSomething &ra = b;
+CSomething d=b;
+CSomething *pA = c;
+CSomething *p = new CSomething(4);
+```
+
+> 解析
+
+```cpp
+CSomething a();  //只是个函数声明
+CSomething b(2); // +1
+CSomething c[3]; // +3，对象数组
+CSomething &ra = b; // 引用，没有新构造
+CSomething d=b; // +1，调用拷贝构造函数
+CSomething *pA = c; // 只是给指针赋值
+CSomething *p = new CSomething(4); // +1，构造并给指针赋值
+```
