@@ -52,7 +52,7 @@ bool LinkList<T>::insert(int i, T newData) {
         if (p == NULL) break;// 如果指针为空，则不存在该节点，或已到表尾
     }
 
-    if (p ==NULL && j < (i - 1)) { // 指针为空且没到第i个位置，则不存在该节点，说明不存在第i个节点
+    if (p == NULL && j < (i - 1)) { // 指针为空且没到第i个位置，则不存在该节点，说明不存在第i个节点
         cout << "插入位置无效！" << endl;
         return false;
     }
@@ -64,22 +64,49 @@ bool LinkList<T>::insert(int i, T newData) {
 
 template<typename T>
 bool LinkList<T>::del(ListNode<T> *node) {
-    return false;
+    if (node == NULL) { // 判断待删除节点是否存在
+        cout << "待删除节点不存在！" << endl;
+        return false;
+    }
+    ListNode<T> *nodeTmp = head; // 设置游标指针，初始化为头结点
+    while (nodeTmp->next != node) { // 遍历单链表，找到q所指向节点的前驱节点
+        nodeTmp = nodeTmp->next; // 不断往后走
+    }
+    // 找到了节点和目标节点相等的点
+    nodeTmp->next = node->next; // 将node节点的后继节点地址赋值给其前驱节点的next指针
+    delete node; // 回收节点node的空间
+    return true;
 }
 
 template<typename T>
 ListNode<T> *LinkList<T>::find(T val) {
-    return nullptr;
+    ListNode<T> *pCur = head; // 设置游标指针
+    // 判断游标指针所指节点的值是否与val相等
+    while (pCur != NULL && pCur->data != val) {
+        pCur = pCur->next;
+    }
+    if (pCur == NULL) {
+        cout << "没找到该节点！程序异常退出！" << endl;
+        exit(1);
+    } else {
+        return pCur; // 返回所找到的节点的指针
+    }
 }
 
 template<typename T>
 bool LinkList<T>::clear() {
+    ListNode<T> *cur = head; // 设置游标指针
+    while (head->next != NULL) { // 判断head的后继节点是否为NULL
+        cur = head->next;
+        head->next = cur->next;
+        delete cur;
+    }
     return false;
 }
 
 template<typename T>
 T LinkList<T>::getNodeData(ListNode<T> *node) {
-    return nullptr;
+    return node->data;
 }
 
 template<typename T>
