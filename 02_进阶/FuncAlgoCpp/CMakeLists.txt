@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 # 第1章 基础数据结构
 add_executable(01_01 Chapter01Basic/Section01SeqList/SeqList.cpp)
-add_executable(01_02 Chapter01Basic/Section02LinkList/LinkList.cpp)
+add_executable(01_02_1 Chapter01Basic/Section02LinkList/LinkList.cpp)
+add_executable(01_02_2 Chapter01Basic/Section02LinkList/DoubleList.cpp)
 
 add_executable(FuncAlgoCpp main.cpp)
