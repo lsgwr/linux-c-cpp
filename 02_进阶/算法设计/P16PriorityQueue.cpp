@@ -22,7 +22,7 @@ int main() {
     }
     cout << endl;
 
-    priority_queue<int> pq2(a, a + n);
+    priority_queue<int, vector<int>, greater<int>> pq2(a, a + n);
     cout << "pq2: ";
     while (!pq2.empty()) {
         cout << pq2.top() << "\t";
