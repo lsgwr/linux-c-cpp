@@ -12,3 +12,6 @@
 + [Linux系统编程：APUE部分的笔记](https://www.cnblogs.com/0xcafebabe/tag/APUE/)
 + [完整课程的笔记](https://github.com/impact-eintr/LinuxC)
 + [LinuxC学习笔记](https://blog.csdn.net/m0_46152793)
+
+## 参考资料
++ [跟我一起写Makefile](https://seisman.github.io/how-to-write-makefile/index.html)
