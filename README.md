@@ -14,4 +14,12 @@
 + [Linux系统及网络编程视频](02_进阶/Linux系统及网络编程视频)
 
 ## Linux网络编程 学习计划
-+ [Unix网络编程]()
++ [UNIX网络编程 卷1：套接字联网API（第3版）](https://book.douban.com/subject/26434583/)
++ [UNIX网络编程 卷2：进程间通信（第2版）](https://book.douban.com/subject/26434599/)
++ [Linux网络编程（第2版）](https://book.douban.com/subject/26669330/)
+
+## Linux内核编程 学习计划
++ [《奔跑吧Linux内核》](https://book.douban.com/subject/27108677/)
++ [《深入理解Linux内核》](https://book.douban.com/subject/1767120/)
++ [《深入Linux内核》](https://book.douban.com/subject/4843567/)
+
