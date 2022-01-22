@@ -16,3 +16,21 @@
 ## 参考资料
 + [跟我一起写Makefile](https://seisman.github.io/how-to-write-makefile/index.html)
 + [APUE第三版完整材料](https://github.com/Lincheng1993/apue)
+
+## 书的结构
+> APUE主要讨论了三部分内容：文件IO、并发、进程间通信。
+
++ 文件IO：
+  + 标准IO：优点是可移植性高，缺点是性能比系统 IO 差，且功能没有系统 IO 丰富。
+  + 系统IO：因为是内核直接提供的系统调用函数，所以性能比标准 IO 高，但是可移植性比标准 IO 差。
+
++ 并发：
+　　信号 + 多进程；
+　　多线程；
++ 进程间通信(IPC)：
+  + FIFO：管道；
+  + System V：又称为 XSI，支持以下三种方式：
+    + msg：消息队列；
+    + sem：信号量；
+    + shm：共享存储；
+  + Socket：套接字（网络通信）；
