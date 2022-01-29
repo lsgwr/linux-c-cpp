@@ -44,18 +44,18 @@
 
 
 
-```
- 1 htonl,  htons,  ntohl,  ntohs - convert values between host and network byte order
- 2 
- 3 #include <arpa/inet.h>
- 4 
- 5 uint32_t htonl(uint32_t hostlong);
- 6 
- 7 uint16_t htons(uint16_t hostshort);
- 8 
- 9 uint32_t ntohl(uint32_t netlong);
-10 
-11 uint16_t ntohs(uint16_t netshort);
+```c
+// htonl,  htons,  ntohl,  ntohs - convert values between host and network byte order
+
+#include <arpa/inet.h>
+
+uint32_t htonl(uint32_t hostlong);
+
+uint16_t htons(uint16_t hostshort);
+
+uint32_t ntohl(uint32_t netlong);
+
+uint16_t ntohs(uint16_t netshort);
 ```
 
 
@@ -76,18 +76,17 @@ h 是 host，表示主机；n 是 network，表示网络。l 表示 long，s 表
 
 如何使数据不对齐呢，只需要在定义结构体的时候在结尾添加 __attribute__((packed)) 就可以了，见如下栗子：
 
-```
-1 struct msg_st
-2 {
-3     uint8_t name[NAMESIZE];
-4     uint32_t math;
-5     uint32_t chinese;
-6 }__attribute__((packed));
+```c
+struct msg_st
+{
+    uint8_t name[NAMESIZE];
+    uint32_t math;
+    uint32_t chinese;
+}__attribute__((packed));
 ```
 
 网络传输的结构体中的成员都是紧凑的，所以不能地址对齐，需要在结构体外面增加 __attribute__((packed))。
 
- 
 
 关于字节对齐的东西就足够写一篇博文了，LZ 在这里仅仅简单介绍一下什么是字节对齐，如果感兴趣大家可以去查阅专门的资料。
 
@@ -132,27 +131,27 @@ proto.h 里面主要是通讯双方约定的协议，包含端口号、传送数
 
 
 
-```
- 1 /* proto.h */
- 2 #ifndef PROTO_H__
- 3 #define PROTO_H__
- 4 
- 5 #include <stdint.h>
- 6 
- 7 #define RCVPORT            "1989"    
- 8 
- 9 #define NAMESIZE        13
-10 
-11 
-12 struct msg_st
-13 {
-14     uint8_t name[NAMESIZE];
-15     uint32_t math;
-16     uint32_t chinese;
-17 }__attribute__((packed));
-18 
-19 
-20 #endif
+```c
+/* proto.h */
+#ifndef PROTO_H__
+#define PROTO_H__
+
+#include <stdint.h>
+
+#define RCVPORT  "1989"    
+
+#define NAMESIZE  13
+
+
+struct msg_st
+{
+    uint8_t name[NAMESIZE];
+    uint32_t math;
+    uint32_t chinese;
+}__attribute__((packed));
+
+
+#endif
 ```
 
 
@@ -163,65 +162,65 @@ rcver.c 是被动端的代码，也是通讯双方先启动的一端。
 
 
 
-```
- 1 /* rcver.c */
- 2 #include <stdio.h>
- 3 #include <stdlib.h>
- 4 
- 5 #include <arpa/inet.h>
- 6 #include <sys/types.h>
- 7 #include <sys/socket.h>
- 8 
- 9 #include "proto.h"
-10 
-11 #define IPSTRSIZE        64
-12 
-13 int main()
-14 {
-15     int sd;
-16     struct sockaddr_in laddr,raddr;
-17     socklen_t raddr_len;
-18     struct msg_st rbuf;
-19     char ipstr[IPSTRSIZE];
-20 
-21     sd = socket(AF_INET,SOCK_DGRAM, 0/*IPPROTO_UDP*/);
-22     if(sd < 0)
-23     {
-24         perror("socket()");
-25         exit(1);
-26     }
-27 
-28     laddr.sin_family = AF_INET;
-29     laddr.sin_port = htons(atoi(RCVPORT));
-30     inet_pton(AF_INET,"0.0.0.0",&laddr.sin_addr.s_addr);
-31  
-32     if(bind(sd,(void *)&laddr,sizeof(laddr)) < 0)
-33     {
-34         perror("bind()");
-35         exit(1);
-36     }
-37 
-38     raddr_len = sizeof(raddr);
-39     while(1)
-40     {
-41         if(recvfrom(sd,&rbuf,sizeof(rbuf),0,(void *)&raddr,&raddr_len) < 0)
-42         {
-43             perror("recvfrom()");
-44             exit(1);
-45         }
-46                 
-47         inet_ntop(AF_INET,&raddr.sin_addr,ipstr,IPSTRSIZE);
-48         printf("---MESSAGE FROM:%s:%d---\n",ipstr,ntohs(raddr.sin_port));
-49         printf("Name = %s\n",rbuf.name);
-50         printf("Math = %d\n",ntohl(rbuf.math));
-51         printf("Chinese = %d\n",ntohl(rbuf.chinese));
-52     }
-53 
-54     close(sd);
-55         
-56 
-57     exit(0);
-58 }
+```c
+/* rcver.c */
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+
+#include "proto.h"
+
+#define IPSTRSIZE  64
+
+int main()
+{
+    int sd;
+    struct sockaddr_in laddr,raddr;
+    socklen_t raddr_len;
+    struct msg_st rbuf;
+    char ipstr[IPSTRSIZE];
+
+    sd = socket(AF_INET,SOCK_DGRAM, 0/*IPPROTO_UDP*/);
+    if(sd < 0)
+    {
+        perror("socket()");
+        exit;
+    }
+
+    laddr.sin_family = AF_INET;
+    laddr.sin_port = htons(atoi(RCVPORT));
+    inet_pton(AF_INET,"0.0.0.0",&laddr.sin_addr.s_addr);
+ 
+    if(bind(sd,(void *)&laddr,sizeof(laddr)) < 0)
+    {
+        perror("bind()");
+        exit;
+    }
+
+    raddr_len = sizeof(raddr);
+    while
+    {
+        if(recvfrom(sd,&rbuf,sizeof(rbuf),0,(void *)&raddr,&raddr_len) < 0)
+        {
+            perror("recvfrom()");
+            exit;
+        }
+                
+        inet_ntop(AF_INET,&raddr.sin_addr,ipstr,IPSTRSIZE);
+        printf("---MESSAGE FROM:%s:%d---\n",ipstr,ntohs(raddr.sin_port));
+        printf("Name = %s\n",rbuf.name);
+        printf("Math = %d\n",ntohl(rbuf.math));
+        printf("Chinese = %d\n",ntohl(rbuf.chinese));
+    }
+
+    close(sd);
+        
+
+    exit(0);
+}
 ```
 
 
@@ -232,61 +231,61 @@ snder.c 是主动端，主动向另一端发送消息。这端可以不用向操
 
 
 
-```
- 1 /* snder.c */
- 2 #include <stdio.h>
- 3 #include <stdlib.h>
- 4 #include <arpa/inet.h>
- 5 #include <sys/types.h>
- 6 #include <sys/socket.h>
- 7 #include <string.h>
- 8 
- 9 #include "proto.h"
-10 
-11 
-12 int main(int argc,char **argv)
-13 {
-14     int sd;
-15     struct msg_st sbuf;
-16     struct sockaddr_in raddr;
-17     
-18     if(argc < 2)
-19     {
-20         fprintf(stderr,"Usage...\n");
-21         exit(1);
-22     }
-23 
-24     sd = socket(AF_INET,SOCK_DGRAM,0);
-25     if(sd < 0)
-26     {
-27         perror("socket()");
-28         exit(1);
-29     }
-30 
-31 //    bind();    // 主动端可省略绑定端口的步骤
-32 
-33     memset(&sbuf,'\0',sizeof(sbuf));
-34     strcpy(sbuf.name,"Alan");
-35     sbuf.math = htonl(rand()%100);
-36     sbuf.chinese = htonl(rand()%100);
-37 
-38     raddr.sin_family = AF_INET;
-39     raddr.sin_port = htons(atoi(RCVPORT));
-40     inet_pton(AF_INET,argv[1],&raddr.sin_addr);
-41 
-42     if(sendto(sd,&sbuf,sizeof(sbuf),0,(void *)&raddr,sizeof(raddr)) < 0)
-43     {
-44         perror("sendto()");
-45         exit(1);
-46     }
-47 
-48     puts("ok!");
-49 
-50     close(sd);    
-51 
-52 
-53     exit(0);
-54 }
+```c
+/* snder.c */
+#include <stdio.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <string.h>
+
+#include "proto.h"
+
+
+int main(int argc,char **argv)
+{
+    int sd;
+    struct msg_st sbuf;
+    struct sockaddr_in raddr;
+    
+    if(argc < 2)
+    {
+        fprintf(stderr,"Usage...\n");
+        exit;
+    }
+
+    sd = socket(AF_INET,SOCK_DGRAM,0);
+    if(sd < 0)
+    {
+        perror("socket()");
+        exit;
+    }
+
+//    bind();    // 主动端可省略绑定端口的步骤
+
+    memset(&sbuf,'\0',sizeof(sbuf));
+    strcpy(sbuf.name,"Alan");
+    sbuf.math = htonl(rand()%100);
+    sbuf.chinese = htonl(rand()%100);
+
+    raddr.sin_family = AF_INET;
+    raddr.sin_port = htons(atoi(RCVPORT));
+    inet_pton(AF_INET,argv[1],&raddr.sin_addr);
+
+    if(sendto(sd,&sbuf,sizeof(sbuf),0,(void *)&raddr,sizeof(raddr)) < 0)
+    {
+        perror("sendto()");
+        exit;
+    }
+
+    puts("ok!");
+
+    close(sd);    
+
+
+    exit(0);
+}
 ```
 
 
@@ -297,15 +296,15 @@ snder.c 是主动端，主动向另一端发送消息。这端可以不用向操
 
 根据上面的代码中协议（proto.h）的定义，我们知道其中 msg_st 结构体中 name 成员的长度是固定的，这样并不好用，那么我们就把它修改为变长结构体。
 
-修改成变长结构体很简单，只需把变长的部分放到结构体的最后面，然后通过 malloc(3) 动态内存管理来为它分配我们需要的大小。如下所示：
+修改成变长结构体很简单，只需把变长的部分放到结构体的最后面，然后通过 malloc() 动态内存管理来为它分配我们需要的大小。如下所示：
 
-```
-1 struct msg_st
-2 {
-3     uint32_t math;
-4     uint32_t chinese;
-5     uint8_t name[1];
-6 }__attribute__((packed));
+```c
+struct msg_st
+{
+    uint32_t math;
+    uint32_t chinese;
+    uint8_t name[1];
+}__attribute__((packed));
 ```
 
  
@@ -316,36 +315,36 @@ UDP 包常规的最大尺寸是 512 字节，去掉包头的 8 个字节，再�
 
 大家还记得如何操作一个文件吗？
 
-1.首先通过 open(2) 函数打开文件，并获得文件描述符；
+1.首先通过 open() 函数打开文件，并获得文件描述符；
 
-2.通过 read(2)、write(2) 函数读写文件；
+2.通过 read()、write() 函数读写文件；
 
-3.调用 close(2) 函数关闭文件，释放相关资源。
+3.调用 close() 函数关闭文件，释放相关资源。
 
 没错，在 Linux 的一切皆文件的设计理念中，网络也是文件，网络之间的通讯也可以像操作文件一样，对它进行读写。
 
 在网络程序中，通常步骤是这样的：
 
-1.首先通过 socket(2) 函数获得 socket 文件描述符；
+1.首先通过 socket() 函数获得 socket 文件描述符；
 
-2.通过 send(2)、sendto(2)、recv(2)、recvfrom(2) 等函数读写数据，这一步就相当于在网络上收发数据了。
+2.通过 send()、sendto()、recv()、recvfrom() 等函数读写数据，这一步就相当于在网络上收发数据了。
 
-3.调用 close(2) 函数关闭网络，释放相关资源。你没看错，这个函数就是我们关闭文件描述符的时候使用的函数。
+3.调用 close() 函数关闭网络，释放相关资源。你没看错，这个函数就是我们关闭文件描述符的时候使用的函数。
 
 下面我们依次介绍上面遇到的各种函数。
 
-socket(2)
+socket()
 
-```
-1 socket - create an endpoint for communication
-2 
-3 #include <sys/types.h>          /* See NOTES */
-4 #include <sys/socket.h>
-5 
-6 int socket(int domain, int type, int protocol);
+```c
+// socket - create an endpoint for communication
+
+#include <sys/types.h>          /* See NOTES */
+#include <sys/socket.h>
+
+int socket(int domain, int type, int protocol);
 ```
 
-socket(2) 函数是用来获取对网络操作的文件描述符的，就像 open(2) 函数一样。
+socket() 函数是用来获取对网络操作的文件描述符的，就像 open() 函数一样。
 
 参数列表：
 
@@ -377,7 +376,7 @@ socket(2) 函数是用来获取对网络操作的文件描述符的，就像 ope
 >
 > AF_APPLETALK：苹果使用的一个局域网协议；
 >
-> AF_PACKET：底层 socket 所用到的协议，比如抓包器所遵循的协议一定要在网卡驱动层，而不能在应用层，否则无法见到包封装的过程。再比如 ping(1) 命令大家都熟悉吧，想要实现 ping(1) 命令就需要了解这个协议族，感兴趣的话大家可以自行 Google 一下。
+> AF_PACKET：底层 socket 所用到的协议，比如抓包器所遵循的协议一定要在网卡驱动层，而不能在应用层，否则无法见到包封装的过程。再比如 ping 命令大家都熟悉吧，想要实现 ping 命令就需要了解这个协议族，感兴趣的话大家可以自行 Google 一下。
 
 如果想要对网络编程进行更深入的学习，那么《APUE》作者写的《UNIX 网络编程》有必要读一遍；《TCP/IP详解》三卷也要读一下，但是这三卷都很难读，而且翻译质量也一般，可以买一本中文的再找一本英文电子版的，遇到中文的读不通的时候拿出来英文原文对照一下就可以了。
 
@@ -415,92 +414,71 @@ socket(2) 函数是用来获取对网络操作的文件描述符的，就像 ope
 
  
 
-bind(2)
+bind()
 
 
 
+```c
+// bind - bind a name to a socket
+
+#include <sys/types.h>          /* See NOTES */
+#include <sys/socket.h>
+
+int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 ```
-1 bind - bind a name to a socket
-2 
-3 #include <sys/types.h>          /* See NOTES */
-4 #include <sys/socket.h>
-5 
-6 int bind(int sockfd, const struct sockaddr *addr,
-7          socklen_t addrlen);
-```
 
-
-
- 
-
-bind(2) 函数用于绑定本机端口，就是提前跟操作系统约定好，来自 xx 端口的数据都要转交给我（当前进程）处理，并且我占用了这个端口号别人（其它进程）就不能再使用了。
+bind() 函数用于绑定本机端口，就是提前跟操作系统约定好，来自 xx 端口的数据都要转交给我（当前进程）处理，并且我占用了这个端口号别人（其它进程）就不能再使用了。
 
 参数列表：
 
-　　sockfd：刚刚使用 socket(2) 函数得到的文件描述符，表示要对该网络链接绑定端口。
-
-　　addr：要绑定到套接字上的地址。根据不同的协议要在 man 手册第 7 章查阅具体的章节，然后在 Address Types 一栏里面找到对应的结构体。比如你在调用 socket(2) 函数的时候，domain 参数选择的是 AF_INET，那么这个结构体就可以在 man 手册 ip(7) 章节中找到。
-
-　　addrlen：addr 传递的地址结构体的长度。
++ sockfd：刚刚使用 socket() 函数得到的文件描述符，表示要对该网络链接绑定端口。
++ addr：要绑定到套接字上的地址。根据不同的协议要在 man 手册第 7 章查阅具体的章节，然后在 Address Types 一栏里面找到对应的结构体。比如你在调用 socket() 函数的时候，domain 参数选择的是 AF_INET，那么这个结构体就可以在 man 手册 ip(7) 章节中找到。
++ addrlen：addr 传递的地址结构体的长度。
 
 以 AF_INET 为例，下面这两个结构体就是在 ip(7) 中找到的。
 
+```c
+struct sockaddr_in {
+    sa_family_t sin_family; /* 指定协议族，一定是 AF_INET，因为既然是 man ip(7)，那么一定是 AF_INET 协议族的 */
+    in_port_t sin_port; /* 端口，需要使用 htons() 转换为网络序 */
+    struct in_addr sin_addr; /* internet address */
+};
 
-
-```
- 1 struct sockaddr_in {
- 2 sa_family_t sin_family; /* 指定协议族，一定是 AF_INET，因为既然是 man ip(7)，那么一定是 AF_INET 协议族的 */
- 3 in_port_t sin_port; /* 端口，需要使用 htons(3) 转换为网络序 */
- 4 struct in_addr sin_addr; /* internet address */
- 5 };
- 6 
- 7 /* Internet address. */
- 8 struct in_addr {
- 9 uint32_t s_addr; /* 无符号32位大整数，可以使用 inet_pton(3) 将便于记忆的点分式 IP 地址表示法转换为便于计算机使用的大整数，inet_ntop(3) 的作用则正好相反。本机地址转换的时候可以使用万能IP：0.0.0.0(称为any address)，函数会自动将 0.0.0.0 解析为真实的本机 IP 地址。 */
-10 };
+/* Internet address. */
+struct in_addr {
+    uint32_t s_addr; /* 无符号32位大整数，可以使用 inet_pton() 将便于记忆的点分式 IP 地址表示法转换为便于计算机使用的大整数，inet_ntop() 的作用则正好相反。本机地址转换的时候可以使用万能IP：0.0.0.0(称为any address)，函数会自动将 0.0.0.0 解析为真实的本机 IP 地址。 */
+};
 ```
 
+大家可以看到，这个结构体的类型是 struct sockaddr_in，而 bind() 函数的第二个参数 的类型是 struct sockaddr，它们二者有什么关系呢？别瞎想，不是继承关系啦，C 语言中没有继承这种东东。在传参的时候直接把实参强转为 void* 类型即可，就像上面栗子中 rcver.c 写得那样。
 
 
- 
-
- 大家可以看到，这个结构体的类型是 struct sockaddr_in，而 bind(2) 函数的第二个参数 的类型是 struct sockaddr，它们二者有什么关系呢？别瞎想，不是继承关系啦，C 语言中没有继承这种东东。在传参的时候直接把实参强转为 void* 类型即可，就像上面栗子中 rcver.c 写得那样。
-
- 
-
-recv(2) 和 recvfrom(2) 函数
+recv() 和 recvfrom() 函数
 
 
 
+```c
+// recv, recvfrom - receive a message from a socket
+
+#include <sys/types.h>
+#include <sys/socket.h>
+
+ssize_t recv(int sockfd, void *buf, size_t len, int flags);
+
+ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags, struct sockaddr *src_addr, socklen_t *addrlen);
 ```
-1 recv, recvfrom - receive a message from a socket
-2 
-3 #include <sys/types.h>
-4 #include <sys/socket.h>
-5 
-6 ssize_t recv(int sockfd, void *buf, size_t len, int flags);
-7 
-8 ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
-9                  struct sockaddr *src_addr, socklen_t *addrlen);
-```
-
-
-
- 
 
 这两个函数的作用是从网络上接收内容并写入 len 个字节长度的数据到 buf 中，且将发送端的地址信息填写到 src_addr 中。
 
 返回值是真正能接收到的字节数，返回 -1 表示失败。
 
-recv(2) 函数一般用在流式（SOCK_STREAM）套接字中，而 recvfrom(2) 则一般用在报式（SOCK_DGRAM）套接字中。
+recv() 函数一般用在流式（SOCK_STREAM）套接字中，而 recvfrom() 则一般用在报式（SOCK_DGRAM）套接字中。
 
-为什么这么说呢，还记得上面我们提到过吗，流式套接字是基于链接的，而报式套接字是无链接的。那么我们再来观察下这两个函数的参数列表，很明显 recv(2) 函数并没有地址相关的参数，而 recvfrom(2) 函数则会将对方的地址端口等信息回填给调用者。
+为什么这么说呢，还记得上面我们提到过吗，流式套接字是基于链接的，而报式套接字是无链接的。那么我们再来观察下这两个函数的参数列表，很明显 recv() 函数并没有地址相关的参数，而 recvfrom() 函数则会将对方的地址端口等信息回填给调用者。
 
 网络中的数据只有单字节数据不用考虑字节序，从网络上接收过来的数据只要涉及到字节序就需要使用 ntoh 系列函数进行字节序转换。这一组函数我们上面介绍过了，没记住的童鞋可以往上翻。
 
- 
-
-> 小提示：通过 netstat(1) 命令 ant 参数可以查看 TCP 链接情况，或通过 netstat(1) 命令 anu 参数可以查看 UDP 链接情况。
+> 小提示：通过 netstat 命令 ant 参数可以查看 TCP 链接情况，或通过 netstat 命令 anu 参数可以查看 UDP 链接情况。
 >
 > t 参数表示 TCP；
 >
@@ -508,49 +486,33 @@ recv(2) 函数一般用在流式（SOCK_STREAM）套接字中，而 recvfrom(2) 
 
  
 
-send(2) 和 sendto(2) 函数
+send() 和 sendto() 函数
 
+```c
+send, sendto, sendmsg - send a message on a socket
 
+#include <sys/types.h>
+#include <sys/socket.h>
 
-```
-1 send, sendto, sendmsg - send a message on a socket
-2 
-3 #include <sys/types.h>
-4 #include <sys/socket.h>
-5 
-6 ssize_t send(int sockfd, const void *buf, size_t len, int flags);
-7 
-8 ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
-9                const struct sockaddr *dest_addr, socklen_t addrlen);
+ssize_t send(int sockfd, const void *buf, size_t len, int flags);
+
+ssize_t sendto(int sockfd, const void *buf, size_t len, int flags, const struct sockaddr *dest_addr, socklen_t addrlen);
 ```
 
-
-
- 
-
-这两个函数与 recv(2) 和 recvfrom(2) 函数正好是对应的，它们的作用是向网络上发送数据。
+这两个函数与 recv() 和 recvfrom() 函数正好是对应的，它们的作用是向网络上发送数据。
 
 参数列表：
 
-　　sockfd：通过哪个 Socket 往外发数据，这个参数的值就是在调用 socket(2) 函数的时候取得的；
-
-　　buf：要发送的数据；
-
-　　len：要发送的数据的长度；
-
-　　flags：特殊要求，没有填 0；
-
-　　src_addr：目标地址；就像上面我们讨论 bind(2) 函数时一样，具体使用哪个结构体要根据你在调用 socket(2) 函数的时候使用的具体协议族有关系，然后到对应的 man 手册第 7 章去查找。
-
-　　addrlen：目标地址的长度；
++ sockfd：通过哪个 Socket 往外发数据，这个参数的值就是在调用 socket() 函数的时候取得的；
++ buf：要发送的数据；
++ len：要发送的数据的长度；
++ flags：特殊要求，没有填 0；
++ src_addr：目标地址；就像上面我们讨论 bind() 函数时一样，具体使用哪个结构体要根据你在调用 socket() 函数的时候使用的具体协议族有关系，然后到对应的 man 手册第 7 章去查找。
++ addrlen：目标地址的长度；
 
 返回值是真正发送出去的数据的长度；出现错误返回 -1 并设置 errno。
 
- 
-
-最后剩下 close(2) 函数就不需要 LZ 在这里介绍了吧，如果还有童鞋对 close(2) 函数不熟悉，那么请翻阅到前面 文件 IO 部分的博文中复习一遍。
-
- 
+最后剩下 close() 函数就不需要 LZ 在这里介绍了吧，如果还有童鞋对 close() 函数不熟悉，那么请翻阅到前面 文件 IO 部分的博文中复习一遍。
 
 上面我们讨论的是单点通讯，多点通讯只能用报式套接字来实现。
 
@@ -562,22 +524,19 @@ send(2) 和 sendto(2) 函数
 
 注意：广播和组播仅在局域网内有效。
 
- 
 
-getsockopt(2) 和 setsockopt(2) 函数
-
+getsockopt() 和 setsockopt() 函数
 
 
-```
-1 getsockopt, setsockopt - get and set options on sockets
-2 
-3 #include <sys/types.h>
-4 #include <sys/socket.h>
-5 
-6 int getsockopt(int sockfd, int level, int optname,
-7                void *optval, socklen_t *optlen);
-8 int setsockopt(int sockfd, int level, int optname,
-9                const void *optval, socklen_t optlen);
+
+```c
+// getsockopt, setsockopt - get and set options on sockets
+
+#include <sys/types.h>
+#include <sys/socket.h>
+
+int getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optlen);
+int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen);
 ```
 
 
@@ -600,19 +559,18 @@ getsockopt(2) 和 setsockopt(2) 函数
 
 **IP_MULTICAST_IF**：创建多播组，optval 参数应该使用 ip_mreqn 还是 ip_mreq 结构体，取决于 IP_ADD_MEMBERSHIP 选项。
 
-```
-1 struct ip_mreqn {
-2 struct in_addr imr_multiaddr; /* 多播组 IP 地址，大整数，可以用 inet_pton(3) 将点分式转换为大整数 */
-3 struct in_addr imr_address; /* 本机 IP 地址，可以用 0.0.0.0 代替，大整数，可以用 inet_pton(3) 将点分式转换为大整数 */
-4 int imr_ifindex; /* 当前使用的网络设备的索引号，ip ad sh 命令可以查看编号，用 if_nametoindex(3) 函数也可以通过网络设备名字获取编号，名字就是 ifconfig(1) 看到的名字，如 eth0、wlan0 等 */
-5 };
+```c
+struct ip_mreqn {
+    struct in_addr imr_multiaddr; /* 多播组 IP 地址，大整数，可以用 inet_pton() 将点分式转换为大整数 */
+    struct in_addr imr_address; /* 本机 IP 地址，可以用 0.0.0.0 代替，大整数，可以用 inet_pton() 将点分式转换为大整数 */
+    int imr_ifindex; /* 当前使用的网络设备的索引号，ip ad sh 命令可以查看编号，用 if_nametoindex() 函数也可以通过网络设备名字获取编号，名字就是 ifconfig 看到的名字，如 eth0、wlan0 等 */
+};
 ```
 
  
 
 **IP_ADD_MEMBERSHIP**：加入多播组
 
- 
 
 下面来谈谈丢包和校验的问题。
 
@@ -627,17 +585,16 @@ ping 命令的 TTL 是一个数据包能够经过的路由器数量的上限，�
 我们在这里介绍一种停等式流控：它是一种闭环式流控。它的实现方式很简单，一问一答即可。就是发送方每次发送一个数据包之后要等待接收方的响应，确认接收方收到了自己的数据包后再发送下一个数据包。这种方式的特点是每次等待的时间是不确定的，因为每次发包走的路径是不同的，所以包到达目的地的时间也是不同的，而且还要受网络等环境因素影响。
 
 并且停等式流控的缺点也很明显：
-1.浪费时间，多数时间都花费在等待响应上面了。
-2.双方发送包的数量增加了，这也意味着丢包率升高了。
-3.为了降低错误率，实现的复杂度会变高。如果 s 端 data 包发过去了，但是 c 端响应的 ack 包丢了，s 端过了一会儿没收到 ack 认为 data 丢了再次发送 data，当 c 端再次收到一模一样的 data 包时不知道到底是有两段数据一模一样还是 s 端把包发重复了，所以需要给data包加编号，这样 c 端就知道当前这个 data 包是合法的数据还是多余的数据了。
++ 1.浪费时间，多数时间都花费在等待响应上面了。
++ 2.双方发送包的数量增加了，这也意味着丢包率升高了。
++ 3.为了降低错误率，实现的复杂度会变高。如果 s 端 data 包发过去了，但是 c 端响应的 ack 包丢了，s 端过了一会儿没收到 ack 认为 data 丢了再次发送 data，当 c 端再次收到一模一样的 data 包时不知道到底是有两段数据一模一样还是 s 端把包发重复了，所以需要给data包加编号，这样 c 端就知道当前这个 data 包是合法的数据还是多余的数据了。
 
 停等式流控虽然上升了丢包率，但是能保证对方一定能收到数据包。
 
 web 传输通常采用两种校验方案：
 
-1.不做硬性校验：交给用户来做。比如你在浏览网页，网页周边的广告都加载出来了，但是正文没有加载出来，你肯定会刷新页面吧？但是如果正文加载出来了，周边的广告没有加载出来，你会刷新网页一定要让整个网页全部都加载完整再看内容码？
-
-2.延迟应答：下次通讯的时候把上次的 ack 带过来，表示上次的通讯是完整的。
++ 1.不做硬性校验：交给用户来做。比如你在浏览网页，网页周边的广告都加载出来了，但是正文没有加载出来，你肯定会刷新页面吧？但是如果正文加载出来了，周边的广告没有加载出来，你会刷新网页一定要让整个网页全部都加载完整再看内容码？
++ 2.延迟应答：下次通讯的时候把上次的 ack 带过来，表示上次的通讯是完整的。
 
 ![img](img/ack延迟.png)
 
@@ -651,7 +608,7 @@ web 传输通常采用两种校验方案：
 
 可以通过窗口或滑动窗口提高速度，见图4。
 
- ![img](D:\code\linux-c-cpp\02_进阶\00_尚观教育李慧芹_C和数据结构和Linux编程\03_Linux系统编程_APUE\img\窗口.png)
+ ![img](img/窗口.png)
 
 图4 窗口
 
@@ -665,7 +622,7 @@ web 传输通常采用两种校验方案：
 
 说到 TCP 就不得不谈到 TCP 的三次握手，见图 5。
 
-![img](D:\code\linux-c-cpp\02_进阶\00_尚观教育李慧芹_C和数据结构和Linux编程\03_Linux系统编程_APUE\img\三次握手.png)
+![img](img/三次握手.png)
 
 图5 TCP 三次握手
 
@@ -689,151 +646,136 @@ TCP 的步骤
 
 S端（先运行）
 
-1.取得 SOCKET (socket(2)) IPPROTO_SCTP 是一种新协议，也可以实现流式套接字
-
-2.给 SOCKET 取得地址 (bind(2))
-
-3.将 SOCKET 置为监听模式 (listen(2)) backlog 参数写什么正整数都行。
-
-4.接受链接 (accept(2)) 如果成功返回接受链接的文件描述符，失败返回 -1 并设置 errno。注意不能直接用存放之前 socket(2) 返回的文件描述符变量来接收 accept(2) 的返回值，因为accept(2) 可能会遇到假错，这样之前变量里保存的文件描述符就丢了，会导致内存泄漏。
-
-5.收/发消息 (send(2))
-
-6.关闭 SOCKET (close(2))
++ 1.取得 SOCKET (socket()) IPPROTO_SCTP 是一种新协议，也可以实现流式套接字
++ 2.给 SOCKET 取得地址 (bind())
++ 3.将 SOCKET 置为监听模式 (listen()) backlog 参数写什么正整数都行。
++ 4.接受链接 (accept()) 如果成功返回接受链接的文件描述符，失败返回 -1 并设置 errno。注意不能直接用存放之前 socket() 返回的文件描述符变量来接收 accept() 的返回值，因为accept() 可能会遇到假错，这样之前变量里保存的文件描述符就丢了，会导致内存泄漏。
++ 5.收/发消息 (send())
++ 6.关闭 SOCKET (close())
 
  
 
 C端（主动）
 
-1.取得 SOCKET (socket)
-
-2.给 SOCKET 取得地址（可省） (bind)
-
-3.发起链接 (connect)
-
-4.收/发消息
-
-5.关闭 SOCKET
++ 1.取得 SOCKET (socket)
++ 2.给 SOCKET 取得地址（可省） (bind)
++ 3.发起链接 (connect)
++ 4.收/发消息
++ 5.关闭 SOCKET
 
 proto.h，这个文件是客户端与服务端的协议，双方共同遵守的格式要定义在这里，所以两边都要包含这个头文件。
 
+```c
+#ifndef PROTO_H__
+#define PROTO_H__
 
+// 服务器端口号
+#define SERVERPORT  "12999"
 
+#define FMT_STAMP  "%lld\r\n"
+
+#endif
 ```
-1 #ifndef PROTO_H__
-2 #define PROTO_H__
-3 
-4 // 服务器端口号
-5 #define SERVERPORT        "12999"
-6 
-7 #define FMT_STAMP        "%lld\r\n"
-8 
-9 #endif
-```
-
-
-
- 
 
 server.c 服务端，要先运行起来，监听指定的端口，操作系统指定的端口收到数据后就会送到服务端程序这里来。
 
 
 
-```
- 1 #include <stdio.h>
- 2 #include <stdlib.h>
- 3 #include <arpa/inet.h>
- 4 #include <sys/types.h>
- 5 #include <sys/socket.h>
- 6 #include <errno.h>
- 7 
- 8 #include "proto.h"
- 9 
-10 #define BUFSIZE 1024
-11 #define IPSTRSIZE 40
-12 
-13 static void server_job(int sd)
-14 {
-15     char buf[BUFSIZE];
-16     int len;
-17 
-18     len = sprintf(buf,FMT_STAMP,(long long)time(NULL));
-19 
-20     if(send(sd,buf,len,0) < 0)
-21     {
-22         perror("send()");
-23         exit(1);
-24     }
-25     
-26     return ;
-27 }
-28 
-29 int main()
-30 {
-31     int sd,newsd;
-32     struct sockaddr_in laddr,raddr;
-33     socklen_t raddr_len;
-34     char ipstr[IPSTRSIZE];
-35 
-36     // 选择 TCP 协议
-37     sd = socket(AF_INET,SOCK_STREAM,0/*IPPROTO_TCP,IPPROTO_SCTP*/);
-38     if(sd < 0)
-39     {
-40         perror("socket()");
-41         exit(1);
-42     }
-43 
-44     // SO_REUSEADDR 用来设置端口被释放后可立即被重新使用
-45     int val = 1;
-46     if(setsockopt(sd,SOL_SOCKET,SO_REUSEADDR,&val,sizeof(val)) < 0)
-47     {
-48         perror("setsockopt()");
-49         exit(1);
-50     }
-51 
-52     laddr.sin_family = AF_INET;
-53     // 指定服务端使用的端口号
-54     laddr.sin_port = htons(atoi(SERVERPORT));
-55     inet_pton(AF_INET,"0.0.0.0",&laddr.sin_addr.s_addr);
-56 
-57     // 绑定端口
-58     if(bind(sd,(void *)&laddr,sizeof(laddr)) < 0)
-59     {
-60         perror("bind()");
-61         exit(1);
-62     }
-63 
-64     // 开始监听端口
-65     if(listen(sd,200) < 0)
-66     {
-67         perror("listen()");
-68         exit(1);
-69     }
-70 
-71     raddr_len = sizeof(raddr);
-72 
-73     while(1)
-74     {
-75         // 阻塞等待新消息传入
-76         newsd = accept(sd,(void *)&raddr,&raddr_len);
-77         if(newsd < 0)
-78         {
-79             if(errno == EINTR || errno == EAGAIN)
-80                 continue;
-81             perror("newsd()");
-82             exit(1);
-83         }
-84 
-85         inet_ntop(AF_INET,&raddr.sin_addr,ipstr,IPSTRSIZE);
-86         printf("Client:%s:%d\n",ipstr,ntohs(raddr.sin_port));
-87         server_job(newsd);
-88         close(newsd);
-89     }
-90 
-91     close(sd);
-92 
-93     exit(0);
-94 }
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <errno.h>
+
+#include "proto.h"
+
+#define BUFSIZE 1024
+#define IPSTRSIZE 40
+
+static void server_job(int sd)
+{
+    char buf[BUFSIZE];
+    int len;
+
+    len = sprintf(buf,FMT_STAMP,(long long)time(NULL));
+
+    if(send(sd,buf,len,0) < 0)
+    {
+        perror("send()");
+        exit;
+    }
+    
+    return ;
+}
+
+int main()
+{
+    int sd,newsd;
+    struct sockaddr_in laddr,raddr;
+    socklen_t raddr_len;
+    char ipstr[IPSTRSIZE];
+
+    // 选择 TCP 协议
+    sd = socket(AF_INET,SOCK_STREAM,0/*IPPROTO_TCP,IPPROTO_SCTP*/);
+    if(sd < 0)
+    {
+        perror("socket()");
+        exit;
+    }
+
+    // SO_REUSEADDR 用来设置端口被释放后可立即被重新使用
+    int val = 1;
+    if(setsockopt(sd,SOL_SOCKET,SO_REUSEADDR,&val,sizeof(val)) < 0)
+    {
+        perror("setsockopt()");
+        exit;
+    }
+
+    laddr.sin_family = AF_INET;
+    // 指定服务端使用的端口号
+    laddr.sin_port = htons(atoi(SERVERPORT));
+    inet_pton(AF_INET,"0.0.0.0",&laddr.sin_addr.s_addr);
+
+    // 绑定端口
+    if(bind(sd,(void *)&laddr,sizeof(laddr)) < 0)
+    {
+        perror("bind()");
+        exit;
+    }
+
+    // 开始监听端口
+    if(listen(sd,200) < 0)
+    {
+        perror("listen()");
+        exit;
+    }
+
+    raddr_len = sizeof(raddr);
+
+    while
+    {
+        // 阻塞等待新消息传入
+        newsd = accept(sd,(void *)&raddr,&raddr_len);
+        if(newsd < 0)
+        {
+            if(errno == EINTR || errno == EAGAIN)
+                continue;
+            perror("newsd()");
+            exit;
+        }
+
+        inet_ntop(AF_INET,&raddr.sin_addr,ipstr,IPSTRSIZE);
+        printf("Client:%s:%d\n",ipstr,ntohs(raddr.sin_port));
+        server_job(newsd);
+        close(newsd);
+    }
+
+    close(sd);
+
+    exit(0);
+}
 ```
 
 
@@ -842,66 +784,66 @@ server.c 服务端，要先运行起来，监听指定的端口，操作系统�
 
 
 
-```
- 1 #include <stdio.h>
- 2 #include <stdlib.h>
- 3 #include <arpa/inet.h>
- 4 #include <sys/types.h>
- 5 #include <sys/socket.h>
- 6 #include <errno.h>
- 7 
- 8 #include "proto.h"
- 9 
-10 int main(int argc,char **argv)
-11 {
-12   int sd;
-13   FILE *fp;
-14   struct sockaddr_in raddr;
-15   long long stamp;    
-16 
-17   if(argc < 2)
-18     {
-19       fprintf(stderr,"Usage...\n");
-20       exit(1);
-21     }
-22 
-23   // 使用 TCP 协议
-24   sd = socket(AF_INET,SOCK_STREAM,0/*IPPROTO_TCP,IPPROTO_SCTP*/);
-25   if(sd < 0)
-26     {
-27       perror("socket()");
-28       exit(1);
-29     }
-30 
-31   raddr.sin_family = AF_INET;
-32   // 指定服务器的端口号
-33   raddr.sin_port = htons(atoi(SERVERPORT));
-34   // 指定服务端 IP 地址
-35   inet_pton(AF_INET,argv[1],&raddr.sin_addr);
-36   // 发起连接请求
-37   if(connect(sd,(void *)&raddr,sizeof(raddr)) < 0)
-38     {
-39       perror("connect()");
-40       exit(1);
-41     }
-42 
-43   fp = fdopen(sd,"r+");
-44   if(fp == NULL)
-45     {
-46       perror("fdopen()");
-47       exit(1);
-48     }
-49 
-50   // 读取服务端的响应，当然也可以使用 recv(3P) 函数来替代 fscanf(3) 函数。
-51   if(fscanf(fp,FMT_STAMP,&stamp) < 1)
-52     fprintf(stderr,"fscanf() failed.\n");
-53   else
-54     printf("stamp = %lld\n",stamp);
-55 
-56   fclose(fp);
-57 
-58   exit(0);
-59 }
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <errno.h>
+
+#include "proto.h"
+
+int main(int argc,char **argv)
+{
+  int sd;
+  FILE *fp;
+  struct sockaddr_in raddr;
+  long long stamp;    
+
+  if(argc < 2)
+    {
+      fprintf(stderr,"Usage...\n");
+      exit;
+    }
+
+  // 使用 TCP 协议
+  sd = socket(AF_INET,SOCK_STREAM,0/*IPPROTO_TCP,IPPROTO_SCTP*/);
+  if(sd < 0)
+    {
+      perror("socket()");
+      exit;
+    }
+
+  raddr.sin_family = AF_INET;
+  // 指定服务器的端口号
+  raddr.sin_port = htons(atoi(SERVERPORT));
+  // 指定服务端 IP 地址
+  inet_pton(AF_INET,argv[1],&raddr.sin_addr);
+  // 发起连接请求
+  if(connect(sd,(void *)&raddr,sizeof(raddr)) < 0)
+    {
+      perror("connect()");
+      exit;
+    }
+
+  fp = fdopen(sd,"r+");
+  if(fp == NULL)
+    {
+      perror("fdopen()");
+      exit;
+    }
+
+  // 读取服务端的响应，当然也可以使用 recv(3P) 函数来替代 fscanf() 函数。
+  if(fscanf(fp,FMT_STAMP,&stamp) < 1)
+    fprintf(stderr,"fscanf() failed.\n");
+  else
+    printf("stamp = %lld\n",stamp);
+
+  fclose(fp);
+
+  exit(0);
+}
 ```
 
 
@@ -910,17 +852,17 @@ server.c 服务端，要先运行起来，监听指定的端口，操作系统�
 
  
 
-最后再补充一点：如果 Ctrl+C 结束服务端，再次启动后执行 bind(2) 就会报错。
+最后再补充一点：如果 Ctrl+C 结束服务端，再次启动后执行 bind() 就会报错。
 
 bind(): Address already in use
 
 使用 netstat -ant 命令会发现之前的链接都没有释放，且端口也没有释放，所以由于无法监听一个没有被释放的端口就报错了。
 
-有两种办法，一种是等一会儿就好了，另一种是使用 setsockopt(2) 函数，这个在上面 server.c 的注释中说明过了，没有注意到的童鞋请翻到上面去参考一下。
+有两种办法，一种是等一会儿就好了，另一种是使用 setsockopt() 函数，这个在上面 server.c 的注释中说明过了，没有注意到的童鞋请翻到上面去参考一下。
 
 为什么等一会儿就好了呢？因为操作系统会经常检查有哪些端口被无效的进程占用了，找到了就会释放这个端口。
 
-在 bind(2) 之前使用 setsockopt(2) 函数，将 optname 设置为 SO_REUSEADDR，它表示如果占用当前端口的程序已经消亡了，那么重新使用这个端口。
+在 bind() 之前使用 setsockopt() 函数，将 optname 设置为 SO_REUSEADDR，它表示如果占用当前端口的程序已经消亡了，那么重新使用这个端口。
 
  
 
