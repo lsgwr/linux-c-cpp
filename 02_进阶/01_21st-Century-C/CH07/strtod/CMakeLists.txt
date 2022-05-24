@@ -3,4 +3,4 @@ project(strtod C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(strtod main.c)
+add_executable(strtod main.c stopif.h)
