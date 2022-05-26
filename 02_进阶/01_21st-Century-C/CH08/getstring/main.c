@@ -3,7 +3,7 @@
 
 void get_string(char const *in) {
     char *cmd;
-    asiprintf(&cmd, "string %s", in);
+    asprintf(&cmd, "string %s", in);
     if (system(cmd)) {
         fprintf(stderr, "something went wrong running %s.\n", cmd);
     }
