@@ -1,4 +1,4 @@
-#define _GNU_SOURCE
+#define _GNU_SOURCE // 指定GNU源码，非常有用
 
 #include <stdio.h>
 #include <stdarg.h>
